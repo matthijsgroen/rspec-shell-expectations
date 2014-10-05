@@ -45,20 +45,19 @@ see specs in `spec/` folder:
 ### Stubbing commands:
 
 ```ruby
-  require 'English'
+  let(:stubbed_env) { create_stubbed_env }
+  before do
+    stubbed_env.stub_command('rake')
+  end
+```
 
-  describe 'my shell script' do
-    include Rspec::Shell::Expectations
+### Changing exitstatus:
 
-    let(:stubbed_env) { create_stubbed_env }
-    before do
-      stubbed_env.stub_command('rake')
-    end
-
-    it 'runs the script' do
-      stubbed_env.execute 'my-shell-script.sh'
-      expect($CHILD_STATUS.exitstatus).to eq 0
-    end
+```ruby
+  let(:stubbed_env) { create_stubbed_env }
+  before do
+    stubbed_env.stub_command('rake').returns_exitstatus(5)
+    stubbed_env.stub_command('rake').with_args('spec').returns_exitstatus(3)
   end
 ```
 
