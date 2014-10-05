@@ -26,5 +26,17 @@ describe 'Change exitstatus' do
       subject
       expect($CHILD_STATUS.exitstatus).to eq 4
     end
+
+    context 'with specific args only' do
+      before do
+        command1_stub.with_args('foo bar').returns_exitstatus(2)
+        command1_stub.with_args('bar').returns_exitstatus(6)
+      end
+
+      it 'returns the stubbed exitstatus' do
+        subject
+        expect($CHILD_STATUS.exitstatus).to eq 2
+      end
+    end
   end
 end

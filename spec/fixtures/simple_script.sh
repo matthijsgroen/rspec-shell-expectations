@@ -1,1 +1,1 @@
-command1 'foo bar' baz
+command1 "foo bar"

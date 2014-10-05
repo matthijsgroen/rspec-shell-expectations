@@ -14,9 +14,24 @@ module Rspec
           )
         end
 
+        def with_args(*args)
+          StubbedCall.new(@call_configuration, args)
+        end
+
         def returns_exitstatus(statuscode)
-          @call_configuration.set_exitcode(statuscode)
-          @call_configuration.write
+          with_args.returns_exitstatus(statuscode)
+        end
+
+        # A specific call with arguments on a StubbedCommand
+        class StubbedCall
+          def initialize(config, args)
+            @config, @args = config, args
+          end
+
+          def returns_exitstatus(statuscode)
+            @config.set_exitcode(statuscode, @args)
+            @config.write
+          end
         end
 
         # Configuration of a stubbed command
