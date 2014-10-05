@@ -17,7 +17,7 @@ module Rspec
         end
 
         def stub_command(command)
-          FileUtils.cp('bin/stub', File.join(@dir, command))
+          StubbedCommand.new command, @dir
         end
 
         def execute(command)
