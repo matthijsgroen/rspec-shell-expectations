@@ -1,1 +1,26 @@
 #!/usr/bin/env ruby
+require 'pathname'
+require 'yaml'
+
+command = File.basename(__FILE__)
+folder = File.dirname(__FILE__)
+
+call_configurations = Pathname.new(folder).join("#{command}_stub.yml")
+if call_configurations.exist?
+  config = YAML.load call_configurations.read
+
+  matching_calls = []
+  config.each do |call_config|
+    next unless (call_config[:args] - ARGV).empty?
+    matching_calls << {
+      config: call_config,
+      specific: call_config[:args].length
+    }
+  end
+  exit 0 if matching_calls.empty?
+
+  call_config = matching_calls.sort do |a, b|
+    b[:specific] <=> a[:specific]
+  end.first[:config]
+  exit call_config[:statuscode] || 0
+end

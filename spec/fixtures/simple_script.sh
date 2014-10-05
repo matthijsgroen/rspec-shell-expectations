@@ -1,1 +1,1 @@
-command1
+command1 "foo bar"
