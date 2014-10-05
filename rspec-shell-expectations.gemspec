@@ -8,8 +8,11 @@ Gem::Specification.new do |spec|
   spec.version       = Rspec::Shell::Expectations::VERSION
   spec.authors       = ['Matthijs Groen']
   spec.email         = ['matthijs.groen@gmail.com']
-  spec.summary       = 'TODO: Write a short summary. Required.'
-  spec.description   = 'TODO: Write a longer description. Optional.'
+  spec.summary       = 'Fake execution environments to TDD shell scripts'
+  spec.description   = <<-DESCRIPTION
+    Stub results of commands.
+    Assert calls and input using RSpec for your shell scripts
+  DESCRIPTION
   spec.homepage      = ''
   spec.license       = 'MIT'
 
