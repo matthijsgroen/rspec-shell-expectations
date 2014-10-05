@@ -22,7 +22,44 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+see specs in `spec/` folder:
+
+### Running script through stubbed env:
+
+```ruby
+  require 'English'
+
+  describe 'my shell script' do
+    include Rspec::Shell::Expectations
+
+    let(:stubbed_env) { create_stubbed_env }
+
+    it 'runs the script' do
+      stubbed_env.execute 'my-shell-script.sh'
+      expect($CHILD_STATUS.exitstatus).to eq 0
+    end
+  end
+```
+
+### Stubbing commands:
+
+```ruby
+  require 'English'
+
+  describe 'my shell script' do
+    include Rspec::Shell::Expectations
+
+    let(:stubbed_env) { create_stubbed_env }
+    before do
+      stubbed_env.stub_command('rake')
+    end
+
+    it 'runs the script' do
+      stubbed_env.execute 'my-shell-script.sh'
+      expect($CHILD_STATUS.exitstatus).to eq 0
+    end
+  end
+```
 
 ## Contributing
 
