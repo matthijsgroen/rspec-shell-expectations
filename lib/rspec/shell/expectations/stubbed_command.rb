@@ -10,10 +10,21 @@ module Rspec
           @call_configuration = CallConfiguration.new(
             Pathname.new(dir).join("#{command}_stub.yml")
           )
+          @call_log = CallLog.new(
+            Pathname.new(dir).join("#{command}_calls.log")
+          )
         end
 
         def with_args(*args)
-          StubbedCall.new(@call_configuration, args)
+          StubbedCall.new(@call_configuration, @call_log, args)
+        end
+
+        def called?
+          with_args.called?
+        end
+
+        def called_with_args?(*args)
+          with_args.called_with_args?(*args)
         end
 
         def returns_exitstatus(statuscode)

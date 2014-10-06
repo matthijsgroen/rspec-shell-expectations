@@ -11,7 +11,7 @@ RuboCop::RakeTask.new
 require 'cucumber'
 require 'cucumber/rake/task'
 Cucumber::Rake::Task.new(:features) do |t|
-  t.cucumber_opts = 'features --strict --format pretty'
+  t.cucumber_opts = 'features --strict --format progress'
 end
 
 task default: [:rubocop, :features, :spec]

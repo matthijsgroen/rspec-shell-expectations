@@ -32,3 +32,13 @@ end
 Then(/^the exitstatus will be (\d+)$/) do |statuscode|
   expect(@status.exitstatus).to eql statuscode.to_i
 end
+
+Then(/^the command "(.*?)" is called$/) do |command|
+  stubbed_command = simulated_environment.stub_command command
+  expect(stubbed_command).to be_called
+end
+
+Then(/^the command "(.*?)" is not called$/) do |command|
+  stubbed_command = simulated_environment.stub_command command
+  expect(stubbed_command).not_to be_called
+end
