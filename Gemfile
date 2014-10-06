@@ -4,4 +4,5 @@ source 'https://rubygems.org'
 gemspec
 gem 'rubocop'
 gem 'rake'
+gem 'cucumber'
 gem 'rspec'

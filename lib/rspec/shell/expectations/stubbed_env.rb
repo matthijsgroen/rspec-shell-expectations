@@ -1,4 +1,5 @@
 require 'tmpdir'
+require 'English'
 
 module Rspec
   module Shell
@@ -22,6 +23,7 @@ module Rspec
 
         def execute(command)
           `#{stub_path} #{command}`
+          $CHILD_STATUS
         end
 
         private

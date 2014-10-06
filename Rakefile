@@ -8,4 +8,10 @@ end
 require 'rubocop/rake_task'
 RuboCop::RakeTask.new
 
-task default: [:rubocop, :spec]
+require 'cucumber'
+require 'cucumber/rake/task'
+Cucumber::Rake::Task.new(:features) do |t|
+  t.cucumber_opts = 'features --strict --format pretty'
+end
+
+task default: [:rubocop, :features, :spec]
