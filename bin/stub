@@ -5,6 +5,12 @@ require 'yaml'
 command = File.basename(__FILE__)
 folder = File.dirname(__FILE__)
 
+call_logs = Pathname.new(folder).join("#{command}_calls.log")
+call_logs.open('a') do |f|
+  f.puts "args: #{ARGV.join('|')}"
+  f.puts "stdin: #{$stdin.read}" unless STDIN.tty?
+end
+
 call_configurations = Pathname.new(folder).join("#{command}_stub.yml")
 if call_configurations.exist?
   config = YAML.load call_configurations.read
