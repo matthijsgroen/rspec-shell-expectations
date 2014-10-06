@@ -1,4 +1,5 @@
 require 'tmpdir'
+require 'pathname'
 
 Before do
   @dir = Dir.mktmpdir
