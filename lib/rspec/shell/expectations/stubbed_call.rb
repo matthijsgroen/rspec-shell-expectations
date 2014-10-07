@@ -12,6 +12,11 @@ module Rspec
           @config.write
         end
 
+        def outputs(content, to: :stdout)
+          @config.set_output(content, to, @args)
+          @config.write
+        end
+
         def called?
           return false unless @call_log.exist?
           @call_log.called_with_args?(*@args)
