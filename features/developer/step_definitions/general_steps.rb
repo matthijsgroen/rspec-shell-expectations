@@ -22,7 +22,7 @@ Given(/^the stubbed command returns exitstatus (\d+)$/) do |statuscode|
 end
 
 When(/^I run this script in a simulated environment$/) do
-  @status = simulated_environment.execute "#{@script} 2>&1"
+  @stdout, @stderr, @status = simulated_environment.execute "#{@script} 2>&1"
 end
 
 Then(/^the exitstatus will not be (\d+)$/) do |statuscode|
@@ -41,4 +41,22 @@ end
 Then(/^the command "(.*?)" is not called$/) do |command|
   stubbed_command = simulated_environment.stub_command command
   expect(stubbed_command).not_to be_called
+end
+
+Given(/^the stubbed command outputs "(.*?)" to standard\-out$/) do |output|
+  @stubbed_command.outputs(output, to: :stdout)
+end
+
+Given(/^the stubbed command outputs "(.*?)" to standard\-error$/) do |output|
+  @stubbed_command.outputs(output, to: :stderr)
+end
+
+Given(/^the stubbed command outputs "(.*?)" to "(.*?)"$/) do |output, target|
+  @stubbed_command.outputs(output, to: target)
+  files_to_delete.push Pathname.new(target)
+end
+
+Then(/^the file "(.*?)" contains "(.*?)"$/) do |filename, contents|
+  files_to_delete.push Pathname.new(filename)
+  expect(Pathname.new(filename).read).to eql contents
 end

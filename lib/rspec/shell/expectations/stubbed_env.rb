@@ -1,5 +1,6 @@
 require 'tmpdir'
 require 'English'
+require 'open3'
 
 module Rspec
   module Shell
@@ -22,13 +23,12 @@ module Rspec
         end
 
         def execute(command)
-          `#{stub_path} #{command}`
-          $CHILD_STATUS
+          Open3.capture3("#{env} #{command}")
         end
 
         private
 
-        def stub_path
+        def env
           "PATH=#{@dir}:$PATH"
         end
       end

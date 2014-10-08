@@ -30,6 +30,10 @@ module Rspec
         def returns_exitstatus(statuscode)
           with_args.returns_exitstatus(statuscode)
         end
+
+        def outputs(contents, to: :stdout)
+          with_args.outputs(contents, to: to)
+        end
       end
     end
   end

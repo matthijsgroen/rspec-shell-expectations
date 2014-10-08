@@ -28,5 +28,13 @@ if call_configurations.exist?
   call_config = matching_calls.sort do |a, b|
     b[:specific] <=> a[:specific]
   end.first[:config]
+  (call_config[:outputs] || []).each do |data|
+    $stdout.print data[:content] if data[:target] == :stdout
+    $stderr.print data[:content] if data[:target] == :stderr
+    next unless data[:target].is_a? String
+    Pathname.new(data[:target]).open('w') do |f|
+      f.print data[:content]
+    end
+  end
   exit call_config[:statuscode] || 0
 end

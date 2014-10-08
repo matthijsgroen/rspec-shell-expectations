@@ -75,6 +75,24 @@ see specs in `spec/` folder:
   end
 ```
 
+### Stubbing output:
+
+```ruby
+  let(:stubbed_env) { create_stubbed_env }
+  let(:rake_stub) { stubbed_env.stub_command 'rake' }
+  it 'produces output' do
+    rake_stub.outputs('informative message', to: :stdout)
+      .outputs('error message', to: :stderr)
+      .outputs('log contents', to: 'logfile.log')
+
+    stubbed_env.execute_script 'script.sh'
+  end
+```
+
+## Supported ruby versions
+
+Ruby 2+, no JRuby, due to issues with `Open3.capture3`
+
 ## Contributing
 
 1. Fork it ( https://github.com/matthijsgroen/rspec-shell-expectations/fork )

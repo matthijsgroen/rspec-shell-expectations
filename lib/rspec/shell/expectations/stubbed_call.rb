@@ -10,6 +10,13 @@ module Rspec
         def returns_exitstatus(statuscode)
           @config.set_exitcode(statuscode, @args)
           @config.write
+          self
+        end
+
+        def outputs(content, to: :stdout)
+          @config.set_output(content, to, @args)
+          @config.write
+          self
         end
 
         def called?

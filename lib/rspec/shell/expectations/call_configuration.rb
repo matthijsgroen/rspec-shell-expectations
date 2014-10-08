@@ -15,6 +15,12 @@ module Rspec
           @configuration[args][:statuscode] = statuscode
         end
 
+        def set_output(content, target, args = [])
+          @configuration[args] ||= {}
+          @configuration[args][:outputs] ||= []
+          @configuration[args][:outputs] << { target: target, content: content }
+        end
+
         def write
           structure = []
           @configuration.each do |args, results|
