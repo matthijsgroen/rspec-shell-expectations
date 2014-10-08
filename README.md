@@ -89,6 +89,10 @@ see specs in `spec/` folder:
   end
 ```
 
+## Supported ruby versions
+
+Ruby 2+, no JRuby, due to issues with `Open3.capture3`
+
 ## Contributing
 
 1. Fork it ( https://github.com/matthijsgroen/rspec-shell-expectations/fork )
