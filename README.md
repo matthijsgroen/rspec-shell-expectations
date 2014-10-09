@@ -66,12 +66,10 @@ see specs in `spec/` folder:
 ```ruby
   let(:stubbed_env) { create_stubbed_env }
   let(:rake_stub) { stubbed_env.stub_command 'rake' }
-  it 'produces output' do
+  before do
     rake_stub.outputs('informative message', to: :stdout)
       .outputs('error message', to: :stderr)
       .outputs('log contents', to: 'logfile.log')
-
-    stubbed_env.execute_script 'script.sh'
   end
 ```
 
