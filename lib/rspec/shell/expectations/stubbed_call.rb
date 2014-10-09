@@ -19,6 +19,11 @@ module Rspec
           self
         end
 
+        def stdin
+          return nil unless @call_log.exist?
+          @call_log.stdin_for_args(*@args)
+        end
+
         def called?
           return false unless @call_log.exist?
           @call_log.called_with_args?(*@args)
