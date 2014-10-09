@@ -89,6 +89,19 @@ see specs in `spec/` folder:
   end
 ```
 
+### Verifying stdin:
+
+```ruby
+  let(:stubbed_env) { create_stubbed_env }
+  let(:cat_stub) { stubbed_env.stub_command 'cat' }
+  let(:mail_stub) { stubbed_env.stub_command 'mail' }
+  it 'verifies stdin' do
+    stubbed_env.execute_script 'script.sh'
+    expect(cat_stub.stdin).to eql 'hello'
+    expect(mail_stub.with_args('-s', 'hello').stdin).to eql 'world'
+  end
+```
+
 ## Supported ruby versions
 
 Ruby 2+, no JRuby, due to issues with `Open3.capture3`
