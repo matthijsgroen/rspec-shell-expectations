@@ -13,4 +13,3 @@ Feature:
     When I run this script in a simulated environment
     Then the command "command_call" is called
     And the command "other_call" is not called
-

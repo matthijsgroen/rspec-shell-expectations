@@ -17,8 +17,22 @@ Given(/^I have stubbed "(.*?)" with args:$/) do |command, table|
     .with_args(*args)
 end
 
-Given(/^the stubbed command returns exitstatus (\d+)$/) do |statuscode|
+sc = /^the stubbed command/
+Given(/#{sc} returns exitstatus (\d+)$/) do |statuscode|
   @stubbed_command.returns_exitstatus(statuscode.to_i)
+end
+
+Given(/#{sc} outputs "(.*?)" to standard\-out$/) do |output|
+  @stubbed_command.outputs(output, to: :stdout)
+end
+
+Given(/#{sc} outputs "(.*?)" to standard\-error$/) do |output|
+  @stubbed_command.outputs(output, to: :stderr)
+end
+
+Given(/#{sc} outputs "(.*?)" to "(.*?)"$/) do |output, target|
+  @stubbed_command.outputs(output, to: target)
+  files_to_delete.push Pathname.new(target)
 end
 
 When(/^I run this script in a simulated environment$/) do
@@ -33,27 +47,21 @@ Then(/^the exitstatus will be (\d+)$/) do |statuscode|
   expect(@status.exitstatus).to eql statuscode.to_i
 end
 
-Then(/^the command "(.*?)" is called$/) do |command|
-  stubbed_command = simulated_environment.stub_command command
-  expect(stubbed_command).to be_called
+c = /^(the command ".*")/
+Transform(/^the command "(.*)"/) do |command|
+  simulated_environment.stub_command command
 end
 
-Then(/^the command "(.*?)" is not called$/) do |command|
-  stubbed_command = simulated_environment.stub_command command
-  expect(stubbed_command).not_to be_called
+Then(/#{c} is called$/) do |command|
+  expect(command).to be_called
 end
 
-Given(/^the stubbed command outputs "(.*?)" to standard\-out$/) do |output|
-  @stubbed_command.outputs(output, to: :stdout)
+Then(/#{c} is not called$/) do |command|
+  expect(command).not_to be_called
 end
 
-Given(/^the stubbed command outputs "(.*?)" to standard\-error$/) do |output|
-  @stubbed_command.outputs(output, to: :stderr)
-end
-
-Given(/^the stubbed command outputs "(.*?)" to "(.*?)"$/) do |output, target|
-  @stubbed_command.outputs(output, to: target)
-  files_to_delete.push Pathname.new(target)
+Then(/#{c} has received "(.*?)" from standard\-in$/) do |command, contents|
+  expect(command.stdin).to include contents
 end
 
 Then(/^the file "(.*?)" contains "(.*?)"$/) do |filename, contents|

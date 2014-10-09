@@ -11,7 +11,6 @@ Feature:
     When I run this script in a simulated environment
     Then the exitstatus will not be 0
 
-
   Scenario: Run a script with stub
     Given I have the shell script
       """

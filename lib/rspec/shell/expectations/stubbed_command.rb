@@ -11,7 +11,7 @@ module Rspec
             Pathname.new(dir).join("#{command}_stub.yml")
           )
           @call_log = CallLog.new(
-            Pathname.new(dir).join("#{command}_calls.log")
+            Pathname.new(dir).join("#{command}_calls.yml")
           )
         end
 
@@ -29,6 +29,10 @@ module Rspec
 
         def returns_exitstatus(statuscode)
           with_args.returns_exitstatus(statuscode)
+        end
+
+        def stdin
+          with_args.stdin
         end
 
         def outputs(contents, to: :stdout)

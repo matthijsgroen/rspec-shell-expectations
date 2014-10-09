@@ -5,10 +5,11 @@ require 'yaml'
 command = File.basename(__FILE__)
 folder = File.dirname(__FILE__)
 
-call_logs = Pathname.new(folder).join("#{command}_calls.log")
+call_logs = Pathname.new(folder).join("#{command}_calls.yml")
 call_logs.open('a') do |f|
-  f.puts "args: #{ARGV.join('|')}"
-  f.puts "stdin: #{$stdin.read}" unless STDIN.tty?
+  f.puts '- args:'
+  ARGV.each { |arg| f.puts "  - #{arg}" }
+  f.puts "  stdin: #{$stdin.read}" unless STDIN.tty?
 end
 
 call_configurations = Pathname.new(folder).join("#{command}_stub.yml")

@@ -12,13 +12,28 @@ module Rspec
         end
 
         def called_with_args?(*args)
-          @call_log_path.each_line do |line|
-            if (match = /^args:\s(?<args>.*)$/.match(line))
-              call_args = match[:args].split('|')
-              return true if (args - call_args).empty?
-            end
-          end
+          return true if find_call(*args)
           false
+        end
+
+        def stdin_for_args(*args)
+          call = find_call(*args)
+          return call['stdin'] if call
+          nil
+        end
+
+        private
+
+        def find_call(*args)
+          call_log.each do |call|
+            call_args = call['args'] || []
+            return call if (args - call_args).empty?
+          end
+          nil
+        end
+
+        def call_log
+          YAML.load_file @call_log_path
         end
       end
     end
