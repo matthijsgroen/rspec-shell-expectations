@@ -6,7 +6,7 @@ module Rspec
       class StubbedCommand
         def initialize(command, dir)
           @dir, @command = dir, command
-          FileUtils.cp('bin/stub', File.join(dir, command))
+          FileUtils.cp(stub_filepath, File.join(dir, command))
           @call_configuration = CallConfiguration.new(
             Pathname.new(dir).join("#{command}_stub.yml")
           )
@@ -37,6 +37,17 @@ module Rspec
 
         def outputs(contents, to: :stdout)
           with_args.outputs(contents, to: to)
+        end
+
+        private
+
+        def stub_filepath
+          project_root.join('bin', 'stub')
+        end
+
+        def project_root
+          Pathname.new(File.dirname(File.expand_path(__FILE__)))
+            .join('..', '..', '..', '..')
         end
       end
     end
