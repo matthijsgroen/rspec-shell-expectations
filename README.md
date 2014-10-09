@@ -28,16 +28,17 @@ see specs in `spec/` folder:
 ### Running script through stubbed env:
 
 ```ruby
-  require 'English'
-
   describe 'my shell script' do
     include Rspec::Shell::Expectations
 
     let(:stubbed_env) { create_stubbed_env }
 
     it 'runs the script' do
-      stubbed_env.execute 'my-shell-script.sh'
-      expect($CHILD_STATUS.exitstatus).to eq 0
+      stdout, stderr, status = stubbed_env.execute(
+        'my-shell-script.sh',
+        { 'SOME_OPTIONAL' => 'env vars' }
+      )
+      expect(status.exitstatus).to eq 0
     end
   end
 ```
