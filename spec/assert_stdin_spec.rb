@@ -30,13 +30,13 @@ describe 'Assert stdin' do
   describe '#stdin' do
     it 'returns the stdin' do
       subject
-      expect(command1_stub.stdin).to eql 'foo bar'
+      expect(command1_stub.stdin).to match 'foo bar'
     end
 
     context 'with arguments' do
       it 'returns the stdin' do
         subject
-        expect(command1_stub.with_args('hello').stdin).to eql 'baz'
+        expect(command1_stub.with_args('hello').stdin).to match 'baz'
       end
     end
   end
