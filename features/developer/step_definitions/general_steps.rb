@@ -44,7 +44,10 @@ When(/^I run this script in a simulated environment with env:$/) do |table|
     [hash[:name], hash[:value]]
   end]
 
-  @stdout, @stderr, @status = simulated_environment.execute "#{@script} 2>&1", env
+  @stdout, @stderr, @status = simulated_environment.execute(
+    @script,
+    env
+  )
 end
 
 Then(/^the exitstatus will not be (\d+)$/) do |statuscode|

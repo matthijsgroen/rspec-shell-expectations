@@ -22,7 +22,10 @@ describe 'Provide environment vars' do
   let(:stubbed_env) { create_stubbed_env }
 
   it 'exits with an error' do
-    o, _e, _s = stubbed_env.execute "#{script_path} 2>&1", { 'SOME_ENV_VAR' => 'SekretCredential' }
+    o, _e, _s = stubbed_env.execute(
+      script_path,
+      'SOME_ENV_VAR' => 'SekretCredential'
+    )
     expect(o).to eql "SekretCredential\n"
   end
 end
