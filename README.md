@@ -1,6 +1,7 @@
 # Rspec::Shell::Expectations
 [![Build Status](https://travis-ci.org/matthijsgroen/rspec-shell-expectations.png?branch=master)](https://travis-ci.org/matthijsgroen/rspec-shell-expectations)
 [![Gem Version](https://badge.fury.io/rb/rspec-shell-expectations.svg)](http://badge.fury.io/rb/rspec-shell-expectations)
+[![Code Climate](https://codeclimate.com/github/matthijsgroen/rspec-shell-expectations/badges/gpa.svg)](https://codeclimate.com/github/matthijsgroen/rspec-shell-expectations)
 
 Run your shell script in a mocked environment to test its behaviour
 using RSpec.
