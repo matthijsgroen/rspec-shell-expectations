@@ -22,8 +22,8 @@ module Rspec
           StubbedCommand.new command, @dir
         end
 
-        def execute(command)
-          Open3.capture3("#{env} #{command}")
+        def execute(command, env_vars = {})
+          Open3.capture3(env_vars, "#{env} #{command}")
         end
 
         private

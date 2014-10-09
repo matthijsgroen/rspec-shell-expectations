@@ -39,6 +39,14 @@ When(/^I run this script in a simulated environment$/) do
   @stdout, @stderr, @status = simulated_environment.execute "#{@script} 2>&1"
 end
 
+When(/^I run this script in a simulated environment with env:$/) do |table|
+  env = Hash[table.hashes.map do |hash|
+    [hash[:name], hash[:value]]
+  end]
+
+  @stdout, @stderr, @status = simulated_environment.execute "#{@script} 2>&1", env
+end
+
 Then(/^the exitstatus will not be (\d+)$/) do |statuscode|
   expect(@status.exitstatus).not_to eql statuscode.to_i
 end
@@ -54,6 +62,10 @@ end
 
 Then(/#{c} is called$/) do |command|
   expect(command).to be_called
+end
+
+Then(/#{c} is called with "(.*?)"$/) do |command, argument|
+  expect(command.with_args(argument)).to be_called
 end
 
 Then(/#{c} is not called$/) do |command|
