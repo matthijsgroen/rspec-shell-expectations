@@ -61,20 +61,6 @@ see specs in `spec/` folder:
   end
 ```
 
-### Verifying called:
-
-```ruby
-  let(:stubbed_env) { create_stubbed_env }
-  let(:rake_stub) { stubbed_env.stub_command 'rake' }
-  it 'verifies called' do
-    stubbed_env.execute_script 'script.sh'
-
-    expect(rake_stub).to be_called
-    expect(rake_stub.with_args('spec')).to be_called
-    expect(rake_stub.with_args('features')).not_to be_called
-  end
-```
-
 ### Stubbing output:
 
 ```ruby
@@ -86,6 +72,20 @@ see specs in `spec/` folder:
       .outputs('log contents', to: 'logfile.log')
 
     stubbed_env.execute_script 'script.sh'
+  end
+```
+
+### Verifying called:
+
+```ruby
+  let(:stubbed_env) { create_stubbed_env }
+  let(:rake_stub) { stubbed_env.stub_command 'rake' }
+  it 'verifies called' do
+    stubbed_env.execute_script 'script.sh'
+
+    expect(rake_stub).to be_called
+    expect(rake_stub.with_args('spec')).to be_called
+    expect(rake_stub.with_args('features')).not_to be_called
   end
 ```
 
@@ -101,6 +101,10 @@ see specs in `spec/` folder:
     expect(mail_stub.with_args('-s', 'hello').stdin).to eql 'world'
   end
 ```
+
+## More examples
+
+see the *features* folder
 
 ## Supported ruby versions
 
