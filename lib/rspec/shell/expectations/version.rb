@@ -2,7 +2,7 @@ module Rspec
   module Shell
     #:nodoc:
     module Expectations
-      VERSION = '1.0.0-beta.2'
+      VERSION = '1.0.0-rc.1'
     end
   end
 end
