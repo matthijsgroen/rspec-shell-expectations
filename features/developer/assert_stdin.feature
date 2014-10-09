@@ -6,7 +6,7 @@ Feature:
   Scenario: Assert standard-in
     Given I have the shell script
       """
-      command_call <<< "text to stdin"
+      echo "text to stdin" | command_call
       """
     And I have stubbed "command_call"
     When I run this script in a simulated environment

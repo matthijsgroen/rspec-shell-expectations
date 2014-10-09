@@ -8,8 +8,8 @@ describe 'Assert stdin' do
 
   let(:script) do
     <<-SCRIPT
-      command1 <<< "foo bar"
-      command1 'hello' <<< "baz"
+      echo "foo bar" | command1
+      echo "baz" | command1 'hello'
     SCRIPT
   end
   let(:script_path) { Pathname.new '/tmp/test_script.sh' }
