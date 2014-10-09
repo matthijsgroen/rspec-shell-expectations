@@ -61,7 +61,7 @@ Then(/#{c} is not called$/) do |command|
 end
 
 Then(/#{c} has received "(.*?)" from standard\-in$/) do |command, contents|
-  expect(command.stdin).to include contents
+  expect(command.stdin).to eql contents
 end
 
 Then(/^the file "(.*?)" contains "(.*?)"$/) do |filename, contents|
