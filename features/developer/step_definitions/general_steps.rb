@@ -58,7 +58,7 @@ Then(/^the exitstatus will be (\d+)$/) do |statuscode|
   expect(@status.exitstatus).to eql statuscode.to_i
 end
 
-c = /^(the command ".*")/
+c = /^(the command "[^"]+")/
 Transform(/^the command "(.*)"/) do |command|
   simulated_environment.stub_command command
 end
@@ -75,6 +75,14 @@ Then(/#{c} is not called$/) do |command|
   expect(command).not_to be_called
 end
 
+Then(/^#{c} with "(.*?)" is called$/) do |_command, _argument|
+  pending # express the regexp above with the code you wish you had
+end
+
+Then(/^#{c} with "(.*?)" is not called$/) do |_command, _argument|
+  pending # express the regexp above with the code you wish you had
+end
+
 Then(/#{c} has received "(.*?)" from standard\-in$/) do |command, contents|
   expect(command.stdin).to match contents
 end
@@ -82,4 +90,9 @@ end
 Then(/^the file "(.*?)" contains "(.*?)"$/) do |filename, contents|
   files_to_delete.push Pathname.new(filename)
   expect(Pathname.new(filename).read).to eql contents
+end
+
+Given(/^I have stubbed "(.*?)" with args as "(.*?)":$/) do |_command, _call, _arguments|
+  # table is a Cucumber::Ast::Table
+  pending # express the regexp above with the code you wish you had
 end
