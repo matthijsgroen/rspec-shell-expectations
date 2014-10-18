@@ -10,13 +10,11 @@ Feature:
       #!/bin/bash
       bundle exec rake test
       bundle exec rake build
-      exit 0
-      bundle exec rake release
       """
     And I have stubbed "bundle" with args as "rake":
         | args |
         | exec |
         | rake |
-    Then the command "rake" with "test" is called
-    And the command "rake" with "build" is called
-    And the command "rake" with "release" is not called
+    When I run this script in a simulated environment
+    Then the command "rake" is called with "test"
+    And the command "rake" is called with "build"

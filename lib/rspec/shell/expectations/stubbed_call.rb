@@ -7,6 +7,10 @@ module Rspec
           @config, @call_log, @args = config, call_log, args
         end
 
+        def with_args(*args)
+          StubbedCall.new(@config, @call_log, @args + args)
+        end
+
         def returns_exitstatus(statuscode)
           @config.set_exitcode(statuscode, @args)
           @config.write
