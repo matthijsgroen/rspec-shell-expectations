@@ -10,6 +10,15 @@ Given(/^I have stubbed "(.*?)"$/) do |command|
   @stubbed_command = simulated_environment.stub_command command
 end
 
+Given(/^I have stubbed "(.*?)" with args as "(.*)":$/) do |command, call, table|
+  # table is a Cucumber::Ast::Table
+  args = table.hashes.map { |d| d['args'] }
+  @stubbed_command = simulated_environment.stub_command(command)
+    .with_args(*args)
+  @remembered_commands ||= {}
+  @remembered_commands[call] = @stubbed_command
+end
+
 Given(/^I have stubbed "(.*?)" with args:$/) do |command, table|
   # table is a Cucumber::Ast::Table
   args = table.hashes.map { |d| d['args'] }
@@ -58,9 +67,10 @@ Then(/^the exitstatus will be (\d+)$/) do |statuscode|
   expect(@status.exitstatus).to eql statuscode.to_i
 end
 
-c = /^(the command ".*")/
+c = /^(the command "[^"]+")/
 Transform(/^the command "(.*)"/) do |command|
-  simulated_environment.stub_command command
+  cmd = (@remembered_commands || {})[command]
+  cmd || simulated_environment.stub_command(command)
 end
 
 Then(/#{c} is called$/) do |command|
