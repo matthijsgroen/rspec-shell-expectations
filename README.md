@@ -22,6 +22,19 @@ Or install it yourself as:
 
     $ gem install rspec-shell-expectations
 
+
+You can setup rspec-shell-expectations globally for your spec suite:
+
+in `spec_helper.rb`:
+
+```ruby
+  require 'rspec/shell/expectations'
+
+  RSpec.configure do |c|
+    c.include Rspec::Shell::Expectations
+  end
+```
+
 ## Usage
 
 see specs in `spec/` folder:
@@ -29,6 +42,8 @@ see specs in `spec/` folder:
 ### Running script through stubbed env:
 
 ```ruby
+  require 'rspec/shell/expectations'
+
   describe 'my shell script' do
     include Rspec::Shell::Expectations
 
@@ -48,8 +63,13 @@ see specs in `spec/` folder:
 
 ```ruby
   let(:stubbed_env) { create_stubbed_env }
-  before do
-    stubbed_env.stub_command('rake')
+  let(:bundle) { stubbed_env.stub_command('bundle') }
+  let(:rake) { bundle.with_args('exec', 'rake') }
+
+  it 'is stubbed' do
+    stubbed_env.execute 'my-script.sh'
+    expect(rake.with_args('test')).to be_called
+    expect(bundle.with_args('install)).to be_called
   end
 ```
 
