@@ -34,4 +34,3 @@ describe 'Assert called' do
     end
   end
 end
-

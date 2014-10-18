@@ -69,8 +69,8 @@ end
 
 c = /^(the command "[^"]+")/
 Transform(/^the command "(.*)"/) do |command|
-  cmd = @remembered_commands[command]
-  cmd ||= simulated_environment.stub_command command
+  cmd = (@remembered_commands || {})[command]
+  cmd || simulated_environment.stub_command(command)
 end
 
 Then(/#{c} is called$/) do |command|
