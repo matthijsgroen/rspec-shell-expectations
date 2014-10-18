@@ -1,3 +1,8 @@
+# 1.1.0
+
+  * Support chaining of arguments in multiple steps
+    (`.with_args(...).with_args(...)`
+
 # 1.0.0
 
  * Initial release
