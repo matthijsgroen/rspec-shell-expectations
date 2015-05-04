@@ -92,6 +92,8 @@ see specs in `spec/` folder:
     rake_stub.outputs('informative message', to: :stdout)
       .outputs('error message', to: :stderr)
       .outputs('log contents', to: 'logfile.log')
+      .outputs('converted result', to: ['prefix-', :arg2, '.txt'])
+    # last one creates 'prefix-foo.txt' when called as 'rake convert foo'
   end
 ```
 
@@ -124,7 +126,7 @@ see specs in `spec/` folder:
 
 ## More examples
 
-see the *features* folder
+see the *features* and *spec* folder
 
 ## Supported ruby versions
 

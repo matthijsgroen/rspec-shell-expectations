@@ -65,5 +65,22 @@ describe 'Stub command output' do
       expect(o).to be_empty
       expect(Pathname.new(filename).read).to eql 'world'
     end
+
+    describe 'using passed argument as filename' do
+      let(:script) do
+        <<-SCRIPT
+          command1 input output
+        SCRIPT
+      end
+
+      let(:passed_filename) { ['hello-', :arg2, '.foo'] }
+      let(:filename) { 'hello-output.foo' }
+
+      it 'writes data to a interpolated filename' do
+        command1_stub.outputs('world', to: passed_filename)
+        subject
+        expect(Pathname.new(filename).read).to eql 'world'
+      end
+    end
   end
 end
