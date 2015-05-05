@@ -6,6 +6,19 @@
 Run your shell script in a mocked environment to test its behaviour
 using RSpec.
 
+## Features
+
+- Setup a fake shell environment that has preference in exucing commands
+  (highest path value)
+- Stub shell commands in this environment
+- Control multiple outputs (through STDOUT, STDERR or files)
+- Control exit status codes
+- Set different configurations based on command line arguments
+- Verify if command is called
+- Verify arguments command is called with
+- Verify STDIN
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
