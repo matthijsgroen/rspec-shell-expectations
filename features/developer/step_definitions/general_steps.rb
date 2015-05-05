@@ -14,7 +14,7 @@ Given(/^I have stubbed "(.*?)" with args as "(.*)":$/) do |command, call, table|
   # table is a Cucumber::Ast::Table
   args = table.hashes.map { |d| d['args'] }
   @stubbed_command = simulated_environment.stub_command(command)
-    .with_args(*args)
+                     .with_args(*args)
   @remembered_commands ||= {}
   @remembered_commands[call] = @stubbed_command
 end
@@ -23,7 +23,7 @@ Given(/^I have stubbed "(.*?)" with args:$/) do |command, table|
   # table is a Cucumber::Ast::Table
   args = table.hashes.map { |d| d['args'] }
   @stubbed_command = simulated_environment.stub_command(command)
-    .with_args(*args)
+                     .with_args(*args)
 end
 
 sc = /^the stubbed command/
