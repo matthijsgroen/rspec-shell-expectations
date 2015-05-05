@@ -6,6 +6,19 @@
 Run your shell script in a mocked environment to test its behaviour
 using RSpec.
 
+## Features
+
+- Setup a fake shell environment that has preference in exucing commands
+  (highest path value)
+- Stub shell commands in this environment
+- Control multiple outputs (through STDOUT, STDERR or files)
+- Control exit status codes
+- Set different configurations based on command line arguments
+- Verify if command is called
+- Verify arguments command is called with
+- Verify STDIN
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -92,6 +105,8 @@ see specs in `spec/` folder:
     rake_stub.outputs('informative message', to: :stdout)
       .outputs('error message', to: :stderr)
       .outputs('log contents', to: 'logfile.log')
+      .outputs('converted result', to: ['prefix-', :arg2, '.txt'])
+    # last one creates 'prefix-foo.txt' when called as 'rake convert foo'
   end
 ```
 
@@ -124,7 +139,7 @@ see specs in `spec/` folder:
 
 ## More examples
 
-see the *features* folder
+see the *features* and *spec* folder
 
 ## Supported ruby versions
 

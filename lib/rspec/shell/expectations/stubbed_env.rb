@@ -13,9 +13,18 @@ module Rspec
       # A shell environment that can manipulate behaviour
       # of executables
       class StubbedEnv
+        attr_reader :dir
+
         def initialize
           @dir = Dir.mktmpdir
-          at_exit { FileUtils.remove_entry_secure @dir }
+          ENV['PATH'] = "#{@dir}:#{ENV['PATH']}"
+          at_exit { cleanup }
+        end
+
+        def cleanup
+          paths = (ENV['PATH'].split ':') - [@dir]
+          ENV['PATH'] = paths.join ':'
+          FileUtils.remove_entry_secure @dir if Pathname.new(@dir).exist?
         end
 
         def stub_command(command)
