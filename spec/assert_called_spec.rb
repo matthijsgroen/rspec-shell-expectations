@@ -43,7 +43,8 @@ describe 'Assert called' do
     describe 'assertion message' do
       it 'provides a helpful message' do
         expect(command1_stub.inspect).to eql '<Stubbed "command1">'
-        expect(command1_stub.with_args('foo bar').inspect).to eql '<Stubbed "command1" args: "foo bar">'
+        expect(command1_stub.with_args('foo bar').inspect).to \
+          eql '<Stubbed "command1" args: "foo bar">'
       end
     end
   end

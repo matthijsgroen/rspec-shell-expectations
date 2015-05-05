@@ -35,7 +35,8 @@ module Rspec
 
         def inspect
           if @args.any?
-            "<Stubbed #{@config.command.inspect} args: #{@args.join(' ').inspect}>"
+            "<Stubbed #{@config.command.inspect} " \
+              "args: #{@args.join(' ').inspect}>"
           else
             "<Stubbed #{@config.command.inspect}>"
           end
