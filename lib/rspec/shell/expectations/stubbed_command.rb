@@ -5,10 +5,10 @@ module Rspec
       # and monitors input
       class StubbedCommand
         def initialize(command, dir)
-          @dir, @command = dir, command
           FileUtils.cp(stub_filepath, File.join(dir, command))
           @call_configuration = CallConfiguration.new(
-            Pathname.new(dir).join("#{command}_stub.yml")
+            Pathname.new(dir).join("#{command}_stub.yml"),
+            command
           )
           @call_log = CallLog.new(
             Pathname.new(dir).join("#{command}_calls.yml")
@@ -37,6 +37,10 @@ module Rspec
 
         def outputs(contents, to: :stdout)
           with_args.outputs(contents, to: to)
+        end
+
+        def inspect
+          with_args.inspect
         end
 
         private

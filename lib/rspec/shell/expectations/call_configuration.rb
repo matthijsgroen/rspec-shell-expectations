@@ -5,9 +5,12 @@ module Rspec
     module Expectations
       # Configuration of a stubbed command
       class CallConfiguration
-        def initialize(config_path)
+        attr_reader :command
+
+        def initialize(config_path, command)
           @config_path = config_path
           @configuration = {}
+          @command = command
         end
 
         def set_exitcode(statuscode, args = [])
