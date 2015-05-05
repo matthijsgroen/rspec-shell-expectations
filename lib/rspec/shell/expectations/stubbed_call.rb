@@ -32,6 +32,15 @@ module Rspec
           return false unless @call_log.exist?
           @call_log.called_with_args?(*@args)
         end
+
+        def inspect
+          if @args.any?
+            "<Stubbed #{@config.command.inspect} " \
+              "args: #{@args.join(' ').inspect}>"
+          else
+            "<Stubbed #{@config.command.inspect}>"
+          end
+        end
       end
     end
   end
