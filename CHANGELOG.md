@@ -1,3 +1,7 @@
+# 1.3.0
+
+  * Improved assertion message
+
 # 1.2.0
 
   * Support for output filenames based on input arguments
