@@ -76,7 +76,7 @@ see specs in `spec/` folder:
 
 ```ruby
   let(:stubbed_env) { create_stubbed_env }
-  let(:bundle) { stubbed_env.stub_command('bundle') }
+  let!(:bundle) { stubbed_env.stub_command('bundle') }
   let(:rake) { bundle.with_args('exec', 'rake') }
 
   it 'is stubbed' do
