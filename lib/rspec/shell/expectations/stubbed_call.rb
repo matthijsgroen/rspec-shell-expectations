@@ -4,7 +4,9 @@ module Rspec
       # A specific call with arguments on a StubbedCommand
       class StubbedCall
         def initialize(config, call_log, args)
-          @config, @call_log, @args = config, call_log, args
+          @config = config
+          @call_log = call_log
+          @args = args
         end
 
         def with_args(*args)
