@@ -24,7 +24,7 @@ module Rspec
         end
 
         def called_with_args?(*args)
-          with_args.called_with_args?(*args)
+          with_args(*args).called?
         end
 
         def returns_exitstatus(statuscode)
