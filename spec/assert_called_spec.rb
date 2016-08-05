@@ -5,15 +5,15 @@ require 'rspec/shell/expectations/matchers/called_with_arg.rb'
 describe 'Assert called' do
   include Rspec::Shell::Expectations
   let(:stubbed_env) { create_stubbed_env }
-  let!(:command1_stub) { stubbed_env.stub_command('command1') }
-  let!(:command2_stub) { stubbed_env.stub_command('command2') }
+  let!(:first_command) { stubbed_env.stub_command('first_command') }
+  let!(:second_command) { stubbed_env.stub_command('second_command') }
   let!(:flagged_command_stub) { stubbed_env.stub_command('flagged_command') }
 
   let(:script) do
     <<-SCRIPT
-      command1 "foo bar"
-      command2 foo bar
-      command2 foo boo
+      first_command "foo bar"
+      second_command foo bar
+      second_command foo boo
       flagged_command -d flagged_arg
     SCRIPT
   end
@@ -35,34 +35,34 @@ describe 'Assert called' do
   describe 'assert called' do
     it 'returns called status' do
       subject
-      expect(command1_stub).to be_called
+      expect(first_command).to be_called
     end
 
     context 'assert with args' do
       it 'returns called status' do
         subject
-        expect(command1_stub.with_args('foo bar')).to be_called
-        expect(command1_stub.with_args('foo')).not_to be_called
+        expect(first_command.with_args('foo bar')).to be_called
+        expect(first_command.with_args('foo')).not_to be_called
       end
     end
 
     context 'with arg check' do
       it 'matches against entire set of arguments' do
         subject
-        expect(command2_stub).to be_called_with_arg('foo')
-        expect(command2_stub).to be_called_with_arg('bar')
-        expect(command2_stub).to_not be_called_with_arg('baz')
+        expect(second_command).to be_called_with_arg('foo')
+        expect(second_command).to be_called_with_arg('bar')
+        expect(second_command).to_not be_called_with_arg('baz')
       end
     end
 
     context 'with arg at position' do
       it 'matches against argument position' do
         subject
-        expect(command2_stub).to be_called_with_arg('foo').at_position(0)
-        expect(command2_stub).to be_called_with_arg('bar').at_position(1)
-        expect(command2_stub).to_not be_called_with_arg('foo').at_position(1)
-        expect(command2_stub).to_not be_called_with_arg('bar').at_position(0)
-        expect(command2_stub).to be_called_with_arg('boo').at_position(1)
+        expect(second_command).to be_called_with_arg('foo').at_position(0)
+        expect(second_command).to be_called_with_arg('bar').at_position(1)
+        expect(second_command).to_not be_called_with_arg('foo').at_position(1)
+        expect(second_command).to_not be_called_with_arg('bar').at_position(0)
+        expect(second_command).to be_called_with_arg('boo').at_position(1)
       end
     end
 
@@ -76,9 +76,9 @@ describe 'Assert called' do
 
     describe 'assertion message' do
       it 'provides a helpful message' do
-        expect(command1_stub.inspect).to eql '<Stubbed "command1">'
-        expect(command1_stub.with_args('foo bar').inspect).to \
-          eql '<Stubbed "command1" args: "foo bar">'
+        expect(first_command.inspect).to eql '<Stubbed "first_command">'
+        expect(first_command.with_args('foo bar').inspect).to \
+          eql '<Stubbed "first_command" args: "foo bar">'
       end
     end
   end
