@@ -35,6 +35,10 @@ module Rspec
           @call_log.called_with_args?(*@args)
         end
 
+        def called_with_args?(*args, position: false)
+          @call_log.called_with_args?(*args, sub_command_list: @args, position: position)
+        end
+
         def inspect
           if @args.any?
             "<Stubbed #{@config.command.inspect} " \
