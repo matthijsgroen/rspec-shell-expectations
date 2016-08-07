@@ -21,6 +21,21 @@ module Rspec
           nil
         end
 
+        def contains_argument_series?(*expected_argument_series, sub_command_series: [], position: false)
+          expected_argument_series ||= []
+          return true if expected_argument_series.empty?
+
+          call_log_list = load_call_log_list
+          sub_command_argument_list = extract_sub_command_arguments_from_call_log(call_log_list, sub_command_series)
+          position_range_argument_list = extract_position_range_from_argument_list(sub_command_argument_list, position, expected_argument_series.size)
+
+          position_range_argument_list.each do |actual_argument_series|
+            return true if argument_series_contains?(actual_argument_series, expected_argument_series)
+          end
+
+          false
+        end
+
         private
 
         def find_call(*args)
@@ -29,21 +44,6 @@ module Rspec
             return call if (args - call_args).empty?
           end
           nil
-        end
-
-        def contains_argument_series?(*expected_argument_series, sub_command_series: [], position: false)
-          expected_argument_series ||= []
-
-          call_log_list = load_call_log_list
-          sub_command_argument_list = extract_sub_command_arguments_from_call_log(call_log_list, sub_command_series)
-          position_range_argument_list = extract_position_range_from_argument_list(sub_command_argument_list, position, expected_argument_series.size)
-
-          position_range_argument_list.each do |actual_argument_series|
-            return true if expected_argument_series.empty?
-            return true if argument_series_contains?(actual_argument_series, expected_argument_series)
-          end
-
-          false
         end
 
         def extract_sub_command_arguments_from_call_log(call_log_list, sub_command_list)

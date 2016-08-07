@@ -9,11 +9,11 @@ module Rspec
         def initialize(command, dir)
           FileUtils.cp(stub_filepath, File.join(dir, command))
           @call_configuration = CallConfiguration.new(
-            Pathname.new(dir).join("#{command}_stub.yml"),
-            command
+              Pathname.new(dir).join("#{command}_stub.yml"),
+              command
           )
           @call_log = CallLog.new(
-            Pathname.new(dir).join("#{command}_calls.yml")
+              Pathname.new(dir).join("#{command}_calls.yml")
           )
         end
 
@@ -26,7 +26,7 @@ module Rspec
         end
 
         def called_with_args?(*args, position: false)
-          with_args(*args, position: position).called?
+          with_args.called_with_args?(*args, position: position)
         end
 
         def returns_exitstatus(statuscode)
@@ -53,7 +53,7 @@ module Rspec
 
         def project_root
           Pathname.new(File.dirname(File.expand_path(__FILE__)))
-            .join('..', '..', '..', '..')
+              .join('..', '..', '..', '..')
         end
       end
     end

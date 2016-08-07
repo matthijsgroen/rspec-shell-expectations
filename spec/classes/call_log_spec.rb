@@ -2,421 +2,502 @@ require 'English'
 require 'rspec/shell/expectations'
 
 describe 'StubCall' do
-  include Rspec::Shell::Expectations
   let(:stubbed_env) { create_stubbed_env }
+  include Rspec::Shell::Expectations
 
-  context '#called_with_args?' do
-    context 'with only arguments provided' do
+  context '#contains_argument_series?' do
+    context 'with only an series of arguments provided' do
       context 'and a command log with only one argument' do
-        # before(:each) do
-        #   @command_with_one_argument = stubbed_env.stub_command('command_with_one_argument')
-        #   @subject = @command_with_one_argument.call_log
-        #
-        #   @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-        #   command_with_one_argument first_argument
-        #   multiline_script
-        #   )
-        # end
-        #
-        # it 'confirms that the argument was anywhere in called command\'s argument list' do
-        #   expect(@command_with_one_argument).to be_called_with_arguments('first_argument')
-        # end
-        #
-        # it 'confirms that an unpassed argument was nowhere in called command\'s argument list' do
-        #   expect(@command_with_one_argument).to_not be_called_with_arguments('not_an_argument')
-        # end
-      end
-      # context 'and a command called with two arguments' do
-      #   before(:each) do
-      #     @command_with_two_arguments = stubbed_env.stub_command('command_with_two_arguments')
-      #     @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-      #     command_with_two_arguments first_argument second_argument
-      #     multiline_script
-      #     )
-      #   end
-      #
-      #   it 'confirms that the first argument was anywhere in called command\'s argument list' do
-      #     expect(@command_with_two_arguments).to be_called_with_arguments('first_argument')
-      #   end
-      #
-      #   it 'confirms that the second argument was anywhere in called command\'s argument list' do
-      #     expect(@command_with_two_arguments).to be_called_with_arguments('second_argument')
-      #   end
-      #
-      #   it 'confirms that the two arguments were in order in the called command\'s argument list' do
-      #     expect(@command_with_two_arguments).to be_called_with_arguments('first_argument', 'second_argument')
-      #   end
-      #
-      #   it 'confirms that an unpassed argument was nowhere in called command\'s argument list' do
-      #     expect(@command_with_two_arguments).to_not be_called_with_arguments('not_an_argument')
-      #   end
-      # end
-      # context 'and a command called with three arguments' do
-      #   before(:each) do
-      #     @command_with_three_arguments = stubbed_env.stub_command('command_with_three_arguments')
-      #     @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-      #     command_with_three_arguments first_argument second_argument third_argument
-      #     multiline_script
-      #     )
-      #   end
-      #
-      #   it 'confirms that the first argument was anywhere in called command\'s argument list' do
-      #     expect(@command_with_three_arguments).to be_called_with_arguments('first_argument')
-      #   end
-      #
-      #   it 'confirms that the second argument was anywhere in called command\'s argument list' do
-      #     expect(@command_with_three_arguments).to be_called_with_arguments('second_argument')
-      #   end
-      #
-      #   it 'confirms that two contiguous arguments were in order in the called command\'s argument list' do
-      #     expect(@command_with_three_arguments).to be_called_with_arguments('second_argument', 'third_argument')
-      #   end
-      #
-      #   it 'confirms that three contiguous arguments were in order in the called command\'s argument list' do
-      #     expect(@command_with_three_arguments).to be_called_with_arguments('first_argument', 'second_argument', 'third_argument')
-      #   end
-      #
-      #   it 'confirms that two non-contiguous arguments were not in order in the called command\'s argument list' do
-      #     expect(@command_with_three_arguments).to_not be_called_with_arguments('first_argument', 'third_argument')
-      #   end
-      #
-      #   it 'confirms that an unpassed argument was nowhere in called command\'s argument list' do
-      #     expect(@command_with_three_arguments).to_not be_called_with_arguments('not_an_argument')
-      #   end
-      # end
-    end
-    # context 'with the at_position chain added' do
-    #   context 'and a command called with one argument' do
-    #     before(:each) do
-    #       @command_with_one_argument = stubbed_env.stub_command('command_with_one_argument')
-    #       @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-    #       command_with_one_argument first_argument
-    #       multiline_script
-    #       )
-    #     end
-    #
-    #     it 'confirms that the argument was at the specified position in the command\'s argument list' do
-    #       expect(@command_with_one_argument).to be_called_with_arguments('first_argument').at_position(-1)
-    #     end
-    #
-    #     it 'confirms that an unpassed argument was not at the specified position in called command\'s argument list' do
-    #       expect(@command_with_one_argument).to_not be_called_with_arguments('not_an_argument').at_position(-1)
-    #     end
-    #   end
-    #   context 'and a command called with two arguments' do
-    #     before(:each) do
-    #       @command_with_two_arguments = stubbed_env.stub_command('command_with_two_arguments')
-    #       @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-    #       command_with_two_arguments first_argument second_argument
-    #       multiline_script
-    #       )
-    #     end
-    #
-    #     it 'confirms that the first argument was at the second to last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('first_argument').at_position(-2)
-    #     end
-    #
-    #     it 'confirms that the second argument was at the last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('second_argument').at_position(-1)
-    #     end
-    #
-    #     it 'confirms that the first argument was at the last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to_not be_called_with_arguments('first_argument').at_position(-1)
-    #     end
-    #
-    #     it 'confirms that the second argument was not at the second to last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to_not be_called_with_arguments('second_argument').at_position(-2)
-    #     end
-    #
-    #     it 'confirms that the two arguments were in order at the position in the called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('first_argument', 'second_argument').at_position(-2)
-    #     end
-    #   end
-    #   context 'and a command called with three arguments' do
-    #     before(:each) do
-    #       @command_with_two_arguments = stubbed_env.stub_command('command_with_two_arguments')
-    #       @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-    #       command_with_two_arguments first_argument second_argument third_argument
-    #       multiline_script
-    #       )
-    #     end
-    #
-    #     it 'confirms that the first argument was at the third to last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('first_argument').at_position(-3)
-    #     end
-    #
-    #     it 'confirms that the second argument was at the seonc to last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('second_argument').at_position(-2)
-    #     end
-    #
-    #     it 'confirms that the third argument was at the last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('third_argument').at_position(-1)
-    #     end
-    #
-    #     it 'confirms that the first argument was at the last position in called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to_not be_called_with_arguments('first_argument').at_position(-1)
-    #     end
-    #
-    #     it 'confirms that the three arguments were in order at the position in the called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('first_argument', 'second_argument', 'third_argument').at_position(-3)
-    #     end
-    #
-    #     it 'confirms that the first two arguments were in order at the position in the called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('first_argument', 'second_argument').at_position(-3)
-    #     end
-    #
-    #     it 'confirms that the last two arguments were in order at the position in the called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to be_called_with_arguments('second_argument', 'third_argument').at_position(-2)
-    #     end
-    #
-    #     it 'confirms that the last two arguments were in not order at the first position in the called command\'s argument list' do
-    #       expect(@command_with_two_arguments).to_not be_called_with_arguments('second_argument', 'third_argument').at_position(-3)
-    #     end
-    #   end
-    # end
-  end
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['first_argument'],
+                   'stdin' => [],
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_one_argument_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
 
-  # context 'with commands that have sub-commands (ex. git pull)' do
-  #   before(:each) do
-  #     @command_with_sub_commands = stubbed_env.stub_command('command_with_sub_commands')
-  #   end
-  #   context 'with no chain calls' do
-  #     context 'and multiple sub-commands are called' do
-  #       before(:each) do
-  #         @first_subcommand_of_command = @command_with_sub_commands.with_args('first_sub_command')
-  #         @second_subcommand_of_command = @command_with_sub_commands.with_args('second_sub_command')
-  #       end
-  #       context 'with a single, different argument' do
-  #         before(:each) do
-  #           @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-  #             command_with_sub_commands first_sub_command first_sub_command_argument
-  #             command_with_sub_commands second_sub_command second_sub_command_argument
-  #           multiline_script
-  #           )
-  #         end
-  #
-  #         it 'confirms that the first sub command argument was called on the command with sub-commands' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('first_sub_command_argument')
-  #         end
-  #
-  #         it 'confirms that the second sub command argument was called on the command with sub-commands' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('second_sub_command_argument')
-  #         end
-  #
-  #         it 'confirms that the first sub command argument was called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument')
-  #         end
-  #
-  #         it 'confirms that the second sub command argument was called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument')
-  #         end
-  #
-  #         it 'confirms that the second sub command argument was not called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument')
-  #         end
-  #
-  #         it 'confirms that the first sub command argument was not called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument')
-  #         end
-  #       end
-  #       context 'with a two, different arguments' do
-  #         before(:each) do
-  #           @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-  #             command_with_sub_commands first_sub_command first_sub_command_argument_one first_sub_command_argument_two
-  #             command_with_sub_commands second_sub_command second_sub_command_argument_one second_sub_command_argument_two
-  #           multiline_script
-  #           )
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s second argument was called on the command with sub-commands' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('first_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s second argument was called on the command with sub-commands' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('second_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s second argument was called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s second argument was called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s second argument was not called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s second argument was not called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s first and second arguments were called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s first and second arguments were called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument_one', 'second_sub_command_argument_two')
-  #         end
-  #       end
-  #       context 'with a three, different arguments' do
-  #         before(:each) do
-  #           @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-  #             command_with_sub_commands first_sub_command first_sub_command_argument_one first_sub_command_argument_two first_sub_command_argument_three
-  #             command_with_sub_commands second_sub_command second_sub_command_argument_one second_sub_command_argument_two second_sub_command_argument_three
-  #           multiline_script
-  #           )
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s first, second and third arguments were called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_two', 'first_sub_command_argument_three')
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s first, second and third arguments were called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument_one', 'second_sub_command_argument_two', 'second_sub_command_argument_three')
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s non-contiguous arguments were not called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_three')
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s non-contiguous arguments were not called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument_one', 'second_sub_command_argument_three')
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s contiguous arguments were not called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_two')
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s contiguous arguments were not called on the second sub-command' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument_two', 'second_sub_command_argument_three')
-  #         end
-  #       end
-  #     end
-  #   end
-  #   context 'with the at_position chain added' do
-  #     context 'and multiple sub-commands are called' do
-  #       before(:each) do
-  #         @first_subcommand_of_command = @command_with_sub_commands.with_args('first_sub_command')
-  #         @second_subcommand_of_command = @command_with_sub_commands.with_args('second_sub_command')
-  #       end
-  #       context 'with a single, different argument' do
-  #         before(:each) do
-  #           @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-  #             command_with_sub_commands first_sub_command first_sub_command_argument
-  #             command_with_sub_commands second_sub_command second_sub_command_argument
-  #           multiline_script
-  #           )
-  #         end
-  #
-  #         it 'confirms that the first sub command argument was called on the command with sub-commands at the second position' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('first_sub_command_argument').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the second sub command argument was called on the command with sub-commands at the second position' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('second_sub_command_argument').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the first sub command argument was called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the second sub command argument was called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the second sub command argument was not called on the first sub-command' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the first sub command argument was not called on the second sub-command' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument').at_position(0)
-  #         end
-  #       end
-  #       context 'with a two, different arguments' do
-  #         before(:each) do
-  #           @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-  #             command_with_sub_commands first_sub_command first_sub_command_argument_one first_sub_command_argument_two
-  #             command_with_sub_commands second_sub_command second_sub_command_argument_one second_sub_command_argument_two
-  #           multiline_script
-  #           )
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s second argument was called on the command with sub-commands at the third position' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('first_sub_command_argument_two').at_position(2)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s second argument was called on the command with sub-commands at the third position' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('second_sub_command_argument_two').at_position(2)
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s second argument was called on the first sub-command at the second position' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument_two').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s second argument was called on the second sub-command at the second position' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument_two').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s second argument was not called on the first sub-command at the second position' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument_two').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s second argument was not called on the second sub-command at the second position' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument_two').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s first and second arguments were called on the first sub-command at the second position' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_two').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s first and second arguments were called on the second sub-command at the second position' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument_one', 'second_sub_command_argument_two').at_position(0)
-  #         end
-  #       end
-  #       context 'with a three, different arguments' do
-  #         before(:each) do
-  #           @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-  #             command_with_sub_commands first_sub_command first_sub_command_argument_one first_sub_command_argument_two first_sub_command_argument_three
-  #             command_with_sub_commands second_sub_command second_sub_command_argument_one second_sub_command_argument_two second_sub_command_argument_three
-  #           multiline_script
-  #           )
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s arguments were called on the command with sub-commands at the second position' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_two', 'first_sub_command_argument_three').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s arguments were called on the command with sub-commands at the second position' do
-  #           expect(@command_with_sub_commands).to be_called_with_arguments('second_sub_command_argument_one', 'second_sub_command_argument_two', 'second_sub_command_argument_three').at_position(1)
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s first, second and third arguments were called on the first sub-command at the first position' do
-  #           expect(@first_subcommand_of_command).to be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_two', 'first_sub_command_argument_three').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s first, second and third arguments were called on the second sub-command at the first position' do
-  #           expect(@second_subcommand_of_command).to be_called_with_arguments('second_sub_command_argument_one', 'second_sub_command_argument_two', 'second_sub_command_argument_three').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s non-contiguous arguments were not called on the first sub-command at the first position' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_three').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s non-contiguous arguments were not called on the second sub-command at the first position' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument_one', 'second_sub_command_argument_three').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the first sub command\'s contiguous arguments were not called on the second sub-command at the first position' do
-  #           expect(@second_subcommand_of_command).to_not be_called_with_arguments('first_sub_command_argument_one', 'first_sub_command_argument_two').at_position(0)
-  #         end
-  #
-  #         it 'confirms that the second sub command\'s contiguous arguments were not called on the second sub-command at the second position' do
-  #           expect(@first_subcommand_of_command).to_not be_called_with_arguments('second_sub_command_argument_two', 'second_sub_command_argument_three').at_position(1)
-  #         end
-  #       end
-  #     end
-  #   end
-  # end
+        it 'finds the single argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('first_argument')).to be_truthy
+        end
+
+        it 'does not find an un-passed argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument')).to be_falsey
+        end
+      end
+      context 'and a command called with two arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['first_argument', 'second_argument'],
+                   'stdin' => [],
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_two_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the first argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('first_argument')).to be_truthy
+        end
+
+        it 'finds the second argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('second_argument')).to be_truthy
+        end
+
+        it 'finds two contiguous arguments in the series' do
+          expect(@subject.contains_argument_series?('first_argument', 'second_argument')).to be_truthy
+        end
+
+        it 'does not find an un-passed argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument')).to be_falsey
+        end
+      end
+      context 'and a command called with three arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['first_argument', 'second_argument', 'third_argument'],
+                   'stdin' => [],
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_three_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the first argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('first_argument')).to be_truthy
+        end
+
+        it 'finds the second argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('second_argument')).to be_truthy
+        end
+
+        it 'finds the third argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('third_argument')).to be_truthy
+        end
+
+        it 'finds three contiguous arguments in the series' do
+          expect(@subject.contains_argument_series?('first_argument', 'second_argument', 'third_argument')).to be_truthy
+        end
+
+        it 'does not find two non-contiguous arguments in the series' do
+          expect(@subject.contains_argument_series?('first_argument', 'third_argument')).to be_falsey
+        end
+
+        it 'does not find an un-passed argument anywhere in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument')).to be_falsey
+        end
+      end
+    end
+    context 'with a series of arguments and a starting position provided' do
+      context 'and a command called with one argument' do
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['first_argument'],
+                   'stdin' => [],
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_one_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the single argument at the first position in the series' do
+          expect(@subject.contains_argument_series?('first_argument', position: 0)).to be_truthy
+        end
+
+        it 'does not find an un-passed argument at the first position in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument', position: 0)).to be_falsey
+        end
+      end
+      context 'and a command called with two arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['first_argument', 'second_argument'],
+                   'stdin' => [],
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_two_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the first argument at the first position in the series' do
+          expect(@subject.contains_argument_series?('first_argument', position: 0)).to be_truthy
+        end
+
+        it 'finds the second argument at the second position in the series' do
+          expect(@subject.contains_argument_series?('second_argument', position: 1)).to be_truthy
+        end
+
+        it 'does not find the first argument at the second position in the series' do
+          expect(@subject.contains_argument_series?('first_argument', position: 1)).to be_falsey
+        end
+
+        it 'does not find the second argument at the first position in the series' do
+          expect(@subject.contains_argument_series?('second_argument', position: 0)).to be_falsey
+        end
+
+        it 'does not find an un-passed argument at the first position in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument', position: 0)).to be_falsey
+        end
+
+        it 'does not find an un-passed argument at the second position in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument', position: 1)).to be_falsey
+        end
+      end
+      context 'and a command called with three arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['first_argument', 'second_argument', 'third_argument'],
+                   'stdin' => [],
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_three_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the first argument at the first position in the series' do
+          expect(@subject.contains_argument_series?('first_argument', position: 0)).to be_truthy
+        end
+
+        it 'finds the second argument at the second position in the series' do
+          expect(@subject.contains_argument_series?('second_argument', position: 1)).to be_truthy
+        end
+
+        it 'finds the third argument at the third position in the series' do
+          expect(@subject.contains_argument_series?('third_argument', position: 2)).to be_truthy
+        end
+
+        it 'finds the three arguments in order at the first position in the series' do
+          expect(@subject.contains_argument_series?('first_argument', 'second_argument', 'third_argument', position: 0)).to be_truthy
+        end
+
+        it 'finds the first two arguments in order at the first position in the series' do
+          expect(@subject.contains_argument_series?('first_argument', 'second_argument', position: 0)).to be_truthy
+        end
+
+        it 'finds the last two arguments in order at the second position in the series' do
+          expect(@subject.contains_argument_series?('second_argument', 'third_argument', position: 1)).to be_truthy
+        end
+
+        it 'does not find the first two arguments in order at the second position in the series' do
+          expect(@subject.contains_argument_series?('first_argument', 'second_argument', position: 1)).to be_falsey
+        end
+
+        it 'does not find the last two arguments in order at the first position in the series' do
+          expect(@subject.contains_argument_series?('second_argument', 'third_argument', position: 0)).to be_falsey
+        end
+
+        it 'does not find an un-passed argument at the first position in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument', position: 0)).to be_falsey
+        end
+
+        it 'does not find an un-passed argument at the second position in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument', position: 1)).to be_falsey
+        end
+
+        it 'does not find an un-passed argument at the third position in the series' do
+          expect(@subject.contains_argument_series?('not_an_argument', position: 2)).to be_falsey
+        end
+      end
+    end
+    context 'with a series of arguments and a series of sub-commands provided' do
+      context 'and sub commands called with one argument' do
+        before(:each) do
+          actual_call_log_list =
+              [
+                  {
+                      'args' => ['first_sub_command', 'first_sub_command_argument'],
+                      'stdin' => [],
+                  },
+                  {
+                      'args' => ['second_sub_command', 'second_sub_command_argument'],
+                      'stdin' => [],
+                  }
+              ]
+          @subject = Rspec::Shell::Expectations::CallLog.new('sub_commands_with_one_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the first argument of the first sub-command anywhere in the series' do
+          expect(@subject.contains_argument_series?('first_sub_command_argument', sub_command_series: ['first_sub_command'])).to be_truthy
+        end
+
+        it 'finds the first argument of the second sub-command anywhere in the series' do
+          expect(@subject.contains_argument_series?('second_sub_command_argument', sub_command_series: ['second_sub_command'])).to be_truthy
+        end
+
+        it 'does not find the first argument of the first sub-command on other sub-commands in the series' do
+          expect(@subject.contains_argument_series?('first_sub_command_argument', sub_command_series: ['second_sub_command'])).to be_falsey
+        end
+
+        it 'does not find the first argument of the second sub-command on other sub-commands in the series' do
+          expect(@subject.contains_argument_series?('second_sub_command_argument', sub_command_series: ['first_sub_command'])).to be_falsey
+        end
+      end
+      context 'and sub commands called with two arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [
+                  {
+                      'args' => ['first_sub_command', 'first_sub_command_argument_one', 'first_sub_command_argument_two'],
+                      'stdin' => [],
+                  },
+                  {
+                      'args' => ['second_sub_command', 'second_sub_command_argument_one', 'second_sub_command_argument_two'],
+                      'stdin' => [],
+                  }
+              ]
+          @subject = Rspec::Shell::Expectations::CallLog.new('sub_commands_with_two_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the arguments of the first sub-command on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?('first_sub_command_argument_one', 'first_sub_command_argument_two', sub_command_series: ['first_sub_command'])).to be_truthy
+        end
+
+        it 'finds the arguments of the second sub-command on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?('second_sub_command_argument_one', 'second_sub_command_argument_two', sub_command_series: ['second_sub_command'])).to be_truthy
+        end
+
+        it 'does not find the arguments of the first sub-command on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?('first_sub_command_argument_one', 'first_sub_command_argument_two', sub_command_series: ['second_sub_command'])).to be_falsey
+        end
+
+        it 'does not find the arguments of the second sub-command on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?('second_sub_command_argument_one', 'second_sub_command_argument_two', sub_command_series: ['first_sub_command'])).to be_falsey
+        end
+      end
+      context 'and sub commands called with three arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [
+                  {
+                      'args' => [
+                          'first_sub_command',
+                          'first_sub_command_argument_one',
+                          'first_sub_command_argument_two',
+                          'first_sub_command_argument_three',
+                      ],
+                      'stdin' => [],
+                  },
+                  {
+                      'args' => [
+                          'second_sub_command',
+                          'second_sub_command_argument_one',
+                          'second_sub_command_argument_two',
+                          'second_sub_command_argument_three',
+                      ],
+                      'stdin' => [],
+                  }
+              ]
+          @subject = Rspec::Shell::Expectations::CallLog.new('sub_commands_with_three_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+
+        it 'finds the arguments of the first sub-command on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?('first_sub_command_argument_one', 'first_sub_command_argument_two', 'first_sub_command_argument_three', sub_command_series: ['first_sub_command'])).to be_truthy
+        end
+
+        it 'finds the arguments of the second sub-command on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?('second_sub_command_argument_one', 'second_sub_command_argument_two', 'second_sub_command_argument_three', sub_command_series: ['second_sub_command'])).to be_truthy
+        end
+
+        it 'does not find the arguments of the first sub-command on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?('first_sub_command_argument_one', 'first_sub_command_argument_two', 'first_sub_command_argument_three', sub_command_series: ['second_sub_command'])).to be_falsey
+        end
+
+        it 'does not find the arguments of the second sub-command on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?('second_sub_command_argument_one', 'second_sub_command_argument_two', 'second_sub_command_argument_three', sub_command_series: ['first_sub_command'])).to be_falsey
+        end
+
+        it 'does not find the non-contiguous arguments of the first sub-command on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?('first_sub_command_argument_one', 'first_sub_command_argument_three', sub_command_series: ['first_sub_command'])).to be_falsey
+        end
+
+        it 'does not find the non-contiguous arguments of the second sub-command on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?('second_sub_command_argument_one', 'second_sub_command_argument_three', sub_command_series: ['second_sub_command'])).to be_falsey
+        end
+      end
+    end
+    context 'with a series of arguments, a starting position, and a series of sub-commands provided' do
+      context 'and sub commands called with one argument' do
+        before(:each) do
+          actual_call_log_list =
+              [
+                  {
+                      'args' => ['first_sub_command', 'first_sub_command_argument'],
+                      'stdin' => [],
+                  },
+                  {
+                      'args' => ['second_sub_command', 'second_sub_command_argument'],
+                      'stdin' => [],
+                  }
+              ]
+          @subject = Rspec::Shell::Expectations::CallLog.new('sub_commands_with_one_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+        it 'finds the first argument of the first sub-command in the first position in the series' do
+          expect(@subject.contains_argument_series?(
+              'first_sub_command_argument',
+              sub_command_series: ['first_sub_command'],
+              position: 0
+          )).to be_truthy
+        end
+
+        it 'finds the first argument of the second sub-command in the first position in the series' do
+          expect(@subject.contains_argument_series?(
+              'second_sub_command_argument',
+              sub_command_series: ['second_sub_command'],
+              position: 0
+          )).to be_truthy
+        end
+
+        it 'does not find the first argument of the first sub-command on other sub-commands in the series' do
+          expect(@subject.contains_argument_series?(
+              'first_sub_command_argument',
+              sub_command_series: ['second_sub_command'],
+              position: 0
+          )).to be_falsey
+        end
+
+        it 'does not find the first argument of the second sub-command on other sub-commands in the series' do
+          expect(@subject.contains_argument_series?(
+              'second_sub_command_argument',
+              sub_command_series: ['first_sub_command'],
+              position: 0
+          )).to be_falsey
+        end
+      end
+      context 'and sub commands called with two arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [
+                  {
+                      'args' => ['first_sub_command', 'first_sub_command_argument_one', 'first_sub_command_argument_two'],
+                      'stdin' => [],
+                  },
+                  {
+                      'args' => ['second_sub_command', 'second_sub_command_argument_one', 'second_sub_command_argument_two'],
+                      'stdin' => [],
+                  }
+              ]
+          @subject = Rspec::Shell::Expectations::CallLog.new('sub_commands_with_two_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+        it 'finds the arguments of the first sub-command in the first position on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'first_sub_command_argument_two',
+              sub_command_series: ['first_sub_command'],
+              position: 1
+          )).to be_truthy
+        end
+
+        it 'finds the arguments of the second sub-command in the first position on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'second_sub_command_argument_two',
+              sub_command_series: ['second_sub_command'],
+              position: 1
+          )).to be_truthy
+        end
+
+        it 'does not find the arguments of the first sub-command on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'first_sub_command_argument_two',
+              sub_command_series: ['second_sub_command'],
+              position: 1
+          )).to be_falsey
+        end
+
+        it 'does not find the arguments of the second sub-command on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'second_sub_command_argument_two',
+              sub_command_series: ['first_sub_command'],
+              position: 1
+          )).to be_falsey
+        end
+      end
+      context 'and sub commands called with three arguments' do
+        before(:each) do
+          actual_call_log_list =
+              [
+                  {
+                      'args' => [
+                          'first_sub_command',
+                          'first_sub_command_argument_one',
+                          'first_sub_command_argument_two',
+                          'first_sub_command_argument_three',
+                      ],
+                      'stdin' => [],
+                  },
+                  {
+                      'args' => [
+                          'second_sub_command',
+                          'second_sub_command_argument_one',
+                          'second_sub_command_argument_two',
+                          'second_sub_command_argument_three',
+                      ],
+                      'stdin' => [],
+                  }
+              ]
+          @subject = Rspec::Shell::Expectations::CallLog.new('sub_commands_with_three_arguments_log')
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+        it 'finds the arguments of the first sub-command in the second position on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'first_sub_command_argument_two',
+              'first_sub_command_argument_three',
+              sub_command_series: ['first_sub_command'],
+              position: 1
+          )).to be_truthy
+        end
+
+        it 'finds the arguments of the second sub-command in the second position on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'second_sub_command_argument_two',
+              'second_sub_command_argument_three',
+              sub_command_series: ['second_sub_command'],
+              position: 1
+          )).to be_truthy
+        end
+
+        it 'does not find the arguments of the first sub-command in the first position on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'first_sub_command_argument_one',
+              'first_sub_command_argument_two',
+              'first_sub_command_argument_three',
+              sub_command_series: ['second_sub_command'],
+              position: 0
+          )).to be_falsey
+        end
+
+        it 'does not find the arguments of the second sub-command in the first position on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'second_sub_command_argument_one',
+              'second_sub_command_argument_two',
+              'second_sub_command_argument_three',
+              sub_command_series: ['first_sub_command'],
+              position: 0
+          )).to be_falsey
+        end
+
+        it 'does not find the non-contiguous arguments of the first sub-command in the first position on the first sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'first_sub_command_argument_one',
+              'first_sub_command_argument_three',
+              sub_command_series: ['first_sub_command'],
+              position: 0
+          )).to be_falsey
+        end
+
+        it 'does not find the non-contiguous arguments of the second sub-command in the first position on the second sub-command in the series' do
+          expect(@subject.contains_argument_series?(
+              'second_sub_command_argument_one',
+              'second_sub_command_argument_three',
+              sub_command_series: ['second_sub_command'],
+              position: 0
+          )).to be_falsey
+        end
+      end
+    end
+  end
 end
