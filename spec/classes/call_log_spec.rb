@@ -8,23 +8,23 @@ describe 'StubCall' do
   context '#called_with_args?' do
     context 'with only arguments provided' do
       context 'and a command log with only one argument' do
-        before(:each) do
-          @command_with_one_argument = stubbed_env.stub_command('command_with_one_argument')
-          @subject = @command_with_one_argument.call_log
-
-          @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-          command_with_one_argument first_argument
-          multiline_script
-          )
-        end
-
-        it 'confirms that the argument was anywhere in called command\'s argument list' do
-          expect(@command_with_one_argument).to be_called_with_arguments('first_argument')
-        end
-
-        it 'confirms that an unpassed argument was nowhere in called command\'s argument list' do
-          expect(@command_with_one_argument).to_not be_called_with_arguments('not_an_argument')
-        end
+        # before(:each) do
+        #   @command_with_one_argument = stubbed_env.stub_command('command_with_one_argument')
+        #   @subject = @command_with_one_argument.call_log
+        #
+        #   @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
+        #   command_with_one_argument first_argument
+        #   multiline_script
+        #   )
+        # end
+        #
+        # it 'confirms that the argument was anywhere in called command\'s argument list' do
+        #   expect(@command_with_one_argument).to be_called_with_arguments('first_argument')
+        # end
+        #
+        # it 'confirms that an unpassed argument was nowhere in called command\'s argument list' do
+        #   expect(@command_with_one_argument).to_not be_called_with_arguments('not_an_argument')
+        # end
       end
       # context 'and a command called with two arguments' do
       #   before(:each) do

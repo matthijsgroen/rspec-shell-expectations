@@ -23,8 +23,8 @@ module Rspec
 
         private
 
-        def find_call(*call_args)
-          call_log.each do |call|
+        def find_call(*args)
+          load_call_log_list.each do |call|
             call_args = call['args'] || []
             return call if (args - call_args).empty?
           end
