@@ -3,6 +3,8 @@ module Rspec
     module Expectations
       # A specific call with arguments on a StubbedCommand
       class StubbedCall
+        attr_reader :call_log
+
         def initialize(config, call_log, args)
           @config = config
           @call_log = call_log
@@ -36,7 +38,7 @@ module Rspec
         end
 
         def called_with_args?(*args, position: false)
-          @call_log.called_with_args?(*args, sub_command_list: @args, position: position)
+          @call_log.called_with_args?(*args, sub_command_series: @args, position: position)
         end
 
         def inspect

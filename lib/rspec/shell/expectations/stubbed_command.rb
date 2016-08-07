@@ -4,6 +4,8 @@ module Rspec
       # Command that produces specific output
       # and monitors input
       class StubbedCommand
+        attr_reader :call_log
+
         def initialize(command, dir)
           FileUtils.cp(stub_filepath, File.join(dir, command))
           @call_configuration = CallConfiguration.new(
