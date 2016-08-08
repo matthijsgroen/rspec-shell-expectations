@@ -36,7 +36,7 @@ module Rspec
         end
 
         def execute_function(script, command, env_vars = {})
-          Open3.capture3(env_vars, "bash -c 'source #{script} && #{command}'")
+          Open3.capture3(env_vars, "bash -c 'source #{script} && #{env} #{command}'")
         end
 
         private
