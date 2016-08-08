@@ -29,12 +29,6 @@ RSpec::Matchers.define :be_called_with_arg do |argument|
     }
   end
 
-  chain :times do |expected_invocations|
-    @do_match = lambda { |actual_arguments, expected_argument|
-      actual_arguments.count(expected_argument) == expected_invocations
-    }
-  end
-
   failure_message do |stubbed_command|
     print_failure_message stubbed_command
   end
