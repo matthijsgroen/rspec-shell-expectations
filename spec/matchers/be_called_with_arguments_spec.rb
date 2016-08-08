@@ -10,10 +10,9 @@ describe 'be_called_with_arguments' do
   context 'with a command' do
     context 'and no chain calls' do
       before(:each) do
-        @command = stubbed_env.stub_command('command')
-        expect(@command).to receive(:called_with_args?).with('first_argument', 'second_argument', anything).and_return(true)
+        @command = stubbed_env.stub_command('stubbed_command')
         @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-          command first_argument second_argument
+          stubbed_command first_argument second_argument
         multiline_script
         )
       end
@@ -23,10 +22,9 @@ describe 'be_called_with_arguments' do
     end
     context 'and the at_position chain call' do
       before(:each) do
-        @command = stubbed_env.stub_command('command')
-        expect(@command).to receive(:called_with_args?).with('first_argument', 'second_argument', position: 0).and_return(true)
+        @command = stubbed_env.stub_command('stubbed_command')
         @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-          command first_argument second_argument
+          stubbed_command first_argument second_argument
         multiline_script
         )
       end
@@ -38,12 +36,11 @@ describe 'be_called_with_arguments' do
   context 'with a sub-command' do
     context 'and no chain calls' do
       before(:each) do
-        @command = stubbed_env.stub_command('command')
+        @command = stubbed_env.stub_command('stubbed_command')
         @sub_command = @command.with_args('sub_command')
 
-        expect(@sub_command).to receive(:called_with_args?).with('first_argument', 'second_argument', anything).and_return(true)
         @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-          command sub_command first_argument second_argument
+          stubbed_command sub_command first_argument second_argument
         multiline_script
         )
       end
@@ -53,12 +50,11 @@ describe 'be_called_with_arguments' do
     end
     context 'and the at_position chain call' do
       before(:each) do
-        @command = stubbed_env.stub_command('command')
+        @command = stubbed_env.stub_command('stubbed_command')
         @sub_command = @command.with_args('sub_command')
 
-        expect(@sub_command).to receive(:called_with_args?).with('first_argument', 'second_argument', position: 0).and_return(true)
         @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
-          command sub_command first_argument second_argument
+          stubbed_command sub_command first_argument second_argument
         multiline_script
         )
       end
