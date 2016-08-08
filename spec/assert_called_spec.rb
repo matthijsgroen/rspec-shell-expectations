@@ -74,27 +74,6 @@ describe 'Assert called' do
       end
     end
 
-    context 'with same command called twice' do
-      it 'matches against correct number of invocations' do
-        subject
-        expect(second_command).to_not be_called_with_arg('foo').times(2)
-      end
-    end
-
-    context 'with command called exactly once' do
-      it 'matches against correct number of invocations' do
-        subject
-        expect(first_command).to be_called_with_arg('foo bar').times(1)
-      end
-    end
-
-    context 'with command called with arbitrary arguments' do
-        it 'matches when command is called zero times with target argument' do
-        subject
-        expect(first_command).to be_called_with_arg('zoo').times(0)
-      end
-    end
-
     describe 'assertion message' do
       it 'provides a helpful message' do
         expect(first_command.inspect).to eql '<Stubbed "first_command">'
