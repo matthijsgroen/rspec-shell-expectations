@@ -76,11 +76,44 @@ describe 'Stub command output' do
       let(:passed_filename) { ['hello-', :arg2, '.foo'] }
       let(:filename) { 'hello-output.foo' }
 
-      it 'writes data to a interpolated filename' do
+      it 'writes data to an interpolated filename' do
         command1_stub.outputs('world', to: passed_filename)
         subject
         expect(Pathname.new(filename).read).to eql 'world'
       end
+    end
+  end
+
+  describe 'stubbing commands with arguments passed to stdout' do
+    subject do
+      stubbed_env.execute "#{script_path}"
+    end
+    
+    let(:script) do
+      <<-SCRIPT
+        command1 input output
+      SCRIPT
+    end
+
+    it 'outputs correctly when all arguments match' do
+      command1_stub.with_args('input', 'output').outputs('world', to: :stdout)
+      o, e, _s = subject
+      expect(e).to be_empty
+      expect(o).to eql 'world'
+    end
+
+    it 'does not output when called with extra arguments, even if some match' do
+      command1_stub.with_args('input', 'output', 'anything').outputs('arbitrary string', to: :stdout)
+      o, e, _s = subject
+      expect(e).to be_empty
+      expect(o).to be_empty
+    end
+
+    it 'does not output when called with only one matching argument out of many' do
+      command1_stub.with_args('input').outputs('arbitrary string', to: :stdout)
+      o, e, _s = subject
+      expect(e).to be_empty
+      expect(o).to be_empty
     end
   end
 end
