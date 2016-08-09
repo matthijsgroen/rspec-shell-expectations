@@ -21,19 +21,20 @@ module Rspec
           nil
         end
 
-        def contains_argument_series?(*expected_argument_series, sub_command_series: [], position: false)
+        def contains_argument_series?(*contains_arguments)
+          get_argument_count(*contains_arguments) > 0
+        end
+
+        def get_argument_count(*expected_argument_series, sub_command_series: [], position: false)
           expected_argument_series ||= []
-          return true if expected_argument_series.empty?
 
           call_log_list = load_call_log_list
-          sub_command_argument_list = extract_sub_command_arguments_from_call_log(call_log_list, sub_command_series)
-          position_range_argument_list = extract_position_range_from_argument_list(sub_command_argument_list, position, expected_argument_series.size)
+          sub_command_argument_list = get_sub_command_arguments_from_call_log(call_log_list, sub_command_series)
+          position_range_argument_list = get_position_range_from_argument_list(sub_command_argument_list, position, expected_argument_series.size)
 
-          position_range_argument_list.each do |actual_argument_series|
-            return true if argument_series_contains?(actual_argument_series, expected_argument_series)
+          position_range_argument_list.count do |actual_argument_series|
+            argument_series_contains?(actual_argument_series, expected_argument_series)
           end
-
-          false
         end
 
         private
@@ -46,7 +47,7 @@ module Rspec
           nil
         end
 
-        def extract_sub_command_arguments_from_call_log(call_log_list, sub_command_list)
+        def get_sub_command_arguments_from_call_log(call_log_list, sub_command_list)
           call_log_list.map { |call_log|
             call_log_argument_series = call_log['args'] || []
 
@@ -55,14 +56,15 @@ module Rspec
           }.compact
         end
 
-        def extract_position_range_from_argument_list(argument_list, range_start_position, range_length)
+        def get_position_range_from_argument_list(argument_list, range_start_position, range_length)
           argument_list.map { |argument_series|
             range_start_position ? argument_series[range_start_position, range_length] : argument_series
           }
         end
 
-        def argument_series_contains?(actual_argument_sequence, expected_argument_sequence)
-          actual_argument_sequence.each_cons(expected_argument_sequence.size).include? expected_argument_sequence
+        def argument_series_contains?(actual_argument_series, expected_argument_series)
+          expected_argument_series.empty? or
+              actual_argument_series.each_cons(expected_argument_series.size).include? expected_argument_series
         end
 
         def load_call_log_list
