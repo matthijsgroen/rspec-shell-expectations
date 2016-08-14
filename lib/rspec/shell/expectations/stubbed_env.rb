@@ -33,26 +33,22 @@ module Rspec
         end
 
         def execute(command, env_vars = {})
-          full_command=<<-multiline_script
-            /usr/bin/env bash -c '
-            # load in command and function overrides
-            source <(cat #{@dir}/*_overrides.sh)
-
-            # run the command via the source file
-            #{env} source #{command} 2> #{@dir}/errors
-            command_exit_code=$?
-
-            # filter stderr for readonly problems
-            cat #{@dir}/errors | grep -v "readonly function" >&2
-
-            # return original exit code
-            exit ${command_exit_code}'
+          full_command=wrap_execute(<<-multiline_script
+            #{env} source #{command} 2> #{wrapped_error_path}
           multiline_script
+          )
+
           Open3.capture3(env_vars, full_command)
         end
 
         def execute_function(script, command, env_vars = {})
-          Open3.capture3(env_vars, "bash -c 'source #{script} && #{env} #{command}'")
+          full_command=wrap_execute(<<-multiline_script
+            source #{script} 2> #{wrapped_error_path}
+            #{env} #{command}
+          multiline_script
+          )
+
+          Open3.capture3(env_vars, full_command)
         end
 
         def execute_inline(command_string, env_vars = {})
@@ -69,6 +65,27 @@ module Rspec
           template = ERB.new File.new(overrides_filepath).read, nil, "%"
           overrides_content = template.result(binding)
           File.write(overrides_path, overrides_content)
+        end
+
+        def wrap_execute(execution_snippet)
+          <<-multiline_script
+            /usr/bin/env bash -c '
+            # load in command and function overrides
+            source <(cat #{@dir}/*_overrides.sh)
+
+            #{execution_snippet}
+            command_exit_code=$?
+
+            # filter stderr for readonly problems
+            grep -v "readonly function" #{wrapped_error_path}  >&2
+
+            # return original exit code
+            exit ${command_exit_code}'
+          multiline_script
+        end
+
+        def wrapped_error_path
+          "#{@dir}/errors"
         end
 
         def env
