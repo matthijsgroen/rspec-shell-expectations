@@ -5,7 +5,7 @@ describe 'StubbedEnv' do
   include Rspec::Shell::Expectations
   let(:subject) { Rspec::Shell::Expectations::StubbedEnv.new }
 
-  context '#execute' do
+  context '#execute_inline' do
     context 'with a stubbed function' do
       before(:each) do
         @overridden_function = subject.stub_command('overridden_function')
@@ -14,7 +14,16 @@ describe 'StubbedEnv' do
 
       context 'and no arguments' do
         before(:each) do
-          @stdout, @stderr, @status = subject.execute('./spec/scripts/script_with_overridden_function.sh')
+          @stdout, @stderr, @status = subject.execute_inline(<<-multiline_script
+          #!/usr/bin/env bash
+            function overridden_function {
+              echo 'i was not overridden'
+            }
+            overridden_function
+
+            echo 'standard error output' 1>&2
+          multiline_script
+          )
         end
 
         it 'calls the stubbed function' do
@@ -32,7 +41,16 @@ describe 'StubbedEnv' do
 
       context 'and simple arguments' do
         before(:each) do
-          @stdout, @stderr, @status = subject.execute('./spec/scripts/script_with_overridden_function.sh argument_one argument_two')
+          @stdout, @stderr, @status = subject.execute_inline(<<-multiline_script
+          #!/usr/bin/env bash
+            function overridden_function {
+              echo 'i was not overridden'
+            }
+            overridden_function argument_one argument_two
+
+            echo 'standard error output' 1>&2
+          multiline_script
+          )
         end
 
         it 'calls the stubbed function' do
@@ -46,7 +64,16 @@ describe 'StubbedEnv' do
 
       context 'and complex arguments (spaces, etc.)' do
         before(:each) do
-          @stdout, @stderr, @status = subject.execute('./spec/scripts/script_with_overridden_function.sh "argument one" "argument two"')
+          @stdout, @stderr, @status = subject.execute_inline(<<-multiline_script
+          #!/usr/bin/env bash
+            function overridden_function {
+              echo 'i was not overridden'
+            }
+            overridden_function "argument one" "argument two"
+
+            echo 'standard error output' 1>&2
+          multiline_script
+          )
         end
 
         it 'calls the stubbed function' do
@@ -66,7 +93,11 @@ describe 'StubbedEnv' do
 
       context 'and no arguments' do
         before(:each) do
-          @stdout, @stderr, @status = subject.execute('./spec/scripts/script_with_overridden_command.sh')
+          @stdout, @stderr, @status = subject.execute_inline(<<-multiline_script
+            #!/usr/bin/env bash
+            overridden_command
+          multiline_script
+          )
         end
 
         it 'calls the stubbed command' do
@@ -80,7 +111,11 @@ describe 'StubbedEnv' do
 
       context 'and simple arguments' do
         before(:each) do
-          @stdout, @stderr, @status = subject.execute('./spec/scripts/script_with_overridden_command.sh argument_one argument_two')
+          @stdout, @stderr, @status = subject.execute_inline(<<-multiline_script
+            #!/usr/bin/env bash
+            overridden_command argument_one argument_two
+          multiline_script
+          )
         end
 
         it 'calls the stubbed command' do
@@ -94,7 +129,11 @@ describe 'StubbedEnv' do
 
       context 'and complex arguments (spaces, etc.)' do
         before(:each) do
-          @stdout, @stderr, @status = subject.execute('./spec/scripts/script_with_overridden_command.sh "argument one" "argument two"')
+          @stdout, @stderr, @status = subject.execute_inline(<<-multiline_script
+            #!/usr/bin/env bash
+            overridden_command "argument one" "argument two"
+          multiline_script
+          )
         end
 
         it 'calls the stubbed command' do

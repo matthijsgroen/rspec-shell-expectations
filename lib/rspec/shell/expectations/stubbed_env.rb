@@ -32,12 +32,32 @@ module Rspec
         end
 
         def execute(command, env_vars = {})
-          full_command="bash -c 'source <(cat #{@dir}/*_overrides.sh); #{env} source #{command} 2> #{@dir}/errors && cat #{@dir}/errors | grep -v \"readonly function\" >&2'"
-          Open3.capture3(env_vars, full_command)
+          full_command=<<-multiline_script
+            /usr/bin/env bash -c '
+            # load in command and function overrides
+            source <(cat #{@dir}/*_overrides.sh)
+
+            # run the command via the source file
+            #{env} source #{command} 2> #{@dir}/errors
+            command_exit_code=$?
+
+            # filter stderr for readonly problems
+            cat #{@dir}/errors | grep -v "readonly function" >&2
+
+            # return original exit code
+            exit ${command_exit_code}'
+          multiline_script
+          Open3.capture3(env_vars,full_command)
         end
 
         def execute_function(script, command, env_vars = {})
           Open3.capture3(env_vars, "bash -c 'source #{script} && #{env} #{command}'")
+        end
+
+        def execute_inline(command_string, env_vars = {})
+          temp_command_path=Dir::Tmpname.make_tmpname("#{@dir}/inline-", nil)
+          File.write(temp_command_path, command_string)
+          execute(temp_command_path, env_vars)
         end
 
         private
