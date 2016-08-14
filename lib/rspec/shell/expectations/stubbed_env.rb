@@ -32,7 +32,8 @@ module Rspec
         end
 
         def execute(command, env_vars = {})
-          Open3.capture3(env_vars, "#{env} #{command}")
+          full_command="bash -c 'source <(cat #{@dir}/*_overrides.sh); #{env} source #{command} 2> #{@dir}/errors && cat #{@dir}/errors | grep -v \"readonly function\" >&2'"
+          Open3.capture3(env_vars, full_command)
         end
 
         def execute_function(script, command, env_vars = {})
