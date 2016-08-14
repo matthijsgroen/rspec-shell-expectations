@@ -9,6 +9,7 @@ describe 'StubbedEnv' do
     context 'with a stubbed function' do
       before(:each) do
         @overridden_function = subject.stub_command('overridden_function')
+        @overridden_command = subject.stub_command('overridden_command')
         @overridden_function.outputs('i was overridden')
       end
 
@@ -88,6 +89,7 @@ describe 'StubbedEnv' do
     context 'with a stubbed command' do
       before(:each) do
         @overridden_command = subject.stub_command('overridden_command')
+        @overridden_function = subject.stub_command('overridden_function')
         @overridden_command.outputs('i was overridden')
       end
 
@@ -151,6 +153,7 @@ describe 'StubbedEnv' do
     context 'with a stubbed function' do
       before(:each) do
         @overridden_function = subject.stub_command('overridden_function')
+        @overridden_command = subject.stub_command('overridden_command')
         @overridden_function.outputs('i was overridden')
         @overridden_function.outputs('standard error output', to: :stderr)
       end
@@ -212,6 +215,7 @@ describe 'StubbedEnv' do
     end
     context 'with a stubbed command' do
       before(:each) do
+        @overridden_function = subject.stub_command('overridden_function')
         @overridden_command = subject.stub_command('overridden_command')
         @overridden_command.outputs('i was overridden')
       end

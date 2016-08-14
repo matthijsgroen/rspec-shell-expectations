@@ -1,5 +1,3 @@
-require 'erb'
-
 module Rspec
   module Shell
     module Expectations
