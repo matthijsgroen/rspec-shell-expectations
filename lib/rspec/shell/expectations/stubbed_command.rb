@@ -12,11 +12,6 @@ module Rspec
           command_path = File.join(dir, command)
           FileUtils.cp(stub_filepath, command_path)
 
-          overrides_path = File.join(dir, "#{command}_overrides.sh")
-          template = ERB.new File.new(overrides_filepath).read, nil, "%"
-          overrides_content = template.result(binding)
-          File.write(overrides_path, overrides_content)
-
           @call_configuration = CallConfiguration.new(
               Pathname.new(dir).join("#{command}_stub.yml"),
               command
@@ -58,10 +53,6 @@ module Rspec
 
         def stub_filepath
           project_root.join('bin', 'stub')
-        end
-
-        def overrides_filepath
-          project_root.join('bin', 'overrides.sh.erb')
         end
 
         def project_root

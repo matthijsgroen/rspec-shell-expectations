@@ -28,6 +28,7 @@ module Rspec
         end
 
         def stub_command(command)
+          wrap_command command
           StubbedCommand.new command, @dir
         end
 
@@ -47,7 +48,7 @@ module Rspec
             # return original exit code
             exit ${command_exit_code}'
           multiline_script
-          Open3.capture3(env_vars,full_command)
+          Open3.capture3(env_vars, full_command)
         end
 
         def execute_function(script, command, env_vars = {})
@@ -62,8 +63,25 @@ module Rspec
 
         private
 
+        def wrap_command(command)
+          command_path = File.join(@dir, command)
+          overrides_path = File.join(@dir, "#{command}_overrides.sh")
+          template = ERB.new File.new(overrides_filepath).read, nil, "%"
+          overrides_content = template.result(binding)
+          File.write(overrides_path, overrides_content)
+        end
+
         def env
           "PATH=#{@dir}:$PATH"
+        end
+
+        def overrides_filepath
+          project_root.join('bin', 'overrides.sh.erb')
+        end
+
+        def project_root
+          Pathname.new(File.dirname(File.expand_path(__FILE__)))
+              .join('..', '..', '..', '..')
         end
       end
     end
