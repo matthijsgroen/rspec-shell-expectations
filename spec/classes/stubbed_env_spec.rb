@@ -175,7 +175,7 @@ describe 'StubbedEnv' do
         end
 
         it 'prints provided stderr output to standard error' do
-          expect(@stderr).to eql('standard error output')
+          expect(@stderr).to eql("standard error output\n")
         end
       end
 

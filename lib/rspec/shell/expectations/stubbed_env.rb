@@ -33,8 +33,8 @@ module Rspec
         end
 
         def execute(command, env_vars = {})
-          full_command=wrap_execute(<<-multiline_script
-            #{env} source #{command} 2> #{wrapped_error_path}
+          full_command=get_wrapped_execution_with_function_overrides(<<-multiline_script
+            #{env} source #{command}
           multiline_script
           )
 
@@ -42,8 +42,8 @@ module Rspec
         end
 
         def execute_function(script, command, env_vars = {})
-          full_command=wrap_execute(<<-multiline_script
-            source #{script} 2> #{wrapped_error_path}
+          full_command=get_wrapped_execution_with_function_overrides(<<-multiline_script
+            source #{script}
             #{env} #{command}
           multiline_script
           )
@@ -60,8 +60,8 @@ module Rspec
         private
 
         def write_function_override_file_for_command(command)
-          command_binding_for_template = command
-          command_path_binding_for_template = File.join(@dir, command)
+          function_command_binding_for_template = command
+          function_command_path_binding_for_template = File.join(@dir, command)
 
           function_override_file_path = File.join(@dir, "#{command}_overrides.sh")
           function_override_file_template = ERB.new File.new(function_override_template_path).read, nil, "%"
@@ -70,25 +70,14 @@ module Rspec
           File.write(function_override_file_path, function_override_file_content)
         end
 
-        def wrap_execute(execution_snippet)
-          <<-multiline_script
-            /usr/bin/env bash -c '
-            # load in command and function overrides
-            source <(cat #{@dir}/*_overrides.sh)
+        def get_wrapped_execution_with_function_overrides(execution_snippet)
+          execution_binding_for_template = execution_snippet
+          function_override_path_binding_for_template="#{@dir}/*_overrides.sh"
+          wrapped_error_path_binding_for_template = "#{@dir}/errors"
 
-            #{execution_snippet}
-            command_exit_code=$?
+          function_override_wrapper_template = ERB.new File.new(function_override_wrapper_template_path).read, nil, "%"
 
-            # filter stderr for readonly problems
-            grep -v "readonly function" #{wrapped_error_path}  >&2
-
-            # return original exit code
-            exit ${command_exit_code}'
-          multiline_script
-        end
-
-        def wrapped_error_path
-          "#{@dir}/errors"
+          function_override_wrapper_template.result(binding)
         end
 
         def env
@@ -96,7 +85,11 @@ module Rspec
         end
 
         def function_override_template_path
-          project_root.join('bin', 'overrides.sh.erb')
+          project_root.join('bin', 'function_override.sh.erb')
+        end
+
+        def function_override_wrapper_template_path
+          project_root.join('bin', 'function_override_wrapper.sh.erb')
         end
 
         def project_root
