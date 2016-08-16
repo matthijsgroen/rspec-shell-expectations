@@ -12,7 +12,7 @@ describe 'StubbedCommand' do
 
   context '#called_with_args?' do
     before(:each) do
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', '.')
       @stubbed_call = double(Rspec::Shell::Expectations::StubbedCall)
     end
     context 'with only a series of arguments' do
@@ -33,7 +33,7 @@ describe 'StubbedCommand' do
 
   context '#with_args' do
     before(:each) do
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', '.')
     end
     context 'with arguments provided' do
       it 'creates a new StubbedCall with those arguments' do

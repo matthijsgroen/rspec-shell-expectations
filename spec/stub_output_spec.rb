@@ -43,7 +43,7 @@ describe 'Stub command output' do
     it 'changes standard-out' do
       command1_stub.outputs('world', to: :stderr)
       o, e, _s = subject
-      expect(e).to eql "world\n"
+      expect(e).to eql 'world'
       expect(o).to be_empty
     end
   end
