@@ -7,9 +7,7 @@ module Rspec
         attr_reader :call_log
 
         def initialize(command, dir)
-          command_path = File.join(dir, command)
-          FileUtils.cp(stub_filepath, command_path)
-
+          FileUtils.cp(stub_filepath, File.join(dir, command))
           @call_configuration = CallConfiguration.new(
               Pathname.new(dir).join("#{command}_stub.yml"),
               command

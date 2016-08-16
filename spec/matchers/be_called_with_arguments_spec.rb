@@ -11,7 +11,7 @@ describe 'be_called_with_arguments' do
     context 'and no chain calls' do
       before(:each) do
         @command = stubbed_env.stub_command('stubbed_command')
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
+        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
           stubbed_command first_argument second_argument
         multiline_script
         )
@@ -23,7 +23,7 @@ describe 'be_called_with_arguments' do
     context 'and the at_position chain call' do
       before(:each) do
         @command = stubbed_env.stub_command('stubbed_command')
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
+        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
           stubbed_command first_argument second_argument
         multiline_script
         )
@@ -39,7 +39,7 @@ describe 'be_called_with_arguments' do
         @command = stubbed_env.stub_command('stubbed_command')
         @sub_command = @command.with_args('sub_command')
 
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
+        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
           stubbed_command sub_command first_argument second_argument
         multiline_script
         )
@@ -53,7 +53,7 @@ describe 'be_called_with_arguments' do
         @command = stubbed_env.stub_command('stubbed_command')
         @sub_command = @command.with_args('sub_command')
 
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
+        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute(<<-multiline_script
           stubbed_command sub_command first_argument second_argument
         multiline_script
         )
