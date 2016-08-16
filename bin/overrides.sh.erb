@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
-requote() {
-  local res=""
-  for x in "${@}" ; do
-    grep -q "[[:space:]]" <<< "$x" && res="${res} '${x}'" || res="${res} ${x}"
-  done
-  sed -e 's/^ //' <<< "${res}"
+
+function <%=command_binding_for_template%> {
+  <%=command_path_binding_for_template%> "${@}"
 }
 
-function <%=command%> {
-  local arguments=$(requote "${@}")
-  bash -c "<%=command_path%> ${arguments}"
-}
-
-readonly -f <%=command%> &> /dev/null
+readonly -f <%=command_binding_for_template%> &> /dev/null

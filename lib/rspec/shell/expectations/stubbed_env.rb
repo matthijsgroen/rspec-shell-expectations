@@ -28,7 +28,7 @@ module Rspec
         end
 
         def stub_command(command)
-          wrap_command command
+          write_function_override_file_for_command command
           StubbedCommand.new command, @dir
         end
 
@@ -59,12 +59,15 @@ module Rspec
 
         private
 
-        def wrap_command(command)
-          command_path = File.join(@dir, command)
-          overrides_path = File.join(@dir, "#{command}_overrides.sh")
-          template = ERB.new File.new(overrides_filepath).read, nil, "%"
-          overrides_content = template.result(binding)
-          File.write(overrides_path, overrides_content)
+        def write_function_override_file_for_command(command)
+          command_binding_for_template = command
+          command_path_binding_for_template = File.join(@dir, command)
+
+          function_override_file_path = File.join(@dir, "#{command}_overrides.sh")
+          function_override_file_template = ERB.new File.new(function_override_template_path).read, nil, "%"
+          function_override_file_content = function_override_file_template.result(binding)
+
+          File.write(function_override_file_path, function_override_file_content)
         end
 
         def wrap_execute(execution_snippet)
@@ -92,7 +95,7 @@ module Rspec
           "PATH=#{@dir}:$PATH"
         end
 
-        def overrides_filepath
+        def function_override_template_path
           project_root.join('bin', 'overrides.sh.erb')
         end
 
