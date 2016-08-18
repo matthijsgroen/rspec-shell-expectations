@@ -1,6 +1,8 @@
 /usr/bin/env bash -c '
 # load in command and function overrides
-source <(cat <%=function_override_path_binding_for_template%>)
+for override_file in <%=function_override_path_binding_for_template%>; do
+  source ${override_file}
+done
 
 (
   <%=execution_binding_for_template%>
