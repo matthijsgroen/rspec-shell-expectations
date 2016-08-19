@@ -29,8 +29,8 @@ describe 'Assert called' do
   describe 'assert called' do
     it 'returns called status' do
       subject
-      expect(rake.with_args('foo:bar')).to be_called
-      expect(rake.with_args('foo')).not_to be_called
+      expect(rake).to be_called_with_arguments('foo:bar')
+      expect(rake).not_to be_called_with_arguments('foo')
     end
   end
 end
