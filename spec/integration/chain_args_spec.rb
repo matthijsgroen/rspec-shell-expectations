@@ -4,7 +4,9 @@ require 'rspec/shell/expectations'
 describe 'Assert called' do
   include Rspec::Shell::Expectations
   let(:stubbed_env) { create_stubbed_env }
-  let!(:rake) { stubbed_env.stub_command('bundle').with_args('exec', 'rake') }
+  let!(:bundle) {
+    stubbed_env.stub_command('bundle')
+  }
 
   let(:script) do
     <<-SCRIPT
@@ -29,8 +31,8 @@ describe 'Assert called' do
   describe 'assert called' do
     it 'returns called status' do
       subject
-      expect(rake).to be_called_with_arguments('foo:bar')
-      expect(rake).not_to be_called_with_arguments('foo')
+      expect(bundle).to be_called_with_arguments('exec', 'rake', 'foo:bar')
+      expect(bundle).not_to be_called_with_arguments('exec', 'rake', 'foo')
     end
   end
 end
