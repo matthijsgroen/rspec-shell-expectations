@@ -27,4 +27,14 @@ describe 'StubbedCommand' do
       end
     end
   end
+
+  context '#with_args' do
+    before(:each) do
+      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject.with_args('argument_one', 'argument_two')
+    end
+    it 'sets the arguments array on the StubbedCommand to the arguments that were passed in' do
+      expect(@subject.arguments).to eql %w(argument_one argument_two)
+    end
+  end
 end
