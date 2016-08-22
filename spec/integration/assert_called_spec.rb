@@ -16,25 +16,21 @@ describe 'Assert called' do
   before do
     script_path.open('w') { |f| f.puts script }
     script_path.chmod 0777
+
+    stubbed_env.execute script_path.to_s
   end
 
   after do
     script_path.delete
   end
 
-  subject do
-    stubbed_env.execute script_path.to_s
-  end
-
   describe 'assert called' do
     it 'returns called status' do
-      subject
       expect(first_command).to be_called
     end
 
     context 'assert with args' do
       it 'returns called status' do
-        subject
         expect(first_command).to be_called_with_arguments('foo bar')
         expect(first_command).not_to be_called_with_arguments('foot')
       end
