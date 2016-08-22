@@ -35,8 +35,8 @@ describe 'Assert called' do
     context 'assert with args' do
       it 'returns called status' do
         subject
-        expect(first_command.with_args('foo bar')).to be_called
-        expect(first_command.with_args('foo')).not_to be_called
+        expect(first_command).to be_called_with_arguments('foo bar')
+        expect(first_command).not_to be_called_with_arguments('foot')
       end
     end
 

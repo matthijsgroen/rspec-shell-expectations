@@ -1,8 +1,6 @@
 require 'English'
 require 'rspec/shell/expectations'
 
-# TODO - the below specs test implementation, until the goofy wiring of StubbedCommand => StubbedCall => CallLog is sorted out
-
 describe 'StubbedCommand' do
   include Rspec::Shell::Expectations
   let(:stubbed_env) { create_stubbed_env }
@@ -12,20 +10,19 @@ describe 'StubbedCommand' do
 
   context '#called_with_args?' do
     before(:each) do
+      @call_log = double(Rspec::Shell::Expectations::CallLog)
+      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
       @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
-      @stubbed_call = double(Rspec::Shell::Expectations::StubbedCall)
     end
     context 'with only a series of arguments' do
-      it 'passes the check to its StubbedCall\'s #called_with_args? method' do
-        expect(@subject).to receive(:with_args).with(no_args).and_return(@stubbed_call)
-        expect(@stubbed_call).to receive(:called_with_args?).with('first_argument', 'second_argument', anything).and_return(true)
+      it 'passes the check to its CallLog\'s #called_with_args? method' do
+        expect(@call_log).to receive(:called_with_args?).with('first_argument', 'second_argument', anything).and_return(true)
         @subject.called_with_args?('first_argument', 'second_argument')
       end
     end
-    context 'with only a series of arguments and a position' do
-      it 'passes the check to its StubbedCall\'s #called_with_args? method' do
-        expect(@subject).to receive(:with_args).with(no_args).and_return(@stubbed_call)
-        expect(@stubbed_call).to receive(:called_with_args?).with('first_argument', 'second_argument', position: 0).and_return(true)
+    context 'with a series of arguments and a position' do
+      it 'passes the check to its CallLog\'s #called_with_args? method' do
+        expect(@call_log).to receive(:called_with_args?).with('first_argument', 'second_argument', position: 0).and_return(true)
         @subject.called_with_args?('first_argument', 'second_argument', position: 0)
       end
     end
@@ -34,18 +31,10 @@ describe 'StubbedCommand' do
   context '#with_args' do
     before(:each) do
       @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject.with_args('argument_one', 'argument_two')
     end
-    context 'with arguments provided' do
-      it 'creates a new StubbedCall with those arguments' do
-        expect(Rspec::Shell::Expectations::StubbedCall).to receive(:new).with(anything, anything, ['first_sub_command', 'second_sub_command'])
-        @subject.with_args('first_sub_command', 'second_sub_command')
-      end
-    end
-    context 'with no arguments provided' do
-      it 'creates a new StubbedCall with no arguments' do
-        expect(Rspec::Shell::Expectations::StubbedCall).to receive(:new).with(anything, anything, [])
-        @subject.with_args
-      end
+    it 'sets the arguments array on the StubbedCommand to the arguments that were passed in' do
+      expect(@subject.arguments).to eql %w(argument_one argument_two)
     end
   end
 end

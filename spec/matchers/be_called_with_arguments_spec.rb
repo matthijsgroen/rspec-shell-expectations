@@ -16,7 +16,7 @@ describe 'be_called_with_arguments' do
         multiline_script
         )
       end
-      it 'passes the check to the StubCommand\'s #called_with_args? method' do
+      it 'correctly identifies the called arguments' do
         expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
       end
     end
@@ -28,38 +28,8 @@ describe 'be_called_with_arguments' do
         multiline_script
         )
       end
-      it 'passes the check to the StubCommand\'s #called_with_args? method' do
+      it 'correctly identifies the called arguments' do
         expect(@command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0)
-      end
-    end
-  end
-  context 'with a sub-command' do
-    context 'and no chain calls' do
-      before(:each) do
-        @command = stubbed_env.stub_command('stubbed_command')
-        @sub_command = @command.with_args('sub_command')
-
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-          stubbed_command sub_command first_argument second_argument
-        multiline_script
-        )
-      end
-      it 'passes the check to the StubCall\'s #called_with_args? method' do
-        expect(@sub_command).to be_called_with_arguments('first_argument', 'second_argument')
-      end
-    end
-    context 'and the at_position chain call' do
-      before(:each) do
-        @command = stubbed_env.stub_command('stubbed_command')
-        @sub_command = @command.with_args('sub_command')
-
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-          stubbed_command sub_command first_argument second_argument
-        multiline_script
-        )
-      end
-      it 'passes the check to the StubCall\'s #called_with_args? method' do
-        expect(@sub_command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0)
       end
     end
   end
