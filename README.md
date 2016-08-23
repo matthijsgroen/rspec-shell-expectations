@@ -203,7 +203,7 @@ end
 
 ## More examples
 
-see the *features* and *spec* folder
+see the *spec/integration* folder
 
 ## Supported ruby versions
 
