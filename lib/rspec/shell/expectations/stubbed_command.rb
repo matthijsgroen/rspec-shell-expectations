@@ -30,6 +30,10 @@ module Rspec
         def called_with_args?(*args, position: false)
           @call_log.called_with_args?(*args, position: position)
         end
+        
+        def get_argument_count(*arg)
+          @call_log.get_argument_count(*arg)
+        end
 
         def returns_exitstatus(statuscode)
           @call_configuration.set_exitcode(statuscode, @arguments)
