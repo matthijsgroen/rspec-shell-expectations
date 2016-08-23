@@ -7,17 +7,16 @@ Run your shell script in a mocked environment to test its behaviour
 using RSpec.
 
 ## Features
-
-- Setup a fake shell environment that has preference in exucing commands
-  (highest path value)
-- Stub shell commands in this environment
-- Control multiple outputs (through STDOUT, STDERR or files)
+- Test bash functions, entire scripts and inline scripts
+- Stub shell commands and their exitstatus and outputs
+- Parital mocks of functions
 - Control exit status codes
-- Set different configurations based on command line arguments
+- Control multiple outputs (through STDOUT, STDERR or files)
+- Verify STDIN, STDOUT, STDERR
 - Verify if command is called
-- Verify arguments command is called with
-- Verify STDIN
-
+- Verify command is called with specific arguments
+- Verify arguments of command were called in correct sequence
+- Verify command with specific arguments was called correct number of times
 
 ## Installation
 
@@ -81,12 +80,12 @@ see specs in `spec/` folder:
 
   it 'is stubbed' do
     stubbed_env.execute 'my-script.sh'
-    expect(rake.with_args('test')).to be_called
-    expect(bundle.with_args('install)).to be_called
+    expect(rake).to be_called_with_arguments('test')
+    expect(bundle).to be_called_with_arguments('install)
   end
 ```
 
-### Changing exitstatus:
+### Changing exitstatus of stubs:
 
 ```ruby
   let(:stubbed_env) { create_stubbed_env }
@@ -110,20 +109,6 @@ see specs in `spec/` folder:
   end
 ```
 
-### Verifying called:
-
-```ruby
-  let(:stubbed_env) { create_stubbed_env }
-  let(:rake_stub) { stubbed_env.stub_command 'rake' }
-  it 'verifies called' do
-    stubbed_env.execute_script 'script.sh'
-
-    expect(rake_stub).to be_called
-    expect(rake_stub.with_args('spec')).to be_called
-    expect(rake_stub.with_args('features')).not_to be_called
-  end
-```
-
 ### Verifying stdin:
 
 ```ruby
@@ -135,6 +120,85 @@ see specs in `spec/` folder:
     expect(cat_stub.stdin).to eql 'hello'
     expect(mail_stub.with_args('-s', 'hello').stdin).to eql 'world'
   end
+```
+### Test entire script
+
+```ruby
+let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
+stubbed_env.execute('./spec/scripts/function_library.sh')
+```
+
+### Test specific funcion
+
+```ruby
+let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
+stubbed_env.stub_command('overridden_function')
+stubbed_env.execute_function(
+    './spec/scripts/function_library.sh',
+    'overridden_function'
+)
+
+```
+
+### Test inline script
+
+```ruby
+let(:stubbed_env) { create_stubbed_env }
+stubbed_env.stub_command('stubbed_command')
+stubbed_env.execute_inline(<<-multiline_script
+    stubbed_command first_argument second_argument
+    multiline_script
+)
+
+```
+### Check that mock was called with specific arguments
+
+```ruby
+describe 'be_called_with_arguments' do
+  include Rspec::Shell::Expectations
+  let(:stubbed_env) { create_stubbed_env }
+
+  context 'with a command' do
+    context 'and no chain calls' do
+      before(:each) do
+        @command = stubbed_env.stub_command('stubbed_command')
+        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
+          stubbed_command first_argument second_argument
+        multiline_script
+        )
+      end
+      it 'correctly identifies the called arguments' do
+        expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
+      end
+      it 'correctly identifies the called arguments' do
+        expect(@command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0) # The sequence 'first_argument', 'second_argument' starting at position 0
+      end
+    end
+  end
+end
+```
+
+### Check that mock was called a certain number of times
+```ruby
+context 'and the times chain call' do
+  before(:each) do
+    @command = stubbed_env.stub_command('stubbed_command')
+    @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
+      stubbed_command duplicated_argument once_called_argument
+      stubbed_command duplicated_argument
+    multiline_script
+    )
+  end
+  it 'matches when arguments are called twice' do
+    expect(@command).to be_called_with_arguments('duplicated_argument').times(2)
+  end
+  it 'matches when argument is called once' do
+    expect(@command).to be_called_with_arguments('once_called_argument').times(1)
+  end
+  it 'matches when argument combination is called once' do
+    expect(@command).to be_called_with_arguments('duplicated_argument', 'once_called_argument').times(1)
+  end
+end
 ```
 
 ## More examples
