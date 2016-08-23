@@ -9,7 +9,7 @@ using RSpec.
 ## Features
 - Test bash functions, entire scripts and inline scripts
 - Stub shell commands and their exitstatus and outputs
-- Parital mocks of functions
+- Partial mocks of functions
 - Control exit status codes
 - Control multiple outputs (through STDOUT, STDERR or files)
 - Verify STDIN, STDOUT, STDERR
