@@ -49,7 +49,7 @@ in `spec_helper.rb`:
 
 ## Usage
 
-see specs in `spec/` folder:
+see specs in *spec/integration* folder:
 
 ### Running script through stubbed env:
 
@@ -76,11 +76,9 @@ see specs in `spec/` folder:
 ```ruby
   let(:stubbed_env) { create_stubbed_env }
   let!(:bundle) { stubbed_env.stub_command('bundle') }
-  let(:rake) { bundle.with_args('exec', 'rake') }
 
   it 'is stubbed' do
     stubbed_env.execute 'my-script.sh'
-    expect(rake).to be_called_with_arguments('test')
     expect(bundle).to be_called_with_arguments('install)
   end
 ```
