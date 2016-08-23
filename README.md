@@ -123,7 +123,7 @@ see specs in *spec/integration* folder:
 
 ```ruby
 let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
-stubbed_env.execute('./spec/scripts/function_library.sh')
+stubbed_env.execute('./path/to/script.sh')
 ```
 
 ### Test specific function
@@ -132,7 +132,7 @@ stubbed_env.execute('./spec/scripts/function_library.sh')
 let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
 stubbed_env.stub_command('overridden_function')
 stubbed_env.execute_function(
-    './spec/scripts/function_library.sh',
+    './path/to/script.sh',
     'overridden_function'
 )
 
