@@ -123,16 +123,16 @@ see specs in *spec/integration* folder:
 
 ```ruby
 let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
-stubbed_env.execute('./spec/scripts/function_library.sh')
+stubbed_env.execute('./path/to/script.sh')
 ```
 
-### Test specific funcion
+### Test specific function
 
 ```ruby
 let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
 stubbed_env.stub_command('overridden_function')
 stubbed_env.execute_function(
-    './spec/scripts/function_library.sh',
+    './path/to/script.sh',
     'overridden_function'
 )
 
@@ -169,7 +169,8 @@ describe 'be_called_with_arguments' do
         expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
       end
       it 'correctly identifies the called arguments' do
-        expect(@command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0) # The sequence 'first_argument', 'second_argument' starting at position 0
+        # The sequence 'first_argument', 'second_argument' starting at position 0
+        expect(@command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0)
       end
     end
   end
