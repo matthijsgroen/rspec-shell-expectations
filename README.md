@@ -181,6 +181,19 @@ describe 'be_called_with_arguments' do
 end
 ```
 
+### Check that mock was not called with any arguments
+
+```ruby
+@command = stubbed_env.stub_command('stubbed_command')
+stubbed_env.execute_inline(<<-multiline_script
+  stubbed_command
+multiline_script
+
+it 'correctly identifies that no arguments were called' do
+  expect(@command).to be_called_with_no_arguments
+end
+```
+
 ### Check that mock was called a certain number of times
 ```ruby
 context 'and the times chain call' do
