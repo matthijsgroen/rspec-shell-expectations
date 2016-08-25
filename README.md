@@ -17,6 +17,7 @@ using RSpec.
 - Verify command is called with specific arguments
 - Verify arguments of command were called in correct sequence
 - Verify command with specific arguments was called correct number of times
+- Supports RSpec "anything" wildcard matchers
 
 ## Installation
 
@@ -197,6 +198,13 @@ context 'and the times chain call' do
   it 'matches when argument combination is called once' do
     expect(@command).to be_called_with_arguments('duplicated_argument', 'once_called_argument').times(1)
   end
+end
+```
+
+### Use rspec "anything" wildcards for arguments you don't need to match exactly
+```ruby
+it 'correctly matches when wildcard is used for arguments' do
+  expect(@command).to be_called_with_arguments(anything, 'second_argument', anything)
 end
 ```
 

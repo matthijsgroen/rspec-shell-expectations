@@ -63,13 +63,25 @@ module Rspec
         end
 
         def argument_series_contains?(actual_argument_series, expected_argument_series)
+          ensure_wildcards_match(actual_argument_series, expected_argument_series)
           expected_argument_series.empty? or
               actual_argument_series.each_cons(expected_argument_series.size).include? expected_argument_series
         end
-
+        
+        def ensure_wildcards_match(actual_argument_series, expected_argument_series)
+          # yes, i know. i am disappointed in myself
+          num_of_args = actual_argument_series.size
+          expected_argument_series.zip((0..num_of_args), actual_argument_series) do |expected_arg, index, actual_arg|
+            if expected_arg.is_a? RSpec::Mocks::ArgumentMatchers::AnyArgMatcher
+              actual_argument_series[index] = expected_arg
+            end
+          end
+        end
+        
         def load_call_log_list
           YAML.load_file @call_log_path
         end
+
       end
     end
   end

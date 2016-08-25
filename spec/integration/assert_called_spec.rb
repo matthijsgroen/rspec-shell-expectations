@@ -36,6 +36,7 @@ describe 'Assert called' do
       it 'returns called status' do
         subject
         expect(first_command).to be_called_with_arguments('foo bar')
+        expect(first_command).to be_called_with_arguments(anything)
         expect(first_command).not_to be_called_with_arguments('foot')
       end
     end
