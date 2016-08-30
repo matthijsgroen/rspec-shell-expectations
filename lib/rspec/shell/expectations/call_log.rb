@@ -68,7 +68,11 @@ module Rspec
         end
 
         def load_call_log_list
-          YAML.load_file @call_log_path
+          begin
+            YAML.load_file @call_log_path
+          rescue Errno::ENOENT
+            return []
+          end
         end
       end
     end

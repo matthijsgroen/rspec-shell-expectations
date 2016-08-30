@@ -6,6 +6,16 @@ describe 'CallLog' do
   include Rspec::Shell::Expectations
 
   context '#contains_argument_series?' do
+    context 'with no calls made at all (missing call log file)' do
+      before(:each) do
+        @subject = Rspec::Shell::Expectations::CallLog.new('command_with_no_call_log_file')
+        allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
+      end
+
+      it 'does not find an un-passed argument anywhere in the series' do
+        expect(@subject.contains_argument_series?('not_an_argument')).to be_falsey
+      end
+    end
     context 'with only an series of arguments provided' do
       context 'and a command log with only one argument' do
         before(:each) do
