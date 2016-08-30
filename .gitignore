@@ -11,4 +11,6 @@
 *.so
 *.o
 *.a
+*.swp
 mkmf.log
+.idea/

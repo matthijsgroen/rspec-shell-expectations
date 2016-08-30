@@ -1,46 +1,64 @@
 module Rspec
   module Shell
     module Expectations
-      # Command that produces specific output
-      # and monitors input
       class StubbedCommand
+        attr_reader :call_log, :arguments
+
         def initialize(command, dir)
-          FileUtils.cp(stub_filepath, File.join(dir, command))
+          command_path = File.join(dir, command)
+          FileUtils.cp(stub_filepath, command_path)
+          @arguments = []
           @call_configuration = CallConfiguration.new(
-            Pathname.new(dir).join("#{command}_stub.yml"),
-            command
+              Pathname.new(dir).join("#{command}_stub.yml"),
+              command
           )
           @call_log = CallLog.new(
-            Pathname.new(dir).join("#{command}_calls.yml")
+              Pathname.new(dir).join("#{command}_calls.yml")
           )
         end
 
         def with_args(*args)
-          StubbedCall.new(@call_configuration, @call_log, args)
+          @arguments = args
+          self
         end
 
         def called?
-          with_args.called?
+          return false unless @call_log.exist?
+          @call_log.called_with_args?(*@args)
         end
 
-        def called_with_args?(*args)
-          with_args.called_with_args?(*args)
+        def called_with_args?(*args, position: false)
+          @call_log.called_with_args?(*args, position: position)
+        end
+        
+        def get_argument_count(*arg)
+          @call_log.get_argument_count(*arg)
         end
 
         def returns_exitstatus(statuscode)
-          with_args.returns_exitstatus(statuscode)
+          @call_configuration.set_exitcode(statuscode, @arguments)
+          @call_configuration.write
+          self
         end
 
         def stdin
-          with_args.stdin
+          return nil unless @call_log.exist?
+          @call_log.stdin_for_args(*@arguments)
         end
 
         def outputs(contents, to: :stdout)
-          with_args.outputs(contents, to: to)
+          @call_configuration.set_output(contents, to, @arguments)
+          @call_configuration.write
+          self
         end
 
         def inspect
-          with_args.inspect
+          if @arguments.any?
+            "<Stubbed #{@call_configuration.command.inspect} " \
+              "args: #{@arguments.join(' ').inspect}>"
+          else
+            "<Stubbed #{@call_configuration.command.inspect}>"
+          end
         end
 
         private
@@ -51,7 +69,7 @@ module Rspec
 
         def project_root
           Pathname.new(File.dirname(File.expand_path(__FILE__)))
-            .join('..', '..', '..', '..')
+              .join('..', '..', '..', '..')
         end
       end
     end

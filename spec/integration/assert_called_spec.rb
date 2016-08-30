@@ -4,11 +4,11 @@ require 'rspec/shell/expectations'
 describe 'Assert called' do
   include Rspec::Shell::Expectations
   let(:stubbed_env) { create_stubbed_env }
-  let!(:command1_stub) { stubbed_env.stub_command('command1') }
+  let!(:first_command) { stubbed_env.stub_command('first_command') }
 
   let(:script) do
     <<-SCRIPT
-      command1 "foo bar"
+      first_command "foo bar"
     SCRIPT
   end
   let(:script_path) { Pathname.new '/tmp/test_script.sh' }
@@ -29,22 +29,22 @@ describe 'Assert called' do
   describe 'assert called' do
     it 'returns called status' do
       subject
-      expect(command1_stub).to be_called
+      expect(first_command).to be_called
     end
 
     context 'assert with args' do
       it 'returns called status' do
         subject
-        expect(command1_stub.with_args('foo bar')).to be_called
-        expect(command1_stub.with_args('foo')).not_to be_called
+        expect(first_command).to be_called_with_arguments('foo bar')
+        expect(first_command).not_to be_called_with_arguments('foot')
       end
     end
 
     describe 'assertion message' do
       it 'provides a helpful message' do
-        expect(command1_stub.inspect).to eql '<Stubbed "command1">'
-        expect(command1_stub.with_args('foo bar').inspect).to \
-          eql '<Stubbed "command1" args: "foo bar">'
+        expect(first_command.inspect).to eql '<Stubbed "first_command">'
+        expect(first_command.with_args('foo bar').inspect).to \
+          eql '<Stubbed "first_command" args: "foo bar">'
       end
     end
   end
