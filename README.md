@@ -168,9 +168,13 @@ describe 'be_called_with_arguments' do
       it 'correctly identifies the called arguments' do
         expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
       end
-      it 'correctly identifies the called arguments' do
+      it 'correctly identifies the arguments called in correct sequence' do
         # The sequence 'first_argument', 'second_argument' starting at position 0
         expect(@command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0)
+      end
+      it 'correctly identifies the argument is called in last position' do
+        # The argument 'second_argument' is the last argument passed to command
+        expect(@command).to be_called_with_arguments('second_argument').at_position(-1)
       end
     end
   end
