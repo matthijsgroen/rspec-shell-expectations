@@ -19,6 +19,15 @@ describe 'be_called_with_arguments' do
       it 'correctly identifies the called arguments' do
         expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
       end
+      it 'correctly matches when wildcard is used for first argument' do
+        expect(@command).to be_called_with_arguments(anything, 'second_argument')
+      end
+      it 'correctly matches when wildcard is used for second argument' do
+        expect(@command).to be_called_with_arguments('first_argument', anything)
+      end
+      it 'correctly matches when wildcard is used for all arguments' do
+        expect(@command).to be_called_with_arguments(anything, anything)
+      end
     end
     context 'and the at_position chain call' do
       before(:each) do

@@ -35,6 +35,10 @@ describe 'CallLog' do
         it 'does not find an un-passed argument anywhere in the series' do
           expect(@subject.contains_argument_series?('not_an_argument')).to be_falsey
         end
+        
+        it 'finds the single wildcard argument' do
+          expect(@subject.contains_argument_series?(anything)).to be_truthy
+        end
       end
       context 'and a command called with two arguments' do
         before(:each) do
@@ -61,6 +65,26 @@ describe 'CallLog' do
 
         it 'does not find an un-passed argument anywhere in the series' do
           expect(@subject.contains_argument_series?('not_an_argument')).to be_falsey
+        end
+
+        it 'finds the single wildcard argument' do
+          expect(@subject.contains_argument_series?(anything)).to be_truthy
+        end
+        
+        it 'finds when both arguments are wildcards' do
+          expect(@subject.contains_argument_series?(anything, anything)).to be_truthy
+        end
+        
+        it 'finds when only the first argument is a wildcard' do
+          expect(@subject.contains_argument_series?(anything, 'second_argument')).to be_truthy
+        end
+        
+        it 'finds when only the second argument is a wildcard' do
+          expect(@subject.contains_argument_series?('first_argument', anything)).to be_truthy
+        end
+        
+        it 'does not find when wildcard is in wrong position' do
+          expect(@subject.contains_argument_series?('first_argument', anything, 'second_argument')).to be_falsey
         end
       end
       context 'and a command called with three arguments' do
@@ -96,6 +120,27 @@ describe 'CallLog' do
 
         it 'does not find an un-passed argument anywhere in the series' do
           expect(@subject.contains_argument_series?('not_an_argument')).to be_falsey
+        end
+        it 'finds when only the first argument is a wildcard' do
+          expect(@subject.contains_argument_series?(anything, 'second_argument', 'third_argument')).to be_truthy
+        end
+        it 'finds when only the second argument is a wildcard' do
+          expect(@subject.contains_argument_series?('first_argument', anything, 'third_argument')).to be_truthy
+        end
+        it 'finds when only the third argument is a wildcard' do
+          expect(@subject.contains_argument_series?('first_argument', 'second_argument', anything)).to be_truthy
+        end
+        it 'finds when both the first and second arguments are wildcards' do
+          expect(@subject.contains_argument_series?(anything, anything, 'third_argument')).to be_truthy
+        end
+        it 'finds when both the first and third arguments are wildcards' do
+          expect(@subject.contains_argument_series?(anything, 'second_argument', anything)).to be_truthy
+        end
+        it 'finds when both the second and third arguments are wildcards' do
+          expect(@subject.contains_argument_series?('first_argument', anything, anything)).to be_truthy
+        end
+        it 'does not find when wildcard is in wrong position' do
+          expect(@subject.contains_argument_series?('first_argument', anything, 'second_argument', 'third_argument')).to be_falsey
         end
       end
     end

@@ -29,6 +29,7 @@ describe 'Assert called' do
 
     it 'is called with correct argument sequence' do
       expect(bundle).to be_called_with_arguments('exec', 'rake', 'foo:bar')
+      expect(bundle).to be_called_with_arguments('exec', anything, 'foo:bar')
       expect(bundle).not_to be_called_with_arguments('exec', 'rake', 'foo')
     end
   end
