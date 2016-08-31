@@ -37,6 +37,10 @@ module Rspec
           end
         end
 
+        def called_with_no_args?
+          load_call_log_list.first["args"].nil?
+        end
+
         private
 
         def find_call(*args)
