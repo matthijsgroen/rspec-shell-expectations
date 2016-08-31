@@ -17,25 +17,21 @@ describe 'Assert stdin' do
   before do
     script_path.open('w') { |f| f.puts script }
     script_path.chmod 0777
+    
+    stubbed_env.execute script_path.to_s
   end
 
   after do
     script_path.delete
   end
 
-  subject do
-    stubbed_env.execute script_path.to_s
-  end
-
   describe '#stdin' do
     it 'returns the stdin' do
-      subject
       expect(command1_stub.stdin).to match 'foo bar'
     end
 
     context 'with arguments' do
       it 'returns the stdin' do
-        subject
         expect(command1_stub.with_args('hello').stdin).to match 'baz'
       end
     end

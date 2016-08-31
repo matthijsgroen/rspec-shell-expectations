@@ -21,14 +21,10 @@ describe 'Change exitstatus' do
     script_path.delete
   end
 
-  subject do
-    stubbed_env.execute script_path.to_s
-  end
-
   describe 'default exitstatus' do
     it 'is 0' do
-      _o, _e, s = subject
-      expect(s.exitstatus).to eq 0
+      output, error, status = stubbed_env.execute script_path.to_s
+      expect(status.exitstatus).to eq 0
     end
   end
 
@@ -38,8 +34,8 @@ describe 'Change exitstatus' do
     end
 
     it 'returns the stubbed exitstatus' do
-      _o, _e, s = subject
-      expect(s.exitstatus).to eq 4
+      output, error, status = stubbed_env.execute script_path.to_s
+      expect(status.exitstatus).to eq 4
     end
 
     context 'with specific args only' do
@@ -49,8 +45,8 @@ describe 'Change exitstatus' do
       end
 
       it 'returns the stubbed exitstatus' do
-        _o, _e, s = subject
-        expect(s.exitstatus).to eq 2
+        output, error, status = stubbed_env.execute script_path.to_s
+        expect(status.exitstatus).to eq 2
       end
     end
   end
