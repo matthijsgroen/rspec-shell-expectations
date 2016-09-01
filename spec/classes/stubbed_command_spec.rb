@@ -96,4 +96,22 @@ describe 'StubbedCommand' do
       expect(@subject.stdin).to eql 'arbitrary stdin'
     end
   end
+
+  context '#returns_exitstatus' do
+    before(:each) do
+      @call_configuration = double(Rspec::Shell::Expectations::CallConfiguration)
+      allow(Rspec::Shell::Expectations::CallConfiguration).to receive(:new).and_return(@call_configuration)
+      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+    end
+    it 'sets the exitcode on call_configuration' do
+      expect(@call_configuration).to receive(:set_exitcode).with('exit code', anything)
+      expect(@call_configuration).to receive(:write)
+      @subject.returns_exitstatus 'exit code'
+    end
+    it 'returns itself' do
+      expect(@call_configuration).to receive(:set_exitcode)
+      expect(@call_configuration).to receive(:write)
+      expect(@subject.returns_exitstatus(anything)).to eql @subject
+    end
+  end
 end
