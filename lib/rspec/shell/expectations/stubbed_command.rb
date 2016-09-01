@@ -23,7 +23,6 @@ module Rspec
         end
 
         def called?
-          # @call_log&.called_with_args?(*@args) in >= ruby 2.3.0
           @call_log.exist? and @call_log.called_with_args?(*@args)
         end
 
