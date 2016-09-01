@@ -79,4 +79,21 @@ describe 'StubbedCommand' do
       expect(@subject.called?).to be_truthy
     end
   end
+  
+  context '#stdin' do
+    before(:each) do
+      @call_log = double(Rspec::Shell::Expectations::CallLog)
+      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
+      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+    end
+    it 'returns nil when there is no call_log' do
+      expect(@call_log).to receive(:exist?).and_return(false)
+      expect(@subject.stdin).to be_nil
+    end
+    it 'returns stdin from call log when call_log exists' do
+      expect(@call_log).to receive(:exist?).and_return(true)
+      expect(@call_log).to receive(:stdin_for_args).and_return('arbitrary stdin')
+      expect(@subject.stdin).to eql 'arbitrary stdin'
+    end
+  end
 end

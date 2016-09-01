@@ -23,8 +23,8 @@ module Rspec
         end
 
         def called?
-          return false unless @call_log.exist?
-          @call_log.called_with_args?(*@args)
+          # @call_log&.called_with_args?(*@args) in >= ruby 2.3.0
+          @call_log.exist? and @call_log.called_with_args?(*@args)
         end
 
         def called_with_no_args?
@@ -46,8 +46,7 @@ module Rspec
         end
 
         def stdin
-          return nil unless @call_log.exist?
-          @call_log.stdin_for_args(*@arguments)
+          @call_log.stdin_for_args(*@arguments) if @call_log.exist?
         end
 
         def outputs(contents, to: :stdout)
