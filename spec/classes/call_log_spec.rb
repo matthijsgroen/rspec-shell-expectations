@@ -5,6 +5,36 @@ describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }
   include Rspec::Shell::Expectations
 
+  context '#stdin_for_args' do
+    it 'returns nil when no YAML file is used for call log' do
+        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        allow(YAML).to receive(:load_file).and_return([])
+
+        expect(@subject.stdin_for_args(anything)).to be nil
+    end
+    it 'returns the stdin from call log when there is a single value for stdin' do
+      actual_call_log_list =
+        [{
+           'args' => ['arbitrary argument'],
+           'stdin' => ['correct value'],
+        }]
+      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
+
+      expect(@subject.stdin_for_args('arbitrary argument').first).to eql 'correct value'
+    end
+    it 'returns the stdin from call log when there are multiple values for stdin' do
+      actual_call_log_list =
+        [{
+           'args' => ['arbitrary argument'],
+           'stdin' => ['first value', 'second value'],
+        }]
+      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
+
+      expect(@subject.stdin_for_args('arbitrary argument').sort).to eql ['first value', 'second value'].sort
+    end
+  end
   context '#contains_argument_series?' do
     context 'with no calls made at all (missing call log file)' do
       before(:each) do

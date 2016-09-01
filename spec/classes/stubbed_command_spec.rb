@@ -37,4 +37,46 @@ describe 'StubbedCommand' do
       expect(@subject.arguments).to eql %w(argument_one argument_two)
     end
   end
+
+  context '#get_argument_count' do
+    before(:each) do
+      @call_log = double(Rspec::Shell::Expectations::CallLog)
+      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
+      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+    end
+    it 'returns value returned from call_log argument count when there are no arguments' do
+      expect(@call_log).to receive(:get_argument_count).with([]).and_return('arbitrary return value')
+      expect(@subject.get_argument_count([])).to eql 'arbitrary return value'
+    end
+    it 'returns value returned from call_log argument count when there is only one argument' do
+      expect(@call_log).to receive(:get_argument_count).with(['only arg']).and_return('arbitrary return value')
+      expect(@subject.get_argument_count ['only arg']).to eql 'arbitrary return value'
+    end
+    it 'returns value returned from call_log argument count when there are multiple  arguments' do
+      expect(@call_log).to receive(:get_argument_count).with(['first arg', 'second arg']).and_return('arbitrary return value')
+      expect(@subject.get_argument_count ['first arg', 'second arg']).to eql 'arbitrary return value'
+    end
+  end
+
+  context '#called?' do
+    before(:each) do
+      @call_log = double(Rspec::Shell::Expectations::CallLog)
+      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
+      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+    end
+    it 'returns false when there is no call_log' do
+      expect(@call_log).to receive(:exist?).and_return(false)
+      expect(@subject.called?).to be_falsey
+    end
+    it 'returns false when call_log is not called with args' do
+      expect(@call_log).to receive(:exist?).and_return(true)
+      expect(@call_log).to receive(:called_with_args?).and_return(false)
+      expect(@subject.called?).to be_falsey
+    end
+    it 'returns true when call_log is called with args' do
+      expect(@call_log).to receive(:exist?).and_return(true)
+      expect(@call_log).to receive(:called_with_args?).and_return(true)
+      expect(@subject.called?).to be_truthy
+    end
+  end
 end
