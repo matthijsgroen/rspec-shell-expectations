@@ -585,4 +585,46 @@ describe 'CallLog' do
       end
     end
   end
+
+  context '#called_with_no_args?' do
+    it 'returns false if no call log is found' do
+        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
+
+        expect(@subject.called_with_no_args?).to be_falsey
+    end
+    it 'returns true if no arguments are in call log' do
+      actual_call_log_list =
+        [{
+           'args' => nil,
+           'stdin' => [],
+        }]
+        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
+
+        expect(@subject.called_with_no_args?).to be_truthy
+    end
+    it 'returns fails if a single argument is in call log' do
+      actual_call_log_list =
+        [{
+           'args' => ['I am an argument'],
+           'stdin' => [],
+        }]
+        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
+
+        expect(@subject.called_with_no_args?).to be_falsey
+    end
+    it 'returns fails if multiple arguments is in call log' do
+      actual_call_log_list =
+        [{
+           'args' => ['I am an argument', 'as am I'],
+           'stdin' => [],
+        }]
+        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
+
+        expect(@subject.called_with_no_args?).to be_falsey
+    end
+  end
 end

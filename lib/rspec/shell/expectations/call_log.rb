@@ -37,7 +37,8 @@ module Rspec
         end
 
         def called_with_no_args?
-          load_call_log_list.first["args"].nil?
+          call_log_list = load_call_log_list
+          !call_log_list.empty? and call_log_list.first["args"].nil?
         end
 
         private
