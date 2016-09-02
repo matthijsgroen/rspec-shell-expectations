@@ -44,11 +44,10 @@ module Rspec
         private
 
         def find_call(*args)
-          load_call_log_list.each do |call|
+          load_call_log_list.find do |call|
             call_args = call['args'] || []
-            return call if (args - call_args).empty?
+            (args - call_args).empty?
           end
-          nil
         end
 
         def get_sub_command_arguments_from_call_log(call_log_list, sub_command_list)
