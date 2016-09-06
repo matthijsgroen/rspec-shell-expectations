@@ -23,7 +23,7 @@ module Rspec
         end
 
         def called?
-          @call_log.exist? and @call_log.called_with_args?(*@args)
+          @call_log.exist? && @call_log.called_with_args?(*@args)
         end
 
         def called_with_no_args?

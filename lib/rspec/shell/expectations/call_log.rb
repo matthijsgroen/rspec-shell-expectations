@@ -38,7 +38,7 @@ module Rspec
 
         def called_with_no_args?
           call_log_list = load_call_log_list
-          !call_log_list.empty? and call_log_list.first["args"].nil?
+          !call_log_list.empty? && call_log_list.first["args"].nil?
         end
 
         private
@@ -67,8 +67,8 @@ module Rspec
 
         def argument_series_contains?(actual_argument_series, expected_argument_series)
           ensure_wildcards_match(actual_argument_series, expected_argument_series)
-          expected_argument_series.empty? or
-              actual_argument_series.each_cons(expected_argument_series.size).include? expected_argument_series
+          expected_argument_series.empty? ||
+            (actual_argument_series.each_cons(expected_argument_series.size).include? expected_argument_series)
         end
         
         def ensure_wildcards_match(actual_argument_series, expected_argument_series)
