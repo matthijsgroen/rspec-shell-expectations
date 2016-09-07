@@ -33,7 +33,7 @@ module Rspec
         end
 
         def execute(command, env_vars = {})
-          full_command=get_wrapped_execution_with_function_overrides(<<-multiline_script
+          full_command = get_wrapped_execution_with_function_overrides(<<-multiline_script
             #{env} source #{command}
           multiline_script
           )
@@ -42,7 +42,7 @@ module Rspec
         end
 
         def execute_function(script, command, env_vars = {})
-          full_command=get_wrapped_execution_with_function_overrides(<<-multiline_script
+          full_command = get_wrapped_execution_with_function_overrides(<<-multiline_script
             source #{script}
             #{env} #{command}
           multiline_script
@@ -52,7 +52,7 @@ module Rspec
         end
 
         def execute_inline(command_string, env_vars = {})
-          temp_command_path=Dir::Tmpname.make_tmpname("#{@dir}/inline-", nil)
+          temp_command_path = Dir::Tmpname.make_tmpname("#{@dir}/inline-", nil)
           File.write(temp_command_path, command_string)
           execute(temp_command_path, env_vars)
         end
@@ -64,7 +64,7 @@ module Rspec
           function_command_path_binding_for_template = File.join(@dir, command)
 
           function_override_file_path = File.join(@dir, "#{command}_overrides.sh")
-          function_override_file_template = ERB.new File.new(function_override_template_path).read, nil, "%"
+          function_override_file_template = ERB.new File.new(function_override_template_path).read, nil, '%'
           function_override_file_content = function_override_file_template.result(binding)
 
           File.write(function_override_file_path, function_override_file_content)
@@ -72,10 +72,10 @@ module Rspec
 
         def get_wrapped_execution_with_function_overrides(execution_snippet)
           execution_binding_for_template = execution_snippet
-          function_override_path_binding_for_template="#{@dir}/*_overrides.sh"
+          function_override_path_binding_for_template = "#{@dir}/*_overrides.sh"
           wrapped_error_path_binding_for_template = "#{@dir}/errors"
 
-          function_override_wrapper_template = ERB.new File.new(function_override_wrapper_template_path).read, nil, "%"
+          function_override_wrapper_template = ERB.new File.new(function_override_wrapper_template_path).read, nil, '%'
 
           function_override_wrapper_template.result(binding)
         end
@@ -93,8 +93,7 @@ module Rspec
         end
 
         def project_root
-          Pathname.new(File.dirname(File.expand_path(__FILE__)))
-              .join('..', '..', '..', '..')
+          Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..', '..', '..')
         end
       end
     end

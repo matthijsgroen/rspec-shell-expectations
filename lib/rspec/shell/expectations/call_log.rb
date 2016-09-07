@@ -38,7 +38,7 @@ module Rspec
 
         def called_with_no_args?
           call_log_list = load_call_log_list
-          !call_log_list.empty? && call_log_list.first["args"].nil?
+          !call_log_list.empty? && call_log_list.first['args'].nil?
         end
 
         private
@@ -51,18 +51,19 @@ module Rspec
         end
 
         def get_sub_command_arguments_from_call_log(call_log_list, sub_command_list)
-          call_log_list.map { |call_log|
+          sub_commands = call_log_list.map do |call_log|
             call_log_argument_series = call_log['args'] || []
 
             next call_log_argument_series if sub_command_list.empty?
             next call_log_argument_series if call_log_argument_series.slice!(0, sub_command_list.size) == sub_command_list
-          }.compact
+          end
+          sub_commands.compact
         end
 
         def get_position_range_from_argument_list(argument_list, range_start_position, range_length)
-          argument_list.map { |argument_series|
+          argument_list.map do |argument_series|
             range_start_position ? argument_series[range_start_position, range_length] : argument_series
-          }
+          end
         end
 
         def argument_series_contains?(actual_argument_series, expected_argument_series)
@@ -74,7 +75,7 @@ module Rspec
         def ensure_wildcards_match(actual_argument_series, expected_argument_series)
           # yes, i know. i am disappointed in myself
           num_of_args = actual_argument_series.size
-          expected_argument_series.zip((0..num_of_args), actual_argument_series) do |expected_arg, index, actual_arg|
+          expected_argument_series.zip((0..num_of_args), actual_argument_series) do |expected_arg, index, _actual_arg|
             if expected_arg.is_a? RSpec::Mocks::ArgumentMatchers::AnyArgMatcher
               actual_argument_series[index] = expected_arg
             end

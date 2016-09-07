@@ -9,11 +9,11 @@ module Rspec
           FileUtils.cp(stub_filepath, command_path)
           @arguments = []
           @call_configuration = CallConfiguration.new(
-              Pathname.new(dir).join("#{command}_stub.yml"),
-              command
+            Pathname.new(dir).join("#{command}_stub.yml"),
+            command
           )
           @call_log = CallLog.new(
-              Pathname.new(dir).join("#{command}_calls.yml")
+            Pathname.new(dir).join("#{command}_calls.yml")
           )
         end
 
@@ -27,7 +27,7 @@ module Rspec
         end
 
         def called_with_no_args?
-            @call_log.called_with_no_args?
+          @call_log.called_with_no_args?
         end
 
         def called_with_args?(*args, position: false)
@@ -70,8 +70,7 @@ module Rspec
         end
 
         def project_root
-          Pathname.new(File.dirname(File.expand_path(__FILE__)))
-              .join('..', '..', '..', '..')
+          Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..', '..', '..')
         end
       end
     end

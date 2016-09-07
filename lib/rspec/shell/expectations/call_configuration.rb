@@ -26,7 +26,7 @@ module Rspec
 
         def write
           structure = @configuration.map do |args, results|
-            call = {
+            {
               args: args
             }.merge results
           end
