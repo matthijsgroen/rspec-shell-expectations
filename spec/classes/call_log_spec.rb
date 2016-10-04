@@ -192,6 +192,24 @@ describe 'CallLog' do
           expect(@subject.get_argument_count('first_argument', anything, 'second_argument', 'third_argument')).to eql 0
         end
       end
+      context 'with an argument called multiple times' do
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['twice_called_arg'],
+                   'stdin' => []
+               },
+               {
+                   'args' => ['twice_called_arg', 'twice_called_arg'],
+                   'stdin' => []
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+        it 'returns 2 when argument is called 2 times' do
+          expect(@subject.get_argument_count('twice_called_arg')).to eql 2
+        end
+      end
     end
     context 'with a series of arguments and a starting position provided' do
       context 'and a command called with one argument' do
@@ -368,7 +386,31 @@ describe 'CallLog' do
   end
 
   context '#called_with_args' do
-    # TODO - tests for -1, 0, 1
+    before(:each) do
+      actual_call_log_list =
+          [{
+               'args' => ['once_called_arg', 'twice_called_arg'],
+               'stdin' => []
+           },
+           {
+               'args' => ['twice_called_arg'],
+               'stdin' => []
+           }]
+      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+    end
+
+    it 'returns false when there are no matching args' do
+      expect(@subject.called_with_args?('no-match')).to be_falsey
+    end
+    
+    it 'returns true when there is a single matching arg' do
+      expect(@subject.called_with_args?('once_called_arg')).to be_truthy
+    end
+    
+    it 'returns trute when there are multiple matching args' do
+      expect(@subject.called_with_args?('twice_called_arg')).to be_truthy
+    end
   end
 
   context '#called_with_no_args?' do
