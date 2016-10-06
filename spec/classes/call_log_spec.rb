@@ -231,33 +231,6 @@ describe 'CallLog' do
         end
       end
     end
-    context 'with multiple series of arguments' do
-      before(:each) do
-        actual_call_log_list =
-            [
-                {
-                    'args' => ['first_series_first_argument', 'first_series_second_argument'],
-                    'stdin' => [],
-                },
-                {
-                    'args' => ['second_series_first_argument', 'second_series_second_argument'],
-                    'stdin' => [],
-                }
-            ]
-        @subject = Rspec::Shell::Expectations::CallLog.new('two_argument_series_log')
-        allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
-      end
-
-      it 'finds both series when called in correct order' do
-        expect(@subject.called_with_args?('first_series_first_argument', 'first_series_second_argument')).to be_truthy
-        expect(@subject.called_with_args?('second_series_first_argument', 'second_series_second_argument')).to be_truthy
-      end
-
-      it 'does not find when arguments cross argument series' do
-        expect(@subject.called_with_args?('first_series_first_argument', 'second_series_first_argument')).to be_falsey
-        expect(@subject.called_with_args?('first_series_first_argument', 'second_series_second_argument')).to be_falsey
-      end
-    end
   end
 
   context '#called_with_args' do
