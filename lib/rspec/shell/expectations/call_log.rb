@@ -12,7 +12,7 @@ module Rspec
         end
 
         def called_with_args?(*args)
-          get_argument_count(*args) > 0
+          call_count(*args) > 0
         end
 
         def stdin_for_args(*args)
@@ -20,13 +20,9 @@ module Rspec
           call['stdin'] unless call.nil?
         end
         
-        def get_argument_count(*expected_argument_series, position: false)
-          expected_argument_series ||= []
-          
-          position_range_argument_list = get_position_range_from_argument_list(get_call_log_args, position, expected_argument_series.size)
-
-          position_range_argument_list.count do |actual_argument_series|
-            argument_series_contains?(actual_argument_series, expected_argument_series)
+        def call_count(*expected_argument_series)
+          get_call_log_args.count do |actual_argument_series|
+            argument_series_contains?(actual_argument_series, expected_argument_series || [])
           end
         end
 
@@ -56,8 +52,7 @@ module Rspec
 
         def argument_series_contains?(actual_argument_series, expected_argument_series)
           ensure_wildcards_match(actual_argument_series, expected_argument_series)
-          expected_argument_series.empty? ||
-            (actual_argument_series.each_cons(expected_argument_series.size).include? expected_argument_series)
+          expected_argument_series.empty? || (actual_argument_series == expected_argument_series)
         end
         
         def ensure_wildcards_match(actual_argument_series, expected_argument_series)

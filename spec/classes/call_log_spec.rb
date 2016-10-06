@@ -34,9 +34,20 @@ describe 'CallLog' do
 
       expect(@subject.stdin_for_args('arbitrary argument').sort).to eql ['first value', 'second value'].sort
     end
+    it 'returns the stdin from call log when no arguments are provided' do
+      actual_call_log_list =
+        [{
+           'args' => nil,
+           'stdin' => ['correct value'],
+         }]
+      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
+
+      expect(@subject.stdin_for_args).to eql ['correct value']
+    end
   end
 
-  context '#called_with_args?' do
+  context '#call_count?' do
     context 'with no calls made at all (missing call log file)' do
       before(:each) do
         @subject = Rspec::Shell::Expectations::CallLog.new('command_with_no_call_log_file')
@@ -44,7 +55,7 @@ describe 'CallLog' do
       end
 
       it 'does not find an un-passed argument anywhere in the series' do
-        expect(@subject.called_with_args?('not_an_argument')).to be_falsey
+        expect(@subject.call_count('not_an_argument')).to eql 0
       end
     end
     context 'with only an series of arguments provided' do
@@ -59,16 +70,16 @@ describe 'CallLog' do
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
 
-        it 'finds the single argument anywhere in the series' do
-          expect(@subject.called_with_args?('first_argument')).to be_truthy
+        it 'finds the single argument anywhere in the series exactly once' do
+          expect(@subject.call_count('first_argument')).to eql 1
         end
 
         it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.called_with_args?('not_an_argument')).to be_falsey
+          expect(@subject.call_count('not_an_argument')).to eql 0
         end
-        
-        it 'finds the single wildcard argument' do
-          expect(@subject.called_with_args?(anything)).to be_truthy
+
+        it 'finds the single wildcard argument exactly once' do
+          expect(@subject.call_count(anything)).to eql 1
         end
       end
       context 'and a command called with two arguments' do
@@ -81,41 +92,49 @@ describe 'CallLog' do
           @subject = Rspec::Shell::Expectations::CallLog.new('command_with_two_arguments_log')
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
-
-        it 'finds the first argument anywhere in the series' do
-          expect(@subject.called_with_args?('first_argument')).to be_truthy
+        
+        it 'does not find the first argument when other argument is not provided' do
+          expect(@subject.call_count('first_argument')).to eql 0
         end
 
-        it 'finds the second argument anywhere in the series' do
-          expect(@subject.called_with_args?('second_argument')).to be_truthy
+        it 'finds the first argument anywhere in the series exactly once' do
+          expect(@subject.call_count('first_argument', anything)).to eql 1
         end
 
-        it 'finds two contiguous arguments in the series' do
-          expect(@subject.called_with_args?('first_argument', 'second_argument')).to be_truthy
+        it 'does not find the second argument when first argument is not provided' do
+          expect(@subject.call_count('second_argument')).to eql 0
+        end
+
+        it 'finds the second argument anywhere in the series exactly once' do
+          expect(@subject.call_count(anything, 'second_argument')).to eql 1
+        end
+
+        it 'finds two contiguous arguments in the series exactly once' do
+          expect(@subject.call_count('first_argument', 'second_argument')).to eql 1
         end
 
         it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.called_with_args?('not_an_argument')).to be_falsey
+          expect(@subject.call_count('not_an_argument')).to eql 0
         end
 
-        it 'finds the single wildcard argument' do
-          expect(@subject.called_with_args?(anything)).to be_truthy
+        it 'does not find a wildcard argument when other argument is not provided' do
+          expect(@subject.call_count(anything)).to eql 0
         end
-        
-        it 'finds when both arguments are wildcards' do
-          expect(@subject.called_with_args?(anything, anything)).to be_truthy
+
+        it 'finds when both arguments are wildcards exactly once' do
+          expect(@subject.call_count(anything, anything)).to eql 1
         end
-        
-        it 'finds when only the first argument is a wildcard' do
-          expect(@subject.called_with_args?(anything, 'second_argument')).to be_truthy
+
+        it 'finds when only the first argument is a wildcard exactly once' do
+          expect(@subject.call_count(anything, 'second_argument')).to eql 1
         end
-        
-        it 'finds when only the second argument is a wildcard' do
-          expect(@subject.called_with_args?('first_argument', anything)).to be_truthy
+
+        it 'finds when only the second argument is a wildcard exactly once' do
+          expect(@subject.call_count('first_argument', anything)).to eql 1
         end
-        
+
         it 'does not find when wildcard is in wrong position' do
-          expect(@subject.called_with_args?('first_argument', anything, 'second_argument')).to be_falsey
+          expect(@subject.call_count('first_argument', anything, 'second_argument')).to eql 0
         end
       end
       context 'and a command called with three arguments' do
@@ -129,223 +148,120 @@ describe 'CallLog' do
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
 
-        it 'finds the first argument anywhere in the series' do
-          expect(@subject.called_with_args?('first_argument')).to be_truthy
+        it 'does not find first argument when other arguments are not provided' do
+          expect(@subject.call_count('first_argument')).to eql 0
         end
 
-        it 'finds the second argument anywhere in the series' do
-          expect(@subject.called_with_args?('second_argument')).to be_truthy
+        it 'finds the first argument anywhere in the series exactly once' do
+          expect(@subject.call_count('first_argument', anything, anything)).to eql 1
         end
 
-        it 'finds the third argument anywhere in the series' do
-          expect(@subject.called_with_args?('third_argument')).to be_truthy
+        it 'does not find second argument when other arguments are not provided' do
+          expect(@subject.call_count('second_argument')).to eql 0
         end
 
-        it 'finds three contiguous arguments in the series' do
-          expect(@subject.called_with_args?('first_argument', 'second_argument', 'third_argument')).to be_truthy
+        it 'finds the second argument anywhere in the series exactly once' do
+          expect(@subject.call_count(anything, 'second_argument', anything)).to eql 1
         end
 
-        it 'does not find two non-contiguous arguments in the series' do
-          expect(@subject.called_with_args?('first_argument', 'third_argument')).to be_falsey
+        it 'does not find third argument when other arguments are not provided' do
+          expect(@subject.call_count('third_argument')).to eql 0
+        end
+
+        it 'finds the third argument anywhere in the series exactly once' do
+          expect(@subject.call_count(anything, anything, 'third_argument')).to eql 1
+        end
+
+        it 'finds three contiguous arguments in the series exactly once' do
+          expect(@subject.call_count('first_argument', 'second_argument', 'third_argument')).to eql 1
+        end
+
+        it 'does not find two non-contiguous arguments in the series exactly once' do
+          expect(@subject.call_count('first_argument', 'third_argument')).to eql 0
         end
 
         it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.called_with_args?('not_an_argument')).to be_falsey
+          expect(@subject.call_count('not_an_argument')).to eql 0
         end
+
         it 'finds when only the first argument is a wildcard' do
-          expect(@subject.called_with_args?(anything, 'second_argument', 'third_argument')).to be_truthy
+          expect(@subject.call_count(anything, 'second_argument', 'third_argument')).to eql 1
         end
+
         it 'finds when only the second argument is a wildcard' do
-          expect(@subject.called_with_args?('first_argument', anything, 'third_argument')).to be_truthy
+          expect(@subject.call_count('first_argument', anything, 'third_argument')).to eql 1
         end
+
         it 'finds when only the third argument is a wildcard' do
-          expect(@subject.called_with_args?('first_argument', 'second_argument', anything)).to be_truthy
+          expect(@subject.call_count('first_argument', 'second_argument', anything)).to eql 1
         end
+
         it 'finds when both the first and second arguments are wildcards' do
-          expect(@subject.called_with_args?(anything, anything, 'third_argument')).to be_truthy
+          expect(@subject.call_count(anything, anything, 'third_argument')).to eql 1
         end
+
         it 'finds when both the first and third arguments are wildcards' do
-          expect(@subject.called_with_args?(anything, 'second_argument', anything)).to be_truthy
+          expect(@subject.call_count(anything, 'second_argument', anything)).to eql 1
         end
+
         it 'finds when both the second and third arguments are wildcards' do
-          expect(@subject.called_with_args?('first_argument', anything, anything)).to be_truthy
+          expect(@subject.call_count('first_argument', anything, anything)).to eql 1
         end
+        
         it 'does not find when wildcard is in wrong position' do
-          expect(@subject.called_with_args?('first_argument', anything, 'second_argument', 'third_argument')).to be_falsey
+          expect(@subject.call_count('first_argument', anything, 'second_argument', 'third_argument')).to eql 0
+        end
+      end
+      context 'with an argument called multiple times' do
+        before(:each) do
+          actual_call_log_list =
+              [{
+                   'args' => ['twice_called_arg'],
+                   'stdin' => []
+               },
+               {
+                   'args' => ['twice_called_arg'],
+                   'stdin' => []
+               }]
+          @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+        end
+        it 'returns 2 when argument is called 2 times' do
+          expect(@subject.call_count('twice_called_arg')).to eql 2
         end
       end
     end
-    context 'with a series of arguments and a starting position provided' do
-      context 'and a command called with one argument' do
-        before(:each) do
-          actual_call_log_list =
-              [{
-                   'args' => ['first_argument'],
-                   'stdin' => [],
-               }]
-          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_one_arguments_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
-        end
+  end
 
-        it 'finds the single argument at the first position in the series' do
-          expect(@subject.called_with_args?('first_argument', position: 0)).to be_truthy
-        end
-
-        it 'does not find an un-passed argument at the first position in the series' do
-          expect(@subject.called_with_args?('not_an_argument', position: 0)).to be_falsey
-        end
-      end
-      context 'and a command called with two arguments' do
-        before(:each) do
-          actual_call_log_list =
-              [{
-                   'args' => ['first_argument', 'second_argument'],
-                   'stdin' => [],
-               }]
-          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_two_arguments_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
-        end
-
-        it 'finds the first argument at the first position in the series' do
-          expect(@subject.called_with_args?('first_argument', position: 0)).to be_truthy
-        end
-
-        it 'finds the second argument at the second position in the series' do
-          expect(@subject.called_with_args?('second_argument', position: 1)).to be_truthy
-        end
-
-        it 'does not find the first argument at the second position in the series' do
-          expect(@subject.called_with_args?('first_argument', position: 1)).to be_falsey
-        end
-
-        it 'does not find the second argument at the first position in the series' do
-          expect(@subject.called_with_args?('second_argument', position: 0)).to be_falsey
-        end
-
-        it 'does not find an un-passed argument at the first position in the series' do
-          expect(@subject.called_with_args?('not_an_argument', position: 0)).to be_falsey
-        end
-
-        it 'does not find an un-passed argument at the second position in the series' do
-          expect(@subject.called_with_args?('not_an_argument', position: 1)).to be_falsey
-        end
-      end
-      context 'and a command called with three arguments' do
-        before(:each) do
-          actual_call_log_list =
-              [{
-                   'args' => ['first_argument', 'second_argument', 'third_argument'],
-                   'stdin' => [],
-               }]
-          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_three_arguments_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
-        end
-
-        it 'finds the first argument at the first position in the series' do
-          expect(@subject.called_with_args?('first_argument', position: 0)).to be_truthy
-        end
-
-        it 'finds the second argument at the second position in the series' do
-          expect(@subject.called_with_args?('second_argument', position: 1)).to be_truthy
-        end
-
-        it 'finds the third argument at the third position in the series' do
-          expect(@subject.called_with_args?('third_argument', position: 2)).to be_truthy
-        end
-
-        it 'finds the three arguments in order at the first position in the series' do
-          expect(@subject.called_with_args?('first_argument', 'second_argument', 'third_argument', position: 0)).to be_truthy
-        end
-
-        it 'finds the first two arguments in order at the first position in the series' do
-          expect(@subject.called_with_args?('first_argument', 'second_argument', position: 0)).to be_truthy
-        end
-
-        it 'finds the last two arguments in order at the second position in the series' do
-          expect(@subject.called_with_args?('second_argument', 'third_argument', position: 1)).to be_truthy
-        end
-
-        it 'does not find the first two arguments in order at the second position in the series' do
-          expect(@subject.called_with_args?('first_argument', 'second_argument', position: 1)).to be_falsey
-        end
-
-        it 'does not find the last two arguments in order at the first position in the series' do
-          expect(@subject.called_with_args?('second_argument', 'third_argument', position: 0)).to be_falsey
-        end
-
-        it 'does not find an un-passed argument at the first position in the series' do
-          expect(@subject.called_with_args?('not_an_argument', position: 0)).to be_falsey
-        end
-
-        it 'does not find an un-passed argument at the second position in the series' do
-          expect(@subject.called_with_args?('not_an_argument', position: 1)).to be_falsey
-        end
-
-        it 'does not find an un-passed argument at the third position in the series' do
-          expect(@subject.called_with_args?('not_an_argument', position: 2)).to be_falsey
-        end
-      end
+  context '#called_with_args' do
+    before(:each) do
+      actual_call_log_list =
+          [{
+               'args' => ['once_called_arg'],
+               'stdin' => []
+           },
+           {
+               'args' => ['twice_called_arg'],
+               'stdin' => []
+           },
+           {
+               'args' => ['twice_called_arg'],
+               'stdin' => []
+           }]
+      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
     end
 
-    context 'with multiple series of arguments' do
-      context 'and called with no position' do
-        before(:each) do
-          actual_call_log_list =
-              [
-                  {
-                      'args' => ['first_series_first_argument', 'first_series_second_argument'],
-                      'stdin' => [],
-                  },
-                  {
-                      'args' => ['second_series_first_argument', 'second_series_second_argument'],
-                      'stdin' => [],
-                  }
-              ]
-          @subject = Rspec::Shell::Expectations::CallLog.new('two_argument_series_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
-        end
-
-        it 'finds both series when called in correct order' do
-          expect(@subject.called_with_args?('first_series_first_argument', 'first_series_second_argument')).to be_truthy
-          expect(@subject.called_with_args?('second_series_first_argument', 'second_series_second_argument')).to be_truthy
-        end
-
-        it 'does not find when arguments cross argument series' do
-          expect(@subject.called_with_args?('first_series_first_argument', 'second_series_first_argument')).to be_falsey
-          expect(@subject.called_with_args?('first_series_first_argument', 'second_series_second_argument')).to be_falsey
-        end
-      end
-      context 'and called with a position' do
-        before(:each) do
-          actual_call_log_list =
-              [
-                  {
-                      'args' => ['first_series_first_argument', 'first_series_second_argument'],
-                      'stdin' => [],
-                  },
-                  {
-                      'args' => ['second_series_first_argument', 'second_series_second_argument'],
-                      'stdin' => [],
-                  }
-              ]
-          @subject = Rspec::Shell::Expectations::CallLog.new('two_argument_series_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
-        end
-        
-        it 'finds both series when called in correct order at starting position' do
-          expect(@subject.called_with_args?('first_series_first_argument', 'first_series_second_argument', position: 0)).to be_truthy
-          expect(@subject.called_with_args?('second_series_first_argument', 'second_series_second_argument', position: 0)).to be_truthy
-        end
-        
-        it 'does not find when arguments cross argument series' do
-          expect(@subject.called_with_args?('first_series_second_argument', position: 0)).to be_falsey
-        end
-
-        it 'finds the second argument from each series series' do
-          expect(@subject.called_with_args?('first_series_second_argument', position: 1)).to be_truthy
-          expect(@subject.called_with_args?('second_series_second_argument', position: 1)).to be_truthy
-        end
-      end
+    it 'returns false when there are no matching args' do
+      expect(@subject.called_with_args?('no-match')).to be_falsey
+    end
+    
+    it 'returns true when there is a single matching arg' do
+      expect(@subject.called_with_args?('once_called_arg', anything)).to be_truthy
+    end
+    
+    it 'returns true when there are multiple matching args' do
+      expect(@subject.called_with_args?('twice_called_arg')).to be_truthy
     end
   end
 

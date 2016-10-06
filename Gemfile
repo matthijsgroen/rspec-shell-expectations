@@ -5,3 +5,4 @@ gemspec
 gem 'rubocop'
 gem 'rake'
 gem 'rspec'
+gem 'simplecov'
