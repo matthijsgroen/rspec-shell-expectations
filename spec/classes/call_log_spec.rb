@@ -47,7 +47,7 @@ describe 'CallLog' do
     end
   end
 
-  context '#get_argument_count?' do
+  context '#call_count?' do
     context 'with no calls made at all (missing call log file)' do
       before(:each) do
         @subject = Rspec::Shell::Expectations::CallLog.new('command_with_no_call_log_file')
@@ -55,7 +55,7 @@ describe 'CallLog' do
       end
 
       it 'does not find an un-passed argument anywhere in the series' do
-        expect(@subject.get_argument_count('not_an_argument')).to eql 0
+        expect(@subject.call_count('not_an_argument')).to eql 0
       end
     end
     context 'with only an series of arguments provided' do
@@ -71,15 +71,15 @@ describe 'CallLog' do
         end
 
         it 'finds the single argument anywhere in the series exactly once' do
-          expect(@subject.get_argument_count('first_argument')).to eql 1
+          expect(@subject.call_count('first_argument')).to eql 1
         end
 
         it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.get_argument_count('not_an_argument')).to eql 0
+          expect(@subject.call_count('not_an_argument')).to eql 0
         end
 
         it 'finds the single wildcard argument exactly once' do
-          expect(@subject.get_argument_count(anything)).to eql 1
+          expect(@subject.call_count(anything)).to eql 1
         end
       end
       context 'and a command called with two arguments' do
@@ -94,47 +94,47 @@ describe 'CallLog' do
         end
         
         it 'does not find the first argument when other argument is not provided' do
-          expect(@subject.get_argument_count('first_argument')).to eql 0
+          expect(@subject.call_count('first_argument')).to eql 0
         end
 
         it 'finds the first argument anywhere in the series exactly once' do
-          expect(@subject.get_argument_count('first_argument', anything)).to eql 1
+          expect(@subject.call_count('first_argument', anything)).to eql 1
         end
 
         it 'does not find the second argument when first argument is not provided' do
-          expect(@subject.get_argument_count('second_argument')).to eql 0
+          expect(@subject.call_count('second_argument')).to eql 0
         end
 
         it 'finds the second argument anywhere in the series exactly once' do
-          expect(@subject.get_argument_count(anything, 'second_argument')).to eql 1
+          expect(@subject.call_count(anything, 'second_argument')).to eql 1
         end
 
         it 'finds two contiguous arguments in the series exactly once' do
-          expect(@subject.get_argument_count('first_argument', 'second_argument')).to eql 1
+          expect(@subject.call_count('first_argument', 'second_argument')).to eql 1
         end
 
         it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.get_argument_count('not_an_argument')).to eql 0
+          expect(@subject.call_count('not_an_argument')).to eql 0
         end
 
         it 'does not find a wildcard argument when other argument is not provided' do
-          expect(@subject.get_argument_count(anything)).to eql 0
+          expect(@subject.call_count(anything)).to eql 0
         end
 
         it 'finds when both arguments are wildcards exactly once' do
-          expect(@subject.get_argument_count(anything, anything)).to eql 1
+          expect(@subject.call_count(anything, anything)).to eql 1
         end
 
         it 'finds when only the first argument is a wildcard exactly once' do
-          expect(@subject.get_argument_count(anything, 'second_argument')).to eql 1
+          expect(@subject.call_count(anything, 'second_argument')).to eql 1
         end
 
         it 'finds when only the second argument is a wildcard exactly once' do
-          expect(@subject.get_argument_count('first_argument', anything)).to eql 1
+          expect(@subject.call_count('first_argument', anything)).to eql 1
         end
 
         it 'does not find when wildcard is in wrong position' do
-          expect(@subject.get_argument_count('first_argument', anything, 'second_argument')).to eql 0
+          expect(@subject.call_count('first_argument', anything, 'second_argument')).to eql 0
         end
       end
       context 'and a command called with three arguments' do
@@ -149,67 +149,67 @@ describe 'CallLog' do
         end
 
         it 'does not find first argument when other arguments are not provided' do
-          expect(@subject.get_argument_count('first_argument')).to eql 0
+          expect(@subject.call_count('first_argument')).to eql 0
         end
 
         it 'finds the first argument anywhere in the series exactly once' do
-          expect(@subject.get_argument_count('first_argument', anything, anything)).to eql 1
+          expect(@subject.call_count('first_argument', anything, anything)).to eql 1
         end
 
         it 'does not find second argument when other arguments are not provided' do
-          expect(@subject.get_argument_count('second_argument')).to eql 0
+          expect(@subject.call_count('second_argument')).to eql 0
         end
 
         it 'finds the second argument anywhere in the series exactly once' do
-          expect(@subject.get_argument_count(anything, 'second_argument', anything)).to eql 1
+          expect(@subject.call_count(anything, 'second_argument', anything)).to eql 1
         end
 
         it 'does not find third argument when other arguments are not provided' do
-          expect(@subject.get_argument_count('third_argument')).to eql 0
+          expect(@subject.call_count('third_argument')).to eql 0
         end
 
         it 'finds the third argument anywhere in the series exactly once' do
-          expect(@subject.get_argument_count(anything, anything, 'third_argument')).to eql 1
+          expect(@subject.call_count(anything, anything, 'third_argument')).to eql 1
         end
 
         it 'finds three contiguous arguments in the series exactly once' do
-          expect(@subject.get_argument_count('first_argument', 'second_argument', 'third_argument')).to eql 1
+          expect(@subject.call_count('first_argument', 'second_argument', 'third_argument')).to eql 1
         end
 
         it 'does not find two non-contiguous arguments in the series exactly once' do
-          expect(@subject.get_argument_count('first_argument', 'third_argument')).to eql 0
+          expect(@subject.call_count('first_argument', 'third_argument')).to eql 0
         end
 
         it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.get_argument_count('not_an_argument')).to eql 0
+          expect(@subject.call_count('not_an_argument')).to eql 0
         end
 
         it 'finds when only the first argument is a wildcard' do
-          expect(@subject.get_argument_count(anything, 'second_argument', 'third_argument')).to eql 1
+          expect(@subject.call_count(anything, 'second_argument', 'third_argument')).to eql 1
         end
 
         it 'finds when only the second argument is a wildcard' do
-          expect(@subject.get_argument_count('first_argument', anything, 'third_argument')).to eql 1
+          expect(@subject.call_count('first_argument', anything, 'third_argument')).to eql 1
         end
 
         it 'finds when only the third argument is a wildcard' do
-          expect(@subject.get_argument_count('first_argument', 'second_argument', anything)).to eql 1
+          expect(@subject.call_count('first_argument', 'second_argument', anything)).to eql 1
         end
 
         it 'finds when both the first and second arguments are wildcards' do
-          expect(@subject.get_argument_count(anything, anything, 'third_argument')).to eql 1
+          expect(@subject.call_count(anything, anything, 'third_argument')).to eql 1
         end
 
         it 'finds when both the first and third arguments are wildcards' do
-          expect(@subject.get_argument_count(anything, 'second_argument', anything)).to eql 1
+          expect(@subject.call_count(anything, 'second_argument', anything)).to eql 1
         end
 
         it 'finds when both the second and third arguments are wildcards' do
-          expect(@subject.get_argument_count('first_argument', anything, anything)).to eql 1
+          expect(@subject.call_count('first_argument', anything, anything)).to eql 1
         end
         
         it 'does not find when wildcard is in wrong position' do
-          expect(@subject.get_argument_count('first_argument', anything, 'second_argument', 'third_argument')).to eql 0
+          expect(@subject.call_count('first_argument', anything, 'second_argument', 'third_argument')).to eql 0
         end
       end
       context 'with an argument called multiple times' do
@@ -227,7 +227,7 @@ describe 'CallLog' do
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
         it 'returns 2 when argument is called 2 times' do
-          expect(@subject.get_argument_count('twice_called_arg')).to eql 2
+          expect(@subject.call_count('twice_called_arg')).to eql 2
         end
       end
     end

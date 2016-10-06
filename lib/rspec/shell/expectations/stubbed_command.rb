@@ -34,8 +34,8 @@ module Rspec
           @call_log.called_with_args?(*args)
         end
         
-        def get_argument_count(*arg)
-          @call_log.get_argument_count(*arg)
+        def call_count(*arg)
+          @call_log.call_count(*arg)
         end
 
         def returns_exitstatus(statuscode)
