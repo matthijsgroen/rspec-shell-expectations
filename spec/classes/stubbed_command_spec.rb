@@ -16,14 +16,8 @@ describe 'StubbedCommand' do
     end
     context 'with only a series of arguments' do
       it 'passes the check to its CallLog\'s #called_with_args? method' do
-        expect(@call_log).to receive(:called_with_args?).with('first_argument', 'second_argument', anything).and_return(true)
+        expect(@call_log).to receive(:called_with_args?).with('first_argument', 'second_argument').and_return(true)
         @subject.called_with_args?('first_argument', 'second_argument')
-      end
-    end
-    context 'with a series of arguments and a position' do
-      it 'passes the check to its CallLog\'s #called_with_args? method' do
-        expect(@call_log).to receive(:called_with_args?).with('first_argument', 'second_argument', position: 0).and_return(true)
-        @subject.called_with_args?('first_argument', 'second_argument', position: 0)
       end
     end
   end

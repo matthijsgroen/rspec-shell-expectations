@@ -30,8 +30,8 @@ module Rspec
           @call_log.called_with_no_args?
         end
 
-        def called_with_args?(*args, position: false)
-          @call_log.called_with_args?(*args, position: position)
+        def called_with_args?(*args)
+          @call_log.called_with_args?(*args)
         end
         
         def get_argument_count(*arg)

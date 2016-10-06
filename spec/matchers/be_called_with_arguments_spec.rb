@@ -29,32 +29,20 @@ describe 'be_called_with_arguments' do
         expect(@command).to be_called_with_arguments(anything, anything)
       end
     end
-    context 'and the at_position chain call' do
-      before(:each) do
-        @command = stubbed_env.stub_command('stubbed_command')
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-          stubbed_command first_argument second_argument
-        multiline_script
-        )
-      end
-      it 'correctly identifies the called arguments' do
-        expect(@command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0)
-      end
-    end
     context 'and the times chain call' do
       before(:each) do
         @command = stubbed_env.stub_command('stubbed_command')
         @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
           stubbed_command duplicated_argument once_called_argument
-          stubbed_command duplicated_argument
+          stubbed_command duplicated_argument irrelevant_argument
         multiline_script
         )
       end
       it 'matches when arguments are called twice' do
-        expect(@command).to be_called_with_arguments('duplicated_argument').times(2)
+        expect(@command).to be_called_with_arguments('duplicated_argument', anything).times(2)
       end
       it 'matches when argument is called once' do
-        expect(@command).to be_called_with_arguments('once_called_argument').times(1)
+        expect(@command).to be_called_with_arguments(anything, 'once_called_argument').times(1)
       end
       it 'matches when argument combination is called once' do
         expect(@command).to be_called_with_arguments('duplicated_argument', 'once_called_argument').times(1)
