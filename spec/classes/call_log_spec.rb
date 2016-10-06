@@ -1,5 +1,5 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec-bash'
 
 describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }

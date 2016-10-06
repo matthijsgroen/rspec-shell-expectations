@@ -1,5 +1,5 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec-bash'
 
 describe 'StubbedEnv' do
   include Rspec::Shell::Expectations

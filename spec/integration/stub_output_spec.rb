@@ -1,5 +1,5 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec-bash'
 
 describe 'Stub command output' do
   include Rspec::Shell::Expectations

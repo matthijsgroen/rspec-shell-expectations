@@ -1,17 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'rspec/shell/expectations/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'rspec-shell-expectations'
-  spec.version       = Rspec::Shell::Expectations::VERSION
-  spec.authors       = ['Matthijs Groen']
-  spec.email         = ['matthijs.groen@gmail.com']
-  spec.summary       = 'Fake execution environments to TDD shell scripts'
+  spec.name          = 'rspec-bash'
+  spec.version       = '0.0.3'
+  spec.authors       = ['Ben Brewer', 'Mike Urban', 'Matthijs Groen']
+  spec.email         = ['ben@benbrewer.me', 'mike.david.urban@gmail.com']
+  spec.summary       = 'Test Bash with RSpec'
   spec.description   = <<-DESCRIPTION
-    Stub results of commands.
-    Assert calls and input using RSpec for your shell scripts
+    Stub and mock Bash commands
+    Verify Bash calls and outputs
   DESCRIPTION
   spec.homepage      = ''
   spec.license       = 'MIT'

@@ -70,7 +70,7 @@ module Rspec
         end
 
         def project_root
-          Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..', '..', '..')
+          Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..')
         end
       end
     end

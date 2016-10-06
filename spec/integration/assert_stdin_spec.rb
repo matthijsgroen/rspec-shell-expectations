@@ -1,5 +1,5 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec-bash'
 
 describe 'Assert stdin' do
   include Rspec::Shell::Expectations
