@@ -2,7 +2,7 @@ require 'English'
 require 'rspec/bash'
 
 describe 'Provide environment vars' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:script) do
     <<-SCRIPT
       echo $SOME_ENV_VAR

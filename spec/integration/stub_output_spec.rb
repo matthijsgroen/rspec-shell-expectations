@@ -2,7 +2,7 @@ require 'English'
 require 'rspec/bash'
 
 describe 'Stub command output' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   let!(:command1_stub) { stubbed_env.stub_command('command1') }
 

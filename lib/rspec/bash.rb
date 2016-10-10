@@ -1,4 +1,3 @@
-require 'rspec/bash/version'
 require 'rspec/bash/stubbed_command'
 require 'rspec/bash/call_configuration'
 require 'rspec/bash/call_log'

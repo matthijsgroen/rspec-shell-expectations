@@ -2,7 +2,7 @@ require 'English'
 require 'rspec/bash'
 
 describe 'be_called_with_no_arguments' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
 
   context 'when command is called with no args' do

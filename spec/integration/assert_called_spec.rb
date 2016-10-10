@@ -2,7 +2,7 @@ require 'English'
 require 'rspec/bash'
 
 describe 'Assert called' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   let!(:first_command) { stubbed_env.stub_command('first_command') }
 

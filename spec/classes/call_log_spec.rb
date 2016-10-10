@@ -3,11 +3,11 @@ require 'rspec/bash'
 
 describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
 
   context '#stdin_for_args' do
     it 'returns nil when no YAML file is used for call log' do
-        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        @subject = Rspec::Bash::CallLog.new(anything)
         allow(YAML).to receive(:load_file).and_return([])
 
         expect(@subject.stdin_for_args(anything)).to be nil
@@ -18,7 +18,7 @@ describe 'CallLog' do
            'args' => ['arbitrary argument'],
            'stdin' => ['correct value'],
         }]
-      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      @subject = Rspec::Bash::CallLog.new(anything)
       allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
 
       expect(@subject.stdin_for_args('arbitrary argument').first).to eql 'correct value'
@@ -29,7 +29,7 @@ describe 'CallLog' do
            'args' => ['arbitrary argument'],
            'stdin' => ['first value', 'second value'],
         }]
-      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      @subject = Rspec::Bash::CallLog.new(anything)
       allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
 
       expect(@subject.stdin_for_args('arbitrary argument').sort).to eql ['first value', 'second value'].sort
@@ -40,7 +40,7 @@ describe 'CallLog' do
            'args' => nil,
            'stdin' => ['correct value'],
          }]
-      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      @subject = Rspec::Bash::CallLog.new(anything)
       allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
 
       expect(@subject.stdin_for_args).to eql ['correct value']
@@ -50,7 +50,7 @@ describe 'CallLog' do
   context '#call_count?' do
     context 'with no calls made at all (missing call log file)' do
       before(:each) do
-        @subject = Rspec::Shell::Expectations::CallLog.new('command_with_no_call_log_file')
+        @subject = Rspec::Bash::CallLog.new('command_with_no_call_log_file')
         allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
       end
 
@@ -66,7 +66,7 @@ describe 'CallLog' do
                    'args' => ['first_argument'],
                    'stdin' => [],
                }]
-          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_one_argument_log')
+          @subject = Rspec::Bash::CallLog.new('command_with_one_argument_log')
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
 
@@ -89,7 +89,7 @@ describe 'CallLog' do
                    'args' => ['first_argument', 'second_argument'],
                    'stdin' => [],
                }]
-          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_two_arguments_log')
+          @subject = Rspec::Bash::CallLog.new('command_with_two_arguments_log')
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
         
@@ -144,7 +144,7 @@ describe 'CallLog' do
                    'args' => ['first_argument', 'second_argument', 'third_argument'],
                    'stdin' => [],
                }]
-          @subject = Rspec::Shell::Expectations::CallLog.new('command_with_three_arguments_log')
+          @subject = Rspec::Bash::CallLog.new('command_with_three_arguments_log')
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
 
@@ -223,7 +223,7 @@ describe 'CallLog' do
                    'args' => ['twice_called_arg'],
                    'stdin' => []
                }]
-          @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+          @subject = Rspec::Bash::CallLog.new(anything)
           allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
         end
         it 'returns 2 when argument is called 2 times' do
@@ -248,7 +248,7 @@ describe 'CallLog' do
                'args' => ['twice_called_arg'],
                'stdin' => []
            }]
-      @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+      @subject = Rspec::Bash::CallLog.new(anything)
       allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
     end
 
@@ -267,7 +267,7 @@ describe 'CallLog' do
 
   context '#called_with_no_args?' do
     it 'returns false if no call log is found' do
-        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        @subject = Rspec::Bash::CallLog.new(anything)
         allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
 
         expect(@subject.called_with_no_args?).to be_falsey
@@ -278,7 +278,7 @@ describe 'CallLog' do
            'args' => nil,
            'stdin' => [],
         }]
-        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        @subject = Rspec::Bash::CallLog.new(anything)
         allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
 
         expect(@subject.called_with_no_args?).to be_truthy
@@ -289,7 +289,7 @@ describe 'CallLog' do
            'args' => ['I am an argument'],
            'stdin' => [],
         }]
-        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        @subject = Rspec::Bash::CallLog.new(anything)
         allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
 
         expect(@subject.called_with_no_args?).to be_falsey
@@ -300,7 +300,7 @@ describe 'CallLog' do
            'args' => ['I am an argument', 'as am I'],
            'stdin' => [],
         }]
-        @subject = Rspec::Shell::Expectations::CallLog.new(anything)
+        @subject = Rspec::Bash::CallLog.new(anything)
         allow(YAML).to receive(:load_file).and_return(actual_call_log_list)
 
         expect(@subject.called_with_no_args?).to be_falsey
