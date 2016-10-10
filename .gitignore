@@ -12,5 +12,6 @@
 *.o
 *.a
 *.swp
+*.gem
 mkmf.log
 .idea/
