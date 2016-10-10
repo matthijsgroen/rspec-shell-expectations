@@ -33,7 +33,7 @@ module Rspec
         def called_with_args?(*args)
           @call_log.called_with_args?(*args)
         end
-        
+
         def call_count(*arg)
           @call_log.call_count(*arg)
         end
@@ -70,7 +70,7 @@ module Rspec
         end
 
         def project_root
-          Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..')
+          Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..', '..')
         end
       end
     end

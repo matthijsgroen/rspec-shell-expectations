@@ -1,5 +1,5 @@
 require 'English'
-require 'rspec-bash'
+require 'rspec/bash'
 
 describe 'Replace shell commands' do
   include Rspec::Shell::Expectations

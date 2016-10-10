@@ -1,5 +1,5 @@
 require 'English'
-require 'rspec-bash'
+require 'rspec/bash'
 
 describe 'Assert called' do
   context 'checking command is called with argument sequence' do

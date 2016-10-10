@@ -1,5 +1,5 @@
 require 'English'
-require 'rspec-bash'
+require 'rspec/bash'
 
 describe 'be_called_with_no_arguments' do
   include Rspec::Shell::Expectations
