@@ -1,10 +1,10 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec/bash'
 
 # TODO - the below specs test implementation, until the goofy wiring of StubbedCommand => StubbedCall => CallLog is sorted out
 
 describe 'be_called_with_arguments' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
 
   context 'with a command' do

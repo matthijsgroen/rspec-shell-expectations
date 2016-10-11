@@ -1,9 +1,9 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec/bash'
 
 describe 'Assert called' do
   context 'checking command is called with argument sequence' do
-    include Rspec::Shell::Expectations
+    include Rspec::Bash
     let(:stubbed_env) { create_stubbed_env }
     let!(:bundle) {
       stubbed_env.stub_command('bundle')
@@ -34,7 +34,7 @@ describe 'Assert called' do
     end
   end
   context 'checking command is called with no arguments' do
-    include Rspec::Shell::Expectations
+    include Rspec::Bash
     let(:stubbed_env) { create_stubbed_env }
     let!(:ls) {
       stubbed_env.stub_command('ls')

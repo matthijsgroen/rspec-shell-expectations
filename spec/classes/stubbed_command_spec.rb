@@ -1,8 +1,8 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec/bash'
 
 describe 'StubbedCommand' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   before(:each) do
     allow(FileUtils).to receive(:cp)
@@ -10,9 +10,9 @@ describe 'StubbedCommand' do
 
   context '#called_with_args?' do
     before(:each) do
-      @call_log = double(Rspec::Shell::Expectations::CallLog)
-      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @call_log = double(Rspec::Bash::CallLog)
+      allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
+      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
     end
     context 'with only a series of arguments' do
       it 'passes the check to its CallLog\'s #called_with_args? method' do
@@ -24,7 +24,7 @@ describe 'StubbedCommand' do
 
   context '#with_args' do
     before(:each) do
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
       @subject.with_args('argument_one', 'argument_two')
     end
     it 'sets the arguments array on the StubbedCommand to the arguments that were passed in' do
@@ -34,9 +34,9 @@ describe 'StubbedCommand' do
 
   context '#call_count' do
     before(:each) do
-      @call_log = double(Rspec::Shell::Expectations::CallLog)
-      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @call_log = double(Rspec::Bash::CallLog)
+      allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
+      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
     end
     it 'returns value returned from call_log argument count when there are no arguments' do
       expect(@call_log).to receive(:call_count).with([]).and_return('arbitrary return value')
@@ -54,9 +54,9 @@ describe 'StubbedCommand' do
 
   context '#called?' do
     before(:each) do
-      @call_log = double(Rspec::Shell::Expectations::CallLog)
-      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @call_log = double(Rspec::Bash::CallLog)
+      allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
+      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
     end
     it 'returns false when there is no call_log' do
       expect(@call_log).to receive(:exist?).and_return(false)
@@ -76,9 +76,9 @@ describe 'StubbedCommand' do
   
   context '#stdin' do
     before(:each) do
-      @call_log = double(Rspec::Shell::Expectations::CallLog)
-      allow(Rspec::Shell::Expectations::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @call_log = double(Rspec::Bash::CallLog)
+      allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
+      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
     end
     it 'returns nil when there is no call_log' do
       expect(@call_log).to receive(:exist?).and_return(false)
@@ -93,9 +93,9 @@ describe 'StubbedCommand' do
 
   context '#returns_exitstatus' do
     before(:each) do
-      @call_configuration = double(Rspec::Shell::Expectations::CallConfiguration)
-      allow(Rspec::Shell::Expectations::CallConfiguration).to receive(:new).and_return(@call_configuration)
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @call_configuration = double(Rspec::Bash::CallConfiguration)
+      allow(Rspec::Bash::CallConfiguration).to receive(:new).and_return(@call_configuration)
+      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
     end
     it 'sets the exitcode on call_configuration' do
       expect(@call_configuration).to receive(:set_exitcode).with('exit code', anything)
@@ -111,9 +111,9 @@ describe 'StubbedCommand' do
   
   context '#outputs' do
     before(:each) do
-      @call_configuration = double(Rspec::Shell::Expectations::CallConfiguration)
-      allow(Rspec::Shell::Expectations::CallConfiguration).to receive(:new).and_return(@call_configuration)
-      @subject = Rspec::Shell::Expectations::StubbedCommand.new('command', Dir.mktmpdir)
+      @call_configuration = double(Rspec::Bash::CallConfiguration)
+      allow(Rspec::Bash::CallConfiguration).to receive(:new).and_return(@call_configuration)
+      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
     end
     it 'sets the output on the call_configuration' do
       expect(@call_configuration).to receive(:set_output).with('contents', 'stderr', anything)

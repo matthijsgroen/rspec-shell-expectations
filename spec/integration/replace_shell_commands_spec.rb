@@ -1,8 +1,8 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec/bash'
 
 describe 'Replace shell commands' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:script) do
     <<-SCRIPT
       command1 "foo bar"

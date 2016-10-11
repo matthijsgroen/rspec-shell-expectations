@@ -1,9 +1,9 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec/bash'
 
 describe 'StubbedEnv' do
-  include Rspec::Shell::Expectations
-  let(:subject) { Rspec::Shell::Expectations::StubbedEnv.new }
+  include Rspec::Bash
+  let(:subject) { Rspec::Bash::StubbedEnv.new }
 
   context '#execute_inline' do
     context 'with a stubbed function' do

@@ -1,8 +1,8 @@
 require 'English'
-require 'rspec/shell/expectations'
+require 'rspec/bash'
 
 describe 'Assert stdin' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   let!(:command1_stub) { stubbed_env.stub_command('command1') }
 
