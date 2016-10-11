@@ -1,10 +1,6 @@
-# Rspec::Shell::Expectations
-[![Build Status](https://travis-ci.org/matthijsgroen/rspec-shell-expectations.png?branch=master)](https://travis-ci.org/matthijsgroen/rspec-shell-expectations)
-[![Gem Version](https://badge.fury.io/rb/rspec-shell-expectations.svg)](http://badge.fury.io/rb/rspec-shell-expectations)
-[![Code Climate](https://codeclimate.com/github/matthijsgroen/rspec-shell-expectations/badges/gpa.svg)](https://codeclimate.com/github/matthijsgroen/rspec-shell-expectations)
+# Rspec::Bash
 
-Run your shell script in a mocked environment to test its behaviour
-using RSpec.
+Run your shell script in a mocked environment to test its behavior using RSpec.
 
 ## Features
 - Test bash functions, entire scripts and inline scripts
@@ -14,9 +10,8 @@ using RSpec.
 - Control multiple outputs (through STDOUT, STDERR or files)
 - Verify STDIN, STDOUT, STDERR
 - Verify if command is called
-- Verify command is called with specific arguments
-- Verify arguments of command were called in correct sequence
-- Verify command with specific arguments was called correct number of times
+- Verify command is called with specific argument sequence
+- Verify command was called correct number of times
 - Supports RSpec "anything" wildcard matchers
 
 ## Installation
@@ -24,7 +19,7 @@ using RSpec.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rspec-shell-expectations'
+gem 'rspec-bash'
 ```
 
 And then execute:
@@ -33,18 +28,18 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install rspec-shell-expectations
+    $ gem install rspec-bash
 
 
-You can setup rspec-shell-expectations globally for your spec suite:
+You can setup rspec-bash globally for your spec suite:
 
 in `spec_helper.rb`:
 
 ```ruby
-  require 'rspec/shell/expectations'
+  require 'rspec/bash'
 
   RSpec.configure do |c|
-    c.include Rspec::Shell::Expectations
+    c.include Rspec::Bash
   end
 ```
 
@@ -55,10 +50,10 @@ see specs in *spec/integration* folder:
 ### Running script through stubbed env:
 
 ```ruby
-  require 'rspec/shell/expectations'
+  require 'rspec/bash'
 
   describe 'my shell script' do
-    include Rspec::Shell::Expectations
+    include Rspec::Bash
 
     let(:stubbed_env) { create_stubbed_env }
 
@@ -123,14 +118,14 @@ see specs in *spec/integration* folder:
 ### Test entire script
 
 ```ruby
-let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
+let(:stubbed_env) { Rspec::Bash::StubbedEnv.new }
 stubbed_env.execute('./path/to/script.sh')
 ```
 
 ### Test specific function
 
 ```ruby
-let(:stubbed_env) { Rspec::Shell::Expectations::StubbedEnv.new }
+let(:stubbed_env) { Rspec::Bash::StubbedEnv.new }
 stubbed_env.stub_command('overridden_function')
 stubbed_env.execute_function(
     './path/to/script.sh',
@@ -154,7 +149,7 @@ stubbed_env.execute_inline(<<-multiline_script
 
 ```ruby
 describe 'be_called_with_arguments' do
-  include Rspec::Shell::Expectations
+  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
 
   context 'with a command' do
@@ -168,14 +163,6 @@ describe 'be_called_with_arguments' do
       end
       it 'correctly identifies the called arguments' do
         expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
-      end
-      it 'correctly identifies the arguments called in correct sequence' do
-        # The sequence 'first_argument', 'second_argument' starting at position 0
-        expect(@command).to be_called_with_arguments('first_argument', 'second_argument').at_position(0)
-      end
-      it 'correctly identifies the argument is called in last position' do
-        # The argument 'second_argument' is the last argument passed to command
-        expect(@command).to be_called_with_arguments('second_argument').at_position(-1)
       end
     end
   end
@@ -201,8 +188,9 @@ context 'and the times chain call' do
   before(:each) do
     @command = stubbed_env.stub_command('stubbed_command')
     @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-      stubbed_command duplicated_argument once_called_argument
       stubbed_command duplicated_argument
+      stubbed_command duplicated_argument
+      stubbed_command once_called_argument
     multiline_script
     )
   end
@@ -211,9 +199,6 @@ context 'and the times chain call' do
   end
   it 'matches when argument is called once' do
     expect(@command).to be_called_with_arguments('once_called_argument').times(1)
-  end
-  it 'matches when argument combination is called once' do
-    expect(@command).to be_called_with_arguments('duplicated_argument', 'once_called_argument').times(1)
   end
 end
 ```
@@ -235,7 +220,7 @@ Ruby 2+, no JRuby, due to issues with `Open3.capture3`
 
 ## Contributing
 
-1. Fork it ( https://github.com/matthijsgroen/rspec-shell-expectations/fork )
+1. Fork it ( https://github.com/mdurban/rspec-bash )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
