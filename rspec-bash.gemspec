@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
     Stub and mock Bash commands
     Verify Bash calls and outputs
   DESCRIPTION
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/mdurban/rspec-bash'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
