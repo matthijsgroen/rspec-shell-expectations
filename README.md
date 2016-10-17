@@ -1,3 +1,5 @@
+[![Stories in Ready](https://badge.waffle.io/mdurban/rspec-bash.png?label=ready&title=Ready)](http://waffle.io/mdurban/rspec-bash)
+
 # Rspec::Bash
 
 Run your shell script in a mocked environment to test its behavior using RSpec.
