@@ -1,4 +1,5 @@
 [![Stories in Ready](https://badge.waffle.io/mdurban/rspec-bash.png?label=ready&title=Ready)](http://waffle.io/mdurban/rspec-bash)
+[![Build Status](https://travis-ci.org/mdurban/rspec-bash.svg?branch=master)](https://travis-ci.org/mdurban/rspec-bash)
 
 # Rspec::Bash
 
