@@ -35,7 +35,9 @@ if call_configurations.exist?
 
   matching_calls = []
   config.each do |call_config|
-    next unless (call_config[:args] - ARGV).empty?
+    if !call_config[:args].empty?
+      next unless (call_config[:args].eql? ARGV)
+    end
     matching_calls << {
       config: call_config,
       specific: call_config[:args].length
