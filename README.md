@@ -113,7 +113,7 @@ see specs in *spec/integration* folder:
   let(:cat_stub) { stubbed_env.stub_command 'cat' }
   let(:mail_stub) { stubbed_env.stub_command 'mail' }
   it 'verifies stdin' do
-    stubbed_env.execute_script 'script.sh'
+    stubbed_env.execute'script.sh'
     expect(cat_stub.stdin).to eql 'hello'
     expect(mail_stub.with_args('-s', 'hello').stdin).to eql 'world'
   end
