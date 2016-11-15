@@ -16,7 +16,9 @@ describe 'StubbedCommand' do
     end
     context 'with only a series of arguments' do
       it 'passes the check to its CallLog\'s #called_with_args? method' do
-        expect(@call_log).to receive(:called_with_args?).with('first_argument', 'second_argument').and_return(true)
+        expect(@call_log).to receive(:called_with_args?)
+          .with('first_argument', 'second_argument')
+          .and_return(true)
         @subject.called_with_args?('first_argument', 'second_argument')
       end
     end
@@ -43,12 +45,15 @@ describe 'StubbedCommand' do
       expect(@subject.call_count([])).to eql 'arbitrary return value'
     end
     it 'returns value returned from call_log argument count when there is only one argument' do
-      expect(@call_log).to receive(:call_count).with(['only arg']).and_return('arbitrary return value')
-      expect(@subject.call_count ['only arg']).to eql 'arbitrary return value'
+      expect(@call_log).to receive(:call_count)
+        .with(['only arg'])
+        .and_return('arbitrary return value')
+      expect(@subject.call_count(['only arg'])).to eql 'arbitrary return value'
     end
     it 'returns value returned from call_log argument count when there are multiple  arguments' do
-      expect(@call_log).to receive(:call_count).with(['first arg', 'second arg']).and_return('arbitrary return value')
-      expect(@subject.call_count ['first arg', 'second arg']).to eql 'arbitrary return value'
+      expect(@call_log).to receive(:call_count).with(['first arg', 'second arg'])
+        .and_return('arbitrary return value')
+      expect(@subject.call_count(['first arg', 'second arg'])).to eql 'arbitrary return value'
     end
   end
 
@@ -73,7 +78,7 @@ describe 'StubbedCommand' do
       expect(@subject.called?).to be_truthy
     end
   end
-  
+
   context '#stdin' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
@@ -108,7 +113,7 @@ describe 'StubbedCommand' do
       expect(@subject.returns_exitstatus(anything)).to eql @subject
     end
   end
-  
+
   context '#outputs' do
     before(:each) do
       @call_configuration = double(Rspec::Bash::CallConfiguration)

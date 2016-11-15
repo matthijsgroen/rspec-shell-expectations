@@ -32,19 +32,21 @@ module Rspec
       end
 
       def execute(command, env_vars = {})
-        full_command = get_wrapped_execution_with_function_overrides(<<-multiline_script
-          #{env} source #{command}
-        multiline_script
+        full_command = get_wrapped_execution_with_function_overrides(
+          <<-multiline_script
+            #{env} source #{command}
+          multiline_script
         )
 
         Open3.capture3(env_vars, full_command)
       end
 
       def execute_function(script, command, env_vars = {})
-        full_command = get_wrapped_execution_with_function_overrides(<<-multiline_script
-          source #{script}
-          #{env} #{command}
-        multiline_script
+        full_command = get_wrapped_execution_with_function_overrides(
+          <<-multiline_script
+            source #{script}
+            #{env} #{command}
+          multiline_script
         )
 
         Open3.capture3(env_vars, full_command)
@@ -63,7 +65,9 @@ module Rspec
         function_command_path_binding_for_template = File.join(@dir, command)
 
         function_override_file_path = File.join(@dir, "#{command}_overrides.sh")
-        function_override_file_template = ERB.new File.new(function_override_template_path).read, nil, '%'
+        function_override_file_template = ERB.new(
+          File.new(function_override_template_path).read, nil, '%'
+        )
         function_override_file_content = function_override_file_template.result(binding)
 
         File.write(function_override_file_path, function_override_file_content)
@@ -74,7 +78,9 @@ module Rspec
         function_override_path_binding_for_template = "#{@dir}/*_overrides.sh"
         wrapped_error_path_binding_for_template = "#{@dir}/errors"
 
-        function_override_wrapper_template = ERB.new File.new(function_override_wrapper_template_path).read, nil, '%'
+        function_override_wrapper_template = ERB.new(
+          File.new(function_override_wrapper_template_path).read, nil, '%'
+        )
 
         function_override_wrapper_template.result(binding)
       end

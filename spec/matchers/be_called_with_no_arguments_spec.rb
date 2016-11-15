@@ -8,9 +8,10 @@ describe 'be_called_with_no_arguments' do
   context 'when command is called with no args' do
     before(:each) do
       @command = stubbed_env.stub_command('stubbed_command')
-      @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-        stubbed_command
-      multiline_script
+      @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(
+        <<-multiline_script
+          stubbed_command
+        multiline_script
       )
     end
     it 'correctly identifies that no arguments were called' do
@@ -20,9 +21,10 @@ describe 'be_called_with_no_arguments' do
   context 'when command is called with args' do
     before(:each) do
       @command = stubbed_env.stub_command('stubbed_command')
-      @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-        stubbed_command argument
-      multiline_script
+      @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(
+        <<-multiline_script
+          stubbed_command argument
+        multiline_script
       )
     end
     it 'correctly identifies that arguments were passed into command call' do
