@@ -213,6 +213,26 @@ it 'correctly matches when wildcard is used for arguments' do
 end
 ```
 
+### Pitfalls and known issues
+
+- Use `$BASH_SOURCE[0]` instead of `$0` in your Bash scripts when trying to get the directory that your called script is in. This is a good habit to use when writing scripts as `$0` should rarely be used.
+`$0` also has some ramifications when using this gem; it will always be `bash` and will not be the name of the script.
+Please see https://www.gnu.org/software/bash/manual/bashref.html#Positional-Parameters for more information on `$0`
+
+- The `execute_function()` method is recommended to be used only when testing Bash libraries. This is because it needs to source the entire file to run the function under test, so any executable code in the script will be run even if it is outside of the function being tested
+
+- At this time, absolute paths cannot be mocked.
+
+- The RSpec 'anything' matcher is supported for verifying output, but not yet supported for stubbing. For example,
+```ruby
+  expect(@command).to be_called_with_arguments(anything, 'second_argument', anything)
+```
+works as expected but
+```ruby
+  stubbed_git_command.with_args('pull', anything, '--rebase').outputs('I did it')
+```
+does not.
+
 ## More examples
 
 see the *spec/integration* folder
