@@ -1,10 +1,6 @@
 /usr/bin/env bash -c '
-
 # load in command and function overrides
-system_ls=$(whereis ls)
-system_grep=$(whereis grep)
-
-for override_file in $(${system_ls} -d <%=function_override_path_binding_for_template%> 2> /dev/null); do
+for override_file in <%=function_override_path_binding_for_template%>; do
   source ${override_file}
 done
 
@@ -14,7 +10,7 @@ done
 command_exit_code=$?
 
 # filter stderr for readonly problems
-${system_grep} -v "readonly function" <%=wrapped_error_path_binding_for_template%> >&2
+grep -v "readonly function" <%=wrapped_error_path_binding_for_template%> >&2
 
 # return original exit code
 exit ${command_exit_code}'
