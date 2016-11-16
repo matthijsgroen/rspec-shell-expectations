@@ -12,7 +12,7 @@ describe 'CallConfiguration' do
     end
   end
   context '#write' do
-      it 'raises error when there is no config_path' do
+    it 'raises error when there is no config_path' do
       @subject = Rspec::Bash::CallConfiguration.new(nil, anything)
 
       expect { @subject.write }.to raise_exception(NoMethodError)

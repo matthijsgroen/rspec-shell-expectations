@@ -1,0 +1,8 @@
+Metrics/LineLength:
+  Max: 100
+
+Style/NumericLiteralPrefix:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false

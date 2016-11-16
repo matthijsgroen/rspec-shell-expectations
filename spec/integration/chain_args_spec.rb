@@ -5,9 +5,7 @@ describe 'Assert called' do
   context 'checking command is called with argument sequence' do
     include Rspec::Bash
     let(:stubbed_env) { create_stubbed_env }
-    let!(:bundle) {
-      stubbed_env.stub_command('bundle')
-    }
+    let!(:bundle) { stubbed_env.stub_command('bundle') }
 
     let(:script) do
       <<-SCRIPT
@@ -36,10 +34,7 @@ describe 'Assert called' do
   context 'checking command is called with no arguments' do
     include Rspec::Bash
     let(:stubbed_env) { create_stubbed_env }
-    let!(:ls) {
-      stubbed_env.stub_command('ls')
-    }
-
+    let!(:ls) { stubbed_env.stub_command('ls') }
     let(:script) do
       <<-SCRIPT
        ls

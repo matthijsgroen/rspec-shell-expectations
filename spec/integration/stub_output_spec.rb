@@ -25,7 +25,7 @@ describe 'Stub command output' do
   describe 'stubbing standard-out' do
     it 'changes standard-out' do
       command1_stub.outputs('hello', to: :stdout)
-      output, error, status = stubbed_env.execute "#{script_path} 2>/dev/null"
+      output, error, _status = stubbed_env.execute "#{script_path} 2>/dev/null"
 
       expect(output).to eql 'hello'
       expect(error).to be_empty
@@ -35,7 +35,7 @@ describe 'Stub command output' do
   describe 'stubbing standard-err' do
     it 'changes standard-out' do
       command1_stub.outputs('world', to: :stderr)
-      output, error, status = stubbed_env.execute "#{script_path} 1>/dev/null"
+      output, error, _status = stubbed_env.execute "#{script_path} 1>/dev/null"
       expect(error).to eql "world\n"
       expect(output).to be_empty
     end
@@ -50,7 +50,7 @@ describe 'Stub command output' do
 
     it 'write data to a file' do
       command1_stub.outputs('world', to: filename)
-      output, error, status = stubbed_env.execute "#{script_path}"
+      output, error, _status = stubbed_env.execute script_path.to_s
 
       expect(error).to be_empty
       expect(output).to be_empty
@@ -69,7 +69,7 @@ describe 'Stub command output' do
 
       it 'writes data to an interpolated filename' do
         command1_stub.outputs('world', to: passed_filename)
-        stubbed_env.execute "#{script_path}"
+        stubbed_env.execute script_path.to_s
 
         expect(Pathname.new(filename).read).to eql 'world'
       end
@@ -85,15 +85,16 @@ describe 'Stub command output' do
 
     it 'outputs correctly when all arguments match' do
       command1_stub.with_args('input', 'output').outputs('world', to: :stdout)
-      output, error, status = stubbed_env.execute "#{script_path}"
+      output, error, _status = stubbed_env.execute script_path.to_s
 
       expect(error).to be_empty
       expect(output).to eql 'world'
     end
 
     it 'does not output when called with extra arguments, even if some match' do
-      command1_stub.with_args('input', 'output', 'anything').outputs('arbitrary string', to: :stdout)
-      output, error, status = stubbed_env.execute "#{script_path}"
+      command1_stub.with_args('input', 'output', 'anything')
+                   .outputs('arbitrary string', to: :stdout)
+      output, error, _status = stubbed_env.execute script_path.to_s
 
       expect(error).to be_empty
       expect(output).to be_empty
@@ -101,7 +102,7 @@ describe 'Stub command output' do
 
     it 'does not output when called with only one matching argument out of many' do
       command1_stub.with_args('input').outputs('arbitrary string', to: :stdout)
-      output, error, status = stubbed_env.execute "#{script_path}"
+      output, error, _status = stubbed_env.execute script_path.to_s
 
       expect(error).to be_empty
       expect(output).to be_empty

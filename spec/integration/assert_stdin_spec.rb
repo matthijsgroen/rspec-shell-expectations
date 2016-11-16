@@ -17,7 +17,7 @@ describe 'Assert stdin' do
   before do
     script_path.open('w') { |f| f.puts script }
     script_path.chmod 0777
-    
+
     stubbed_env.execute script_path.to_s
   end
 

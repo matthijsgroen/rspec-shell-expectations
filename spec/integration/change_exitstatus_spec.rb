@@ -23,7 +23,7 @@ describe 'Change exitstatus' do
 
   describe 'default exitstatus' do
     it 'is 0' do
-      output, error, status = stubbed_env.execute script_path.to_s
+      _output, _error, status = stubbed_env.execute script_path.to_s
       expect(status.exitstatus).to eq 0
     end
   end
@@ -34,7 +34,7 @@ describe 'Change exitstatus' do
     end
 
     it 'returns the stubbed exitstatus' do
-      output, error, status = stubbed_env.execute script_path.to_s
+      _output, _error, status = stubbed_env.execute script_path.to_s
       expect(status.exitstatus).to eq 4
     end
 
@@ -45,7 +45,7 @@ describe 'Change exitstatus' do
       end
 
       it 'returns the stubbed exitstatus' do
-        output, error, status = stubbed_env.execute script_path.to_s
+        _output, _error, status = stubbed_env.execute script_path.to_s
         expect(status.exitstatus).to eq 2
       end
     end
