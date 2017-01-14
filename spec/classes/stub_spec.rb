@@ -74,4 +74,62 @@ describe 'bin/stub' do
       end
     end
   end
+  context 'when called multiple times from a tty session' do
+    before(:each) do
+      allow(STDIN).to receive(:tty?).and_return(true)
+    end
+    context 'with different combinations of STDIN and arguments' do
+      let(:stub_call_log) do
+        allow(ARGV).to receive(:each)
+        allow(STDIN).to receive(:read).and_return('')
+        load subject_path
+
+        allow(ARGV).to receive(:each)
+        allow(STDIN).to receive(:read).and_return("dog\ncat\n")
+        load subject_path
+
+        allow(ARGV).to receive(:each).and_yield('first_argument').and_yield('second_argument')
+        allow(STDIN).to receive(:read).and_return('')
+        load subject_path
+
+        allow(ARGV).to receive(:each).and_yield('first_argument').and_yield('second_argument')
+        allow(STDIN).to receive(:read).and_return("dog\ncat\n")
+        load subject_path
+
+        YAML.load(stub_call_file.string)
+      end
+
+      it 'logs a blank STDIN for the first call' do
+        expect(stub_call_log[0]['stdin']).to be_nil
+      end
+
+      it 'logs no arguments for the first call' do
+        expect(stub_call_log[0]['args']).to be_nil
+      end
+
+      it 'logs some STDIN for the second call' do
+        expect(stub_call_log[1]['stdin']).to be_nil
+      end
+
+      it 'logs no arguments for the second call' do
+        expect(stub_call_log[1]['args']).to be_nil
+      end
+
+      it 'logs a blank STDIN for the third call' do
+        expect(stub_call_log[2]['stdin']).to be_nil
+      end
+
+      it 'logs some arguments for the third call' do
+        expect(stub_call_log[2]['args']).to eql %w(first_argument second_argument)
+      end
+
+      it 'logs some STDIN for the fourth call' do
+        expect(stub_call_log[3]['stdin']).to be_nil
+      end
+
+      it 'logs some arguments for the fourth call' do
+        expect(stub_call_log[3]['args']).to eql %w(first_argument second_argument)
+      end
+    end
+  end
 end
