@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-gemspec
-gem 'rubocop'
 gem 'rake'
 gem 'rspec'
+gem 'rubocop'
 gem 'simplecov'
