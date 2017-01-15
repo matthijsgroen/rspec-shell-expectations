@@ -1,5 +1,4 @@
-require 'English'
-require 'rspec/bash'
+require 'spec_helper'
 
 describe 'be_called_with_arguments' do
   include Rspec::Bash

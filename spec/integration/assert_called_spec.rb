@@ -1,5 +1,4 @@
-require 'English'
-require 'rspec/bash'
+require 'spec_helper'
 
 describe 'Assert called' do
   include Rspec::Bash

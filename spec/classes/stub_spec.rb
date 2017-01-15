@@ -1,6 +1,4 @@
-require 'English'
-require 'rspec/bash'
-require 'yaml'
+require 'spec_helper'
 
 describe 'bin/stub' do
   let(:subject_path) { File.expand_path('stub', "#{File.dirname(__FILE__)}/../../bin") }
@@ -37,6 +35,7 @@ describe 'bin/stub' do
 
     $stderr = stub_stderr_file
     $stdout = stub_stdout_file
+    allow($stdin).to receive(:tty?).and_return(false)
 
     allow_any_instance_of(Kernel).to receive(:exit) do |_, exit_code|
       exit_code_list << exit_code
@@ -44,301 +43,233 @@ describe 'bin/stub' do
     end
   end
 
-  context 'when called multiple times from a non-tty session' do
+  context 'with no configuration' do
+    let(:stub_call_log) do
+      ARGV.replace []
+      allow($stdin).to receive(:read).and_return('')
+      load subject_path
+
+      ARGV.replace []
+      allow($stdin).to receive(:read).and_return("dog\ncat\n")
+      load subject_path
+
+      ARGV.replace %w(first_argument second_argument)
+      allow($stdin).to receive(:read).and_return('')
+      load subject_path
+
+      ARGV.replace %w(first_argument second_argument)
+      allow($stdin).to receive(:read).and_return("dog\ncat\n")
+      load subject_path
+
+      YAML.load(stub_call_file.string)
+    end
+
+    it 'logs a blank STDIN for the first call' do
+      expect(stub_call_log[0]['stdin']).to be_empty
+    end
+
+    it 'logs no arguments for the first call' do
+      expect(stub_call_log[0]['args']).to be_nil
+    end
+
+    it 'logs some STDIN for the second call' do
+      expect(stub_call_log[1]['stdin']).to eql "dog\ncat\n"
+    end
+
+    it 'logs no arguments for the second call' do
+      expect(stub_call_log[1]['args']).to be_nil
+    end
+
+    it 'logs a blank STDIN for the third call' do
+      expect(stub_call_log[2]['stdin']).to be_empty
+    end
+
+    it 'logs some arguments for the third call' do
+      expect(stub_call_log[2]['args']).to eql %w(first_argument second_argument)
+    end
+
+    it 'logs some STDIN for the fourth call' do
+      expect(stub_call_log[3]['stdin']).to eql "dog\ncat\n"
+    end
+
+    it 'logs some arguments for the fourth call' do
+      expect(stub_call_log[3]['args']).to eql %w(first_argument second_argument)
+    end
+
+    it 'exits with appropriate code for first call' do
+      expect(exit_code_list[0]).to be_nil
+    end
+
+    it 'exits with appropriate code for second call' do
+      expect(exit_code_list[1]).to be_nil
+    end
+
+    it 'exits with appropriate code for third call' do
+      expect(exit_code_list[2]).to be_nil
+    end
+
+    it 'exits with appropriate code for fourth call' do
+      expect(exit_code_list[3]).to be_nil
+    end
+  end
+  context 'with configurations that does not end up matching calls' do
     before(:each) do
-      allow($stdin).to receive(:tty?).and_return(false)
-    end
-    context 'with no configuration' do
-      context 'with different combinations of STDIN and arguments' do
-        let(:stub_call_log) do
-          ARGV.replace []
-          allow($stdin).to receive(:read).and_return('')
-          load subject_path
+      stdout_configuration = [
+        {
+          args: ['super_special_argument'],
+          outputs: [
+            {
+              target: :stderr,
+              content: "no args content\n"
+            }
+          ],
+          statuscode: 1
+        }
+      ]
+      allow($stdin).to receive(:read).and_return('')
+      allow(stub_config_pathname).to receive(:exist?).and_return(true)
+      allow(stub_config_pathname).to receive(:read).and_return(stdout_configuration.to_yaml)
 
-          ARGV.replace []
-          allow($stdin).to receive(:read).and_return("dog\ncat\n")
-          load subject_path
+      ARGV.replace []
+      begin
+        load subject_path
+      rescue SystemExit
+      end
 
-          ARGV.replace %w(first_argument second_argument)
-          allow($stdin).to receive(:read).and_return('')
-          load subject_path
-
-          ARGV.replace %w(first_argument second_argument)
-          allow($stdin).to receive(:read).and_return("dog\ncat\n")
-          load subject_path
-
-          YAML.load(stub_call_file.string)
-        end
-
-        it 'logs a blank STDIN for the first call' do
-          expect(stub_call_log[0]['stdin']).to be_empty
-        end
-
-        it 'logs no arguments for the first call' do
-          expect(stub_call_log[0]['args']).to be_nil
-        end
-
-        it 'logs some STDIN for the second call' do
-          expect(stub_call_log[1]['stdin']).to eql "dog\ncat\n"
-        end
-
-        it 'logs no arguments for the second call' do
-          expect(stub_call_log[1]['args']).to be_nil
-        end
-
-        it 'logs a blank STDIN for the third call' do
-          expect(stub_call_log[2]['stdin']).to be_empty
-        end
-
-        it 'logs some arguments for the third call' do
-          expect(stub_call_log[2]['args']).to eql %w(first_argument second_argument)
-        end
-
-        it 'logs some STDIN for the fourth call' do
-          expect(stub_call_log[3]['stdin']).to eql "dog\ncat\n"
-        end
-
-        it 'logs some arguments for the fourth call' do
-          expect(stub_call_log[3]['args']).to eql %w(first_argument second_argument)
-        end
-
-        it 'exits with appropriate code for first call' do
-          expect(exit_code_list[0]).to be_nil
-        end
-
-        it 'exits with appropriate code for second call' do
-          expect(exit_code_list[1]).to be_nil
-        end
-
-        it 'exits with appropriate code for third call' do
-          expect(exit_code_list[2]).to be_nil
-        end
-
-        it 'exits with appropriate code for fourth call' do
-          expect(exit_code_list[3]).to be_nil
-        end
+      ARGV.replace ['wrongo']
+      begin
+        load subject_path
+      rescue SystemExit
       end
     end
-    context 'with configurations for stdout, stderr and file behaviour' do
-      before(:each) do
-        stdout_configuration = [
-          {
-            args: [],
-            outputs: [
-              {
-                target: :stderr,
-                content: "no args content\n"
-              },
-              {
-                target: :stderr,
-                content: "more no args content\n"
-              }
-            ],
-            statuscode: 1
-          },
-          {
-            args: %w(first_argument second_argument),
-            outputs: [
-              {
-                target: :stdout,
-                content: "some args content\n"
-              },
-              {
-                target: :stdout,
-                content: "more some args content\n"
-              }
-            ],
-            statuscode: 2
-          },
-          {
-            args: %w(first_argument second_argument third_argument),
-            outputs: [
-              {
-                target: 'a unique file name',
-                content: "some args file content\n"
-              },
-              {
-                target: 'a unique file name',
-                content: "more some args file content\n"
-              }
-            ],
-            statuscode: 3
-          },
-          {
-            args: %w(first_argument second_argument third_argument fourth_argument),
-            outputs: [
-              {
-                target: [:arg1, :arg2, 'a unique file name'],
-                content: "some concatenated filename output\n"
-              },
-              {
-                target: [:arg1, :arg2, 'a unique file name'],
-                content: "more some concatenated filename output\n"
-              }
-            ],
-            statuscode: 4
-          }
-        ]
-        allow($stdin).to receive(:read).and_return('')
-        allow(stub_config_pathname).to receive(:exist?).and_return(true)
-        allow(stub_config_pathname).to receive(:read).and_return(stdout_configuration.to_yaml)
 
-        ARGV.replace []
-        begin
-          load subject_path
-        rescue SystemExit
-        end
+    it 'exits with appropriate code for first call' do
+      expect(exit_code_list[0]).to eql 0
+    end
 
-        ARGV.replace %w(first_argument second_argument)
-        begin
-          load subject_path
-        rescue SystemExit
-        end
+    it 'exits with appropriate code for second call' do
+      expect(exit_code_list[1]).to eql 0
+    end
+  end
+  context 'with configurations for stdout, stderr and file behaviour' do
+    before(:each) do
+      stdout_configuration = [
+        {
+          args: [],
+          outputs: [
+            {
+              target: :stderr,
+              content: "no args content\n"
+            },
+            {
+              target: :stderr,
+              content: "more no args content\n"
+            }
+          ],
+          statuscode: 1
+        },
+        {
+          args: %w(first_argument second_argument),
+          outputs: [
+            {
+              target: :stdout,
+              content: "some args content\n"
+            },
+            {
+              target: :stdout,
+              content: "more some args content\n"
+            }
+          ],
+          statuscode: 2
+        },
+        {
+          args: %w(first_argument second_argument third_argument),
+          outputs: [
+            {
+              target: 'a unique file name',
+              content: "some args file content\n"
+            },
+            {
+              target: 'a unique file name',
+              content: "more some args file content\n"
+            }
+          ],
+          statuscode: 3
+        },
+        {
+          args: %w(first_argument second_argument third_argument fourth_argument),
+          outputs: [
+            {
+              target: [:arg1, :arg2, 'a unique file name'],
+              content: "some concatenated filename output\n"
+            },
+            {
+              target: [:arg1, :arg2, 'a unique file name'],
+              content: "more some concatenated filename output\n"
+            }
+          ],
+          statuscode: 4
+        }
+      ]
+      allow($stdin).to receive(:read).and_return('')
+      allow(stub_config_pathname).to receive(:exist?).and_return(true)
+      allow(stub_config_pathname).to receive(:read).and_return(stdout_configuration.to_yaml)
 
-        ARGV.replace %w(first_argument second_argument third_argument)
-        begin
-          load subject_path
-        rescue SystemExit
-        end
-
-        ARGV.replace %w(first_argument second_argument third_argument fourth_argument)
-        begin
-          load subject_path
-        rescue SystemExit
-        end
+      ARGV.replace []
+      begin
+        load subject_path
+      rescue SystemExit
       end
 
-      it 'prints the expected output to stderr' do
-        expect(stub_stderr_file.string).to eql "no args content\nmore no args content\n"
+      ARGV.replace %w(first_argument second_argument)
+      begin
+        load subject_path
+      rescue SystemExit
       end
 
-      it 'prints the expected output to stdout' do
-        expect(stub_stdout_file.string).to eql "some args content\nmore some args content\n"
+      ARGV.replace %w(first_argument second_argument third_argument)
+      begin
+        load subject_path
+      rescue SystemExit
       end
 
-      it 'prints the expected output to the string named file' do
-        expect(stub_output_string_file.string).to eql 'some args file content
+      ARGV.replace %w(first_argument second_argument third_argument fourth_argument)
+      begin
+        load subject_path
+      rescue SystemExit
+      end
+    end
+
+    it 'prints the expected output to stderr' do
+      expect(stub_stderr_file.string).to eql "no args content\nmore no args content\n"
+    end
+
+    it 'prints the expected output to stdout' do
+      expect(stub_stdout_file.string).to eql "some args content\nmore some args content\n"
+    end
+
+    it 'prints the expected output to the string named file' do
+      expect(stub_output_string_file.string).to eql 'some args file content
 more some args file content
 some concatenated filename output
 more some concatenated filename output
 '
-      end
-
-      it 'exits with appropriate code for first call' do
-        expect(exit_code_list[0]).to eql 1
-      end
-
-      it 'exits with appropriate code for second call' do
-        expect(exit_code_list[1]).to eql 2
-      end
-
-      it 'exits with appropriate code for third call' do
-        expect(exit_code_list[2]).to eql 3
-      end
-
-      it 'exits with appropriate code for fourth call' do
-        expect(exit_code_list[3]).to eql 4
-      end
     end
-    context 'with configurations that does not end up matching calls' do
-      before(:each) do
-        stdout_configuration = [
-          {
-            args: ['super_special_argument'],
-            outputs: [
-              {
-                target: :stderr,
-                content: "no args content\n"
-              }
-            ],
-            statuscode: 1
-          }
-        ]
-        allow($stdin).to receive(:read).and_return('')
-        allow(stub_config_pathname).to receive(:exist?).and_return(true)
-        allow(stub_config_pathname).to receive(:read).and_return(stdout_configuration.to_yaml)
 
-        ARGV.replace []
-        begin
-          load subject_path
-        rescue SystemExit
-        end
+    it 'exits with appropriate code for first call' do
+      expect(exit_code_list[0]).to eql 1
+    end
 
-        ARGV.replace ['wrongo']
-        begin
-          load subject_path
-        rescue SystemExit
-        end
-      end
+    it 'exits with appropriate code for second call' do
+      expect(exit_code_list[1]).to eql 2
+    end
 
-      it 'exits with appropriate code for first call' do
-        expect(exit_code_list[0]).to eql 0
-      end
+    it 'exits with appropriate code for third call' do
+      expect(exit_code_list[2]).to eql 3
+    end
 
-      it 'exits with appropriate code for second call' do
-        expect(exit_code_list[1]).to eql 0
-      end
+    it 'exits with appropriate code for fourth call' do
+      expect(exit_code_list[3]).to eql 4
     end
   end
-  # not really sure about this chunk, TBH
-  # context 'when called multiple times from a tty session' do
-  #   before(:each) do
-  #     allow($stdin).to receive(:tty?).and_return(true)
-  #   end
-  #   context 'with no configuration' do
-  #     context 'with different combinations of STDIN and arguments' do
-  #       let(:stub_call_log) do
-  #         ARGV.replace []
-  #         allow($stdin).to receive(:read).and_return('')
-  #         load subject_path
-  #
-  #         ARGV.replace []
-  #         allow($stdin).to receive(:read).and_return(" dog \ ncat \ n ")
-  #         load subject_path
-  #
-  #         ARGV.replace %w(first_argument second_argument)
-  #         allow($stdin).to receive(:read).and_return('')
-  #         load subject_path
-  #
-  #         ARGV.replace %w(first_argument second_argument)
-  #         allow($stdin).to receive(:read).and_return(" dog \ ncat \ n ")
-  #         load subject_path
-  #
-  #         YAML.load(stub_call_file.string)
-  #       end
-  #
-  #       it 'logs a blank STDIN for the first call' do
-  #         expect(stub_call_log[0]['stdin']).to be_nil
-  #       end
-  #
-  #       it 'logs no arguments for the first call' do
-  #         expect(stub_call_log[0]['args']).to be_nil
-  #       end
-  #
-  #       it 'logs some STDIN for the second call' do
-  #         expect(stub_call_log[1]['stdin']).to be_nil
-  #       end
-  #
-  #       it 'logs no arguments for the second call' do
-  #         expect(stub_call_log[1]['args']).to be_nil
-  #       end
-  #
-  #       it 'logs a blank STDIN for the third call' do
-  #         expect(stub_call_log[2]['stdin']).to be_nil
-  #       end
-  #
-  #       it 'logs some arguments for the third call' do
-  #         expect(stub_call_log[2]['args']).to eql %w(first_argument second_argument)
-  #       end
-  #
-  #       it 'logs some STDIN for the fourth call' do
-  #         expect(stub_call_log[3]['stdin']).to be_nil
-  #       end
-  #
-  #       it 'logs some arguments for the fourth call' do
-  #         expect(stub_call_log[3]['args']).to eql %w(first_argument second_argument)
-  #       end
-  #     end
-  #   end
-  # end
 end

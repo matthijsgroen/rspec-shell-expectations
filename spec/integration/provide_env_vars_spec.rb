@@ -1,5 +1,4 @@
-require 'English'
-require 'rspec/bash'
+require 'spec_helper'
 
 describe 'Provide environment vars' do
   include Rspec::Bash

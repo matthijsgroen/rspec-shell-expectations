@@ -1,5 +1,4 @@
-require 'English'
-require 'rspec/bash'
+require 'spec_helper'
 
 describe 'Replace shell commands' do
   include Rspec::Bash

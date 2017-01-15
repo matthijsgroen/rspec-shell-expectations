@@ -1,5 +1,4 @@
-require 'English'
-require 'rspec/bash'
+require 'spec_helper'
 
 describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }
