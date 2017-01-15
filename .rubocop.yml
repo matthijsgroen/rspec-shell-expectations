@@ -6,3 +6,7 @@ Style/NumericLiteralPrefix:
 
 Style/Documentation:
   Enabled: false
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'spec/classes/stub_spec.rb'
