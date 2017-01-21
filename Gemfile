@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'coco'
 gem 'rake'
-gem 'rspec'
-gem 'rubocop'
+gem 'rspec', '3.5.0'
+gem 'rubocop', '0.46.0'
 gem 'simplecov', require: false, group: :test
