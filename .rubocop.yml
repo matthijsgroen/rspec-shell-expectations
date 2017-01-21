@@ -10,3 +10,10 @@ Style/Documentation:
 Lint/HandleExceptions:
   Exclude:
     - 'spec/classes/stub_spec.rb'
+
+Metrics/BlockLength:
+  Max: 428
+
+Security/YAMLLoad:
+  Exclude:
+    - 'bin/stub'
