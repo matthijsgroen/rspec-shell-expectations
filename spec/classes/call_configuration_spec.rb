@@ -1,4 +1,4 @@
-require 'rspec/bash'
+require 'spec_helper'
 
 describe 'CallConfiguration' do
   let(:stubbed_env) { create_stubbed_env }

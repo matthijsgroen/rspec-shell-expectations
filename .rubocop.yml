@@ -6,3 +6,15 @@ Style/NumericLiteralPrefix:
 
 Style/Documentation:
   Enabled: false
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'spec/classes/stub_spec.rb'
+
+Metrics/BlockLength:
+  Max: 428
+
+Security/YAMLLoad:
+  Exclude:
+    - 'bin/stub'
+    - 'spec/classes/stub_spec.rb'

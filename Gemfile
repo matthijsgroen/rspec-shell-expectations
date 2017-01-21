@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gemspec
-gem 'rubocop'
+gem 'rainbow', '>= 2.1.0', '< 2.2.0'
 gem 'rake'
-gem 'rspec'
-gem 'simplecov'
+gem 'rspec', '3.5.0'
+gem 'rubocop', '0.47.1'
+gem 'simplecov', require: false, group: :test
