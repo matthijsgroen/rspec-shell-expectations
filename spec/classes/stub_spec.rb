@@ -55,7 +55,7 @@ describe 'bin/stub' do
           allow($stdin).to receive(:read).and_return('')
           load subject_path
 
-          YAML.safe_load(stub_call_file.string)
+          YAML.load(stub_call_file.string)
         end
 
         it 'logs a blank STDIN' do
@@ -75,7 +75,7 @@ describe 'bin/stub' do
           allow($stdin).to receive(:read).and_return("dog\ncat\n")
           load subject_path
 
-          YAML.safe_load(stub_call_file.string)
+          YAML.load(stub_call_file.string)
         end
 
         it 'logs some STDIN' do
@@ -100,7 +100,7 @@ describe 'bin/stub' do
           allow($stdin).to receive(:read).and_return('')
           load subject_path
 
-          YAML.safe_load(stub_call_file.string)
+          YAML.load(stub_call_file.string)
         end
 
         it 'logs a blank STDIN' do
@@ -120,7 +120,7 @@ describe 'bin/stub' do
           allow($stdin).to receive(:read).and_return("dog\ncat\n")
           load subject_path
 
-          YAML.safe_load(stub_call_file.string)
+          YAML.load(stub_call_file.string)
         end
 
         it 'logs some STDIN' do
@@ -154,7 +154,7 @@ describe 'bin/stub' do
         allow($stdin).to receive(:read).and_return("dog\ncat\n")
         load subject_path
 
-        YAML.safe_load(stub_call_file.string)
+        YAML.load(stub_call_file.string)
       end
 
       it 'logs a blank STDIN for the first call' do

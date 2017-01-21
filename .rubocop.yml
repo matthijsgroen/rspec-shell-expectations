@@ -17,3 +17,4 @@ Metrics/BlockLength:
 Security/YAMLLoad:
   Exclude:
     - 'bin/stub'
+    - 'spec/classes/stub_spec.rb'
