@@ -26,6 +26,34 @@ describe 'be_called_with_arguments' do
       it 'correctly matches when wildcard is used for all arguments' do
         expect(@command).to be_called_with_arguments(anything, anything)
       end
+
+      it 'displays the diff between what was called and what was expected' do
+        begin
+          expect(@command).to be_called_with_arguments('not_first_argument', 'second_argument')
+        rescue RSpec::Expectations::ExpectationNotMetError => rex
+          expected_error_string = <<-multiline_string
+Expected stubbed_command to be called with arguments ["not_first_argument", "second_argument"]
+
+Expected Calls:
+stubbed_command not_first_argument second_argument
+
+Actual Calls:
+stubbed_command first_argument second_argument
+stubbed_command third_argument fourth_argument
+multiline_string
+          expect(rex.message.uncolorize).to eql expected_error_string
+        end
+      end
+
+      it 'displays the diff between what was called and what was expected (negative case)' do
+        begin
+          expect(@command).to_not be_called_with_arguments('first_argument', 'second_argument')
+        rescue RSpec::Expectations::ExpectationNotMetError => rex
+          expected_error_string = 'Expected stubbed_command not to be ' \
+            'called with arguments ["first_argument", "second_argument"]'
+          expect(rex.message.uncolorize).to eql expected_error_string
+        end
+      end
     end
     context 'and the times chain call' do
       before(:each) do
