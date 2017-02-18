@@ -55,7 +55,12 @@ module Rspec
       end
 
       def inspect
-        call_log.call_log_arguments.map(&:inspect).join("\n")
+        if @arguments.any?
+          "<Stubbed #{@call_configuration.command.inspect} " \
+            "args: #{@arguments.join(' ').inspect}>"
+        else
+          "<Stubbed #{@call_configuration.command.inspect}>"
+        end
       end
 
       private
