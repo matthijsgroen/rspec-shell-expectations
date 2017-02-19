@@ -5,9 +5,9 @@ describe 'CallArgumentListMatcher' do
     context 'given a call list with a with multiple sets of arguments' do
       let(:call_list) do
         [
-            %w(first_argument second_argument),
-            %w(first_argument second_argument third_argument),
-            %w(first_argument second_argument)
+          %w(first_argument second_argument),
+          %w(first_argument second_argument third_argument),
+          %w(first_argument second_argument)
         ]
       end
 
@@ -58,9 +58,9 @@ describe 'CallArgumentListMatcher' do
     context 'given a call list with a with multiple sets of arguments' do
       let(:call_list) do
         [
-            %w(first_argument second_argument),
-            %w(first_argument second_argument third_argument),
-            %w(first_argument second_argument)
+          %w(first_argument second_argument),
+          %w(first_argument second_argument third_argument),
+          %w(first_argument second_argument)
         ]
       end
 
