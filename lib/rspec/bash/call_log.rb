@@ -12,10 +12,9 @@ module Rspec
 
       def stdin_for_args(*expected_argument_series)
         call_match_filter = call_matches(*expected_argument_series)
-        matching_calls = call_log_stdin.select.with_index do |_, index|
+        call_log_stdin.select.with_index do |_, index|
           call_match_filter[index]
-        end
-        matching_calls.first
+        end.first
       end
 
       def call_matches(*expected_argument_series)
@@ -34,8 +33,7 @@ module Rspec
       end
 
       def called_with_no_args?
-        call_log_list = load_call_log_list
-        !call_log_list.empty? && call_log_list.first['args'].nil?
+        !call_log_arguments.empty? && call_log_arguments.all?(&:empty?)
       end
 
       private
