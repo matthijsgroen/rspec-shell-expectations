@@ -1,16 +1,32 @@
 require 'rspec/mocks/argument_list_matcher'
+include RSpec::Mocks
+include RSpec::Mocks::ArgumentMatchers
 
-class CallArgumentListMatcher < RSpec::Mocks::ArgumentListMatcher
-  alias parent_args_match? args_match?
+module Rspec
+  module Bash
+    class CallArgumentListMatcher < ArgumentListMatcher
+      alias parent_args_match? args_match?
+      alias parent_initialize initialize
 
-  def args_match?(actual_call_list)
-    get_call_count(actual_call_list) > 0
-  end
+      def initialize(*expected_args)
+        expected_args = expected_args.empty? ? [any_args] : expected_args
+        parent_initialize(*expected_args)
+      end
 
-  def get_call_count(actual_call_list)
-    matching_call_list = actual_call_list.select do |actual_argument_list|
-      parent_args_match?(actual_argument_list)
+      def args_match?(actual_call_list)
+        get_call_count(actual_call_list) > 0
+      end
+
+      def get_call_count(actual_call_list)
+        matching_call_list = get_call_matches(actual_call_list) - [false]
+        matching_call_list.size
+      end
+
+      def get_call_matches(actual_call_list)
+        actual_call_list.map do |actual_argument_list|
+          parent_args_match?(*actual_argument_list)
+        end
+      end
     end
-    matching_call_list.size
   end
 end

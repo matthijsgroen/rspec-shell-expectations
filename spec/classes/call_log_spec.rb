@@ -253,8 +253,8 @@ describe 'CallLog' do
       expect(@subject.called_with_args?('no-match')).to be_falsey
     end
 
-    it 'returns true when there is a single matching arg' do
-      expect(@subject.called_with_args?('once_called_arg', anything)).to be_truthy
+    it 'returns false when there is a single matching arg, but an extra argument' do
+      expect(@subject.called_with_args?('once_called_arg', anything)).to be_falsey
     end
 
     it 'returns true when there are multiple matching args' do

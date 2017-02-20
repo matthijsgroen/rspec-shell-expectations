@@ -10,19 +10,27 @@ module Rspec
         @call_log_path.exist?
       end
 
-      def called_with_args?(*args)
-        call_count(*args) > 0
+      def stdin_for_args(*expected_argument_series)
+        call_match_filter = call_matches(*expected_argument_series)
+        matching_calls = call_log_stdin.select.with_index do |_, index|
+          call_match_filter[index]
+        end
+        matching_calls.first
       end
 
-      def stdin_for_args(*args)
-        call = find_call(*args)
-        call['stdin'] unless call.nil?
+      def call_matches(*expected_argument_series)
+        call_argument_list_matcher = CallArgumentListMatcher.new(*expected_argument_series)
+        call_argument_list_matcher.get_call_matches(call_log_arguments)
       end
 
       def call_count(*expected_argument_series)
-        call_log_arguments.count do |actual_argument_series|
-          argument_series_contains?(actual_argument_series, expected_argument_series || [])
-        end
+        call_argument_list_matcher = CallArgumentListMatcher.new(*expected_argument_series)
+        call_argument_list_matcher.get_call_count(call_log_arguments)
+      end
+
+      def called_with_args?(*expected_argument_series)
+        call_argument_list_matcher = CallArgumentListMatcher.new(*expected_argument_series)
+        call_argument_list_matcher.args_match?(call_log_arguments)
       end
 
       def called_with_no_args?
@@ -32,37 +40,12 @@ module Rspec
 
       private
 
-      def find_call(*args)
-        load_call_log_list.find do |call|
-          call_args = call['args'] || []
-          (args - call_args).empty?
-        end
-      end
-
-      def get_position_range_from_argument_list(argument_list, start_position, range_length)
-        argument_list.map do |argument_series|
-          start_position ? argument_series[start_position, range_length] : argument_series
-        end
-      end
-
       def call_log_arguments
         load_call_log_list.map { |call_log| call_log['args'] || [] }.compact
       end
 
-      def argument_series_contains?(actual_argument_series, expected_argument_series)
-        ensure_wildcards_match(actual_argument_series, expected_argument_series)
-        expected_argument_series.empty? || (actual_argument_series == expected_argument_series)
-      end
-
-      def ensure_wildcards_match(actual_argument_series, expected_argument_series)
-        # yes, i know. i am disappointed in myself
-        num_of_args = actual_argument_series.size
-        expected_argument_series
-          .zip((0..num_of_args), actual_argument_series) do |expected_arg, index, _actual_arg|
-            if expected_arg.is_a? RSpec::Mocks::ArgumentMatchers::AnyArgMatcher
-              actual_argument_series[index] = expected_arg
-            end
-          end
+      def call_log_stdin
+        load_call_log_list.map { |call_log| call_log['stdin'] || [] }.compact
       end
 
       def load_call_log_list
