@@ -65,20 +65,17 @@ module Rspec
 
       def create_stub_file(command_name, directory)
         command_path = File.join(directory, command_name)
+
         stub_template_path = File.expand_path(
-          'stub.rb.erb',
-          "#{File.dirname(__FILE__)}/../../../bin"
+          'stub.rb.erb', "#{File.dirname(__FILE__)}/../../../bin"
         )
         template = ERB.new File.read(stub_template_path), nil, '%'
+        rspec_bash_library_path_for_template = project_root.join('lib')
         stub_content = template.result(binding)
         File.open(command_path, 'w') { |file| file.write(stub_content) }
         File.chmod(0755, command_path)
 
         command_path
-      end
-
-      def stub_filepath
-        project_root.join('bin', 'stub')
       end
 
       def project_root

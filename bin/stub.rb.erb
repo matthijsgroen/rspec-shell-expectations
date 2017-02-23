@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
+$LOAD_PATH.unshift('<%= rspec_bash_library_path_for_template %>')
+
+require 'rspec/bash'
 require 'pathname'
 require 'yaml'
+
+include Rspec::Bash
 
 command = File.basename(__FILE__)
 folder = File.dirname(__FILE__)
@@ -36,7 +41,8 @@ if call_configurations.exist?
   matching_calls = []
   config.each do |call_config|
     unless call_config[:args].empty?
-      next unless call_config[:args].eql? ARGV
+      call_argument_list_matcher = CallArgumentListMatcher.new(*call_config[:args])
+      next unless call_argument_list_matcher.args_match?([ARGV])
     end
     matching_calls << {
       config: call_config,
