@@ -16,5 +16,8 @@ Metrics/BlockLength:
 
 Security/YAMLLoad:
   Exclude:
-    - 'bin/stub'
+    - 'bin/stub.rb.erb'
     - 'spec/classes/stub_spec.rb'
+
+Metrics/BlockLength:
+  Max: 500

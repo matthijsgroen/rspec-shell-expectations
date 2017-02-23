@@ -1,7 +1,11 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'bin/stub' do
-  let(:subject_path) { File.expand_path('stub', "#{File.dirname(__FILE__)}/../../bin") }
+  let!(:subject_command) { StubbedCommand.new('stub', Dir.mktmpdir) }
+  let!(:subject_path) { subject_command.path }
+  let!(:subject_file_name) { File.basename(subject_path) }
+
   let(:stub_call_pathname) { instance_double('Pathname') }
   let(:stub_directory_pathname) { instance_double('Pathname') }
   let(:stub_config_pathname) { instance_double('Pathname') }
@@ -27,9 +31,9 @@ describe 'bin/stub' do
     allow(Pathname).to receive(:new).with(File.dirname(subject_path))
       .and_return(stub_directory_pathname)
 
-    allow(stub_directory_pathname).to receive(:join).with('stub_calls.yml')
+    allow(stub_directory_pathname).to receive(:join).with("#{subject_file_name}_calls.yml")
       .and_return(stub_call_pathname)
-    allow(stub_directory_pathname).to receive(:join).with('stub_stub.yml')
+    allow(stub_directory_pathname).to receive(:join).with("#{subject_file_name}_stub.yml")
       .and_return(stub_config_pathname)
 
     $stderr = stub_stderr_file
@@ -40,6 +44,10 @@ describe 'bin/stub' do
       exit_code_list << exit_code
       raise SystemExit
     end
+  end
+
+  after(:each) do
+    FileUtils.remove_entry_secure File.dirname(subject_path)
   end
 
   context 'with no configuration' do

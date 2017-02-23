@@ -21,6 +21,9 @@ describe 'StubbedCommand' do
         @subject.called_with_args?('first_argument', 'second_argument')
       end
     end
+    after(:each) do
+      FileUtils.remove_entry_secure File.dirname(@subject.path)
+    end
   end
 
   context '#with_args' do
@@ -30,6 +33,9 @@ describe 'StubbedCommand' do
     end
     it 'sets the arguments array on the StubbedCommand to the arguments that were passed in' do
       expect(@subject.arguments).to eql %w(argument_one argument_two)
+    end
+    after(:each) do
+      FileUtils.remove_entry_secure File.dirname(@subject.path)
     end
   end
 
@@ -54,6 +60,9 @@ describe 'StubbedCommand' do
         .and_return('arbitrary return value')
       expect(@subject.call_count(['first arg', 'second arg'])).to eql 'arbitrary return value'
     end
+    after(:each) do
+      FileUtils.remove_entry_secure File.dirname(@subject.path)
+    end
   end
 
   context '#called?' do
@@ -76,6 +85,9 @@ describe 'StubbedCommand' do
       expect(@call_log).to receive(:called_with_args?).and_return(true)
       expect(@subject.called?).to be_truthy
     end
+    after(:each) do
+      FileUtils.remove_entry_secure File.dirname(@subject.path)
+    end
   end
 
   context '#stdin' do
@@ -92,6 +104,9 @@ describe 'StubbedCommand' do
       expect(@call_log).to receive(:exist?).and_return(true)
       expect(@call_log).to receive(:stdin_for_args).and_return('arbitrary stdin')
       expect(@subject.stdin).to eql 'arbitrary stdin'
+    end
+    after(:each) do
+      FileUtils.remove_entry_secure File.dirname(@subject.path)
     end
   end
 
@@ -110,6 +125,9 @@ describe 'StubbedCommand' do
       expect(@call_configuration).to receive(:set_exitcode)
       expect(@call_configuration).to receive(:write)
       expect(@subject.returns_exitstatus(anything)).to eql @subject
+    end
+    after(:each) do
+      FileUtils.remove_entry_secure File.dirname(@subject.path)
     end
   end
 
@@ -133,6 +151,9 @@ describe 'StubbedCommand' do
       expect(@call_configuration).to receive(:set_output)
       expect(@call_configuration).to receive(:write)
       expect(@subject.outputs(anything)).to eql @subject
+    end
+    after(:each) do
+      FileUtils.remove_entry_secure File.dirname(@subject.path)
     end
   end
 end

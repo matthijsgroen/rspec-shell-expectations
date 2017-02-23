@@ -1,11 +1,10 @@
 module Rspec
   module Bash
     class StubbedCommand
-      attr_reader :call_log, :arguments
+      attr_reader :call_log, :arguments, :path
 
       def initialize(command, dir)
-        command_path = File.join(dir, command)
-        FileUtils.cp(stub_filepath, command_path)
+        @path = create_stub_file(command, dir)
         @arguments = []
         @call_configuration = CallConfiguration.new(
           Pathname.new(dir).join("#{command}_stub.yml"),
@@ -63,6 +62,20 @@ module Rspec
       end
 
       private
+
+      def create_stub_file(command_name, directory)
+        command_path = File.join(directory, command_name)
+        stub_template_path = File.expand_path(
+          'stub.rb.erb',
+          "#{File.dirname(__FILE__)}/../../../bin"
+        )
+        template = ERB.new File.read(stub_template_path), nil, '%'
+        stub_content = template.result(binding)
+        File.open(command_path, 'w') { |file| file.write(stub_content) }
+        File.chmod(0755, command_path)
+
+        command_path
+      end
 
       def stub_filepath
         project_root.join('bin', 'stub')
