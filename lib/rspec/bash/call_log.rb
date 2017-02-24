@@ -11,15 +11,9 @@ module Rspec
       end
 
       def stdin_for_args(*expected_argument_series)
-        call_match_filter = call_matches(*expected_argument_series)
-        call_log_stdin.select.with_index do |_, index|
-          call_match_filter[index]
-        end.first
-      end
-
-      def call_matches(*expected_argument_series)
         call_argument_list_matcher = CallArgumentListMatcher.new(*expected_argument_series)
-        call_argument_list_matcher.get_call_matches(call_log_arguments)
+        matching_call_log_list = call_argument_list_matcher.get_call_log_matches(call_log_list)
+        matching_call_log_list.first['stdin'] unless matching_call_log_list.empty?
       end
 
       def call_count(*expected_argument_series)
@@ -39,14 +33,14 @@ module Rspec
       private
 
       def call_log_arguments
-        load_call_log_list.map { |call_log| call_log['args'] || [] }.compact
+        call_log_list.map { |call_log| call_log['args'] || [] }.compact
       end
 
       def call_log_stdin
-        load_call_log_list.map { |call_log| call_log['stdin'] || [] }.compact
+        call_log_list.map { |call_log| call_log['stdin'] || [] }.compact
       end
 
-      def load_call_log_list
+      def call_log_list
         YAML.load_file @call_log_path
       rescue Errno::ENOENT
         return []

@@ -22,6 +22,12 @@ module Rspec
         matching_call_list.size
       end
 
+      def get_call_log_matches(actual_call_log_list)
+        actual_call_log_list.select do |actual_call_list|
+          parent_args_match?(*actual_call_list['args'])
+        end
+      end
+
       def get_call_matches(actual_call_list)
         actual_call_list.map do |actual_argument_list|
           parent_args_match?(*actual_argument_list)

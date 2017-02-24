@@ -64,7 +64,7 @@ describe 'CallLog' do
             'stdin' => []
           }]
           @subject = Rspec::Bash::CallLog.new('command_with_one_argument_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+          allow(@subject).to receive(:call_log_list).and_return(actual_call_log_list)
         end
 
         it 'finds the single argument anywhere in the series exactly once' do
@@ -86,7 +86,7 @@ describe 'CallLog' do
             'stdin' => []
           }]
           @subject = Rspec::Bash::CallLog.new('command_with_two_arguments_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+          allow(@subject).to receive(:call_log_list).and_return(actual_call_log_list)
         end
 
         it 'does not find the first argument when other argument is not provided' do
@@ -140,7 +140,7 @@ describe 'CallLog' do
             'stdin' => []
           }]
           @subject = Rspec::Bash::CallLog.new('command_with_three_arguments_log')
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+          allow(@subject).to receive(:call_log_list).and_return(actual_call_log_list)
         end
 
         it 'does not find first argument when other arguments are not provided' do
@@ -220,7 +220,7 @@ describe 'CallLog' do
             }
           ]
           @subject = Rspec::Bash::CallLog.new(anything)
-          allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+          allow(@subject).to receive(:call_log_list).and_return(actual_call_log_list)
         end
         it 'returns 2 when argument is called 2 times' do
           expect(@subject.call_count('twice_called_arg')).to eql 2
@@ -246,7 +246,7 @@ describe 'CallLog' do
         }
       ]
       @subject = Rspec::Bash::CallLog.new(anything)
-      allow(@subject).to receive(:load_call_log_list).and_return(actual_call_log_list)
+      allow(@subject).to receive(:call_log_list).and_return(actual_call_log_list)
     end
 
     it 'returns false when there are no matching args' do
