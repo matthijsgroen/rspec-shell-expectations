@@ -15,20 +15,16 @@ module Rspec
       def set_exitcode(statuscode, args = [])
         current_conf = create_or_get_conf(args)
         current_conf[:statuscode] = statuscode
+        write
       end
 
       def add_output(content, target, args = [])
         current_conf = create_or_get_conf(args)
         current_conf[:outputs] << {
-          content: content,
-          target: target
+          target: target,
+          content: content
         }
-      end
-
-      def write
-        @config_path.open('w') do |conf_file|
-          conf_file.write @configuration.to_yaml
-        end
+        write
       end
 
       def read
@@ -39,6 +35,12 @@ module Rspec
       end
 
       private
+
+      def write
+        @config_path.open('w') do |conf_file|
+          conf_file.write @configuration.to_yaml
+        end
+      end
 
       def create_or_get_conf(args)
         new_conf = {

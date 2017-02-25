@@ -118,12 +118,10 @@ describe 'StubbedCommand' do
     end
     it 'sets the exitcode on call_configuration' do
       expect(@call_configuration).to receive(:set_exitcode).with('exit code', anything)
-      expect(@call_configuration).to receive(:write)
       @subject.returns_exitstatus 'exit code'
     end
     it 'returns itself' do
       expect(@call_configuration).to receive(:set_exitcode)
-      expect(@call_configuration).to receive(:write)
       expect(@subject.returns_exitstatus(anything)).to eql @subject
     end
     after(:each) do
@@ -139,17 +137,14 @@ describe 'StubbedCommand' do
     end
     it 'sets the output on the call_configuration' do
       expect(@call_configuration).to receive(:add_output).with('contents', 'stderr', anything)
-      expect(@call_configuration).to receive(:write)
       @subject.outputs('contents', to: 'stderr')
     end
     it 'sets the "to" value for the output to stdout by default' do
       expect(@call_configuration).to receive(:add_output).with('contents', :stdout, anything)
-      expect(@call_configuration).to receive(:write)
       @subject.outputs('contents')
     end
     it 'returns itself' do
       expect(@call_configuration).to receive(:add_output)
-      expect(@call_configuration).to receive(:write)
       expect(@subject.outputs(anything)).to eql @subject
     end
     after(:each) do

@@ -38,18 +38,16 @@ module Rspec
 
       def returns_exitstatus(statuscode)
         @call_configuration.set_exitcode(statuscode, @arguments)
-        @call_configuration.write
+        self
+      end
+
+      def outputs(contents, to: :stdout)
+        @call_configuration.add_output(contents, to, @arguments)
         self
       end
 
       def stdin
         @call_log.stdin_for_args(*@arguments) if @call_log.exist?
-      end
-
-      def outputs(contents, to: :stdout)
-        @call_configuration.add_output(contents, to, @arguments)
-        @call_configuration.write
-        self
       end
 
       def inspect
