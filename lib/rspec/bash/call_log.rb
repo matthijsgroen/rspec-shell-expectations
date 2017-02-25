@@ -10,19 +10,19 @@ module Rspec
         @call_log_path.exist?
       end
 
-      def stdin_for_args(*expected_argument_series)
-        call_argument_list_matcher = CallLogArgumentListMatcher.new(*expected_argument_series)
+      def stdin_for_args(*argument_list)
+        call_argument_list_matcher = CallLogArgumentListMatcher.new(*argument_list)
         matching_call_log_list = call_argument_list_matcher.get_call_log_matches(call_log_list)
         matching_call_log_list.first['stdin'] unless matching_call_log_list.empty?
       end
 
-      def call_count(*expected_argument_series)
-        call_argument_list_matcher = CallLogArgumentListMatcher.new(*expected_argument_series)
+      def call_count(*argument_list)
+        call_argument_list_matcher = CallLogArgumentListMatcher.new(*argument_list)
         call_argument_list_matcher.get_call_count(call_log_list)
       end
 
-      def called_with_args?(*expected_argument_series)
-        call_argument_list_matcher = CallLogArgumentListMatcher.new(*expected_argument_series)
+      def called_with_args?(*argument_list)
+        call_argument_list_matcher = CallLogArgumentListMatcher.new(*argument_list)
         call_argument_list_matcher.args_match?(call_log_list)
       end
 

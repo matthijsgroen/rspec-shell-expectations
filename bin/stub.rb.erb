@@ -38,26 +38,11 @@ call_configurations = Pathname.new(folder).join("#{command}_stub.yml")
 if call_configurations.exist?
   config = YAML.load call_configurations.read
 
-  # matching_calls = []
   call_conf_arg_matcher = CallConfArgumentListMatcher.new(config)
-  matching_calls = call_conf_arg_matcher.get_call_conf_matches(*ARGV)
-  # config.each do |call_config|
-  #   unless call_config[:args].empty?
-  #     call_argument_list_matcher = CallLogArgumentListMatcher.new(call_config)
-  #     next unless call_argument_list_matcher.args_match?([ARGV])
-  #   end
-  #   matching_calls << {
-  #     config: call_config,
-  #     specific: call_config[:args].length
-  #   }
-  # end
-  exit 0 if matching_calls.empty?
+  best_matching_call_conf = call_conf_arg_matcher.get_best_call_conf(*ARGV)
+  exit 0 if best_matching_call_conf.empty?
 
-  call_config = matching_calls.last
-  # call_config = matching_calls.sort do |a, b|
-  #   b[:specific] <=> a[:specific]
-  # end.first[:config]
-  (call_config[:outputs] || []).each do |data|
+  (best_matching_call_conf[:outputs] || []).each do |data|
     $stdout.print data[:content] if data[:target] == :stdout
     $stderr.print data[:content] if data[:target] == :stderr
 
@@ -67,5 +52,5 @@ if call_configurations.exist?
       f.print data[:content]
     end
   end
-  exit call_config[:statuscode] || 0
+  exit best_matching_call_conf[:statuscode] || 0
 end
