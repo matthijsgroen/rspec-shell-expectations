@@ -47,7 +47,7 @@ module Rspec
       end
 
       def outputs(contents, to: :stdout)
-        @call_configuration.set_output(contents, to, @arguments)
+        @call_configuration.add_output(contents, to, @arguments)
         @call_configuration.write
         self
       end

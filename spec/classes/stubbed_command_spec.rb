@@ -138,17 +138,17 @@ describe 'StubbedCommand' do
       @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
     end
     it 'sets the output on the call_configuration' do
-      expect(@call_configuration).to receive(:set_output).with('contents', 'stderr', anything)
+      expect(@call_configuration).to receive(:add_output).with('contents', 'stderr', anything)
       expect(@call_configuration).to receive(:write)
       @subject.outputs('contents', to: 'stderr')
     end
     it 'sets the "to" value for the output to stdout by default' do
-      expect(@call_configuration).to receive(:set_output).with('contents', :stdout, anything)
+      expect(@call_configuration).to receive(:add_output).with('contents', :stdout, anything)
       expect(@call_configuration).to receive(:write)
       @subject.outputs('contents')
     end
     it 'returns itself' do
-      expect(@call_configuration).to receive(:set_output)
+      expect(@call_configuration).to receive(:add_output)
       expect(@call_configuration).to receive(:write)
       expect(@subject.outputs(anything)).to eql @subject
     end

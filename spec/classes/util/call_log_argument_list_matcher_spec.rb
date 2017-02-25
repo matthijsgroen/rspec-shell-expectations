@@ -1,5 +1,5 @@
 require 'spec_helper'
-include Rspec::Bash
+include Rspec::Bash::Util
 
 describe 'CallLogArgumentListMatcher' do
   context '#get_call_count' do

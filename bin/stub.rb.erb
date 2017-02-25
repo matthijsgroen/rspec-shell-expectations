@@ -5,7 +5,7 @@ require 'rspec/bash'
 require 'pathname'
 require 'yaml'
 
-include Rspec::Bash
+include Rspec::Bash::Util
 
 command = File.basename(__FILE__)
 folder = File.dirname(__FILE__)

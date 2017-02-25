@@ -1,5 +1,5 @@
 require 'spec_helper'
-include Rspec::Bash
+include Rspec::Bash::Util
 
 describe 'CallConfArgumentListMatcher' do
   context '#get_best_call_conf' do
@@ -9,58 +9,72 @@ describe 'CallConfArgumentListMatcher' do
           {
             args: [],
             statuscode: 6,
-            output: {
-              target: :stdout,
-              content: 'seventh_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'seventh_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument third_argument),
             statuscode: 1,
-            output: {
-              target: :stdout,
-              content: 'second_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'second_content'
+              }
+            ]
           },
           {
             args: ['first_argument', anything, anything],
             statuscode: 3,
-            output: {
-              target: :stdout,
-              content: 'fourth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fourth_content'
+              }
+            ]
           },
           {
             args: [anything, 'second_argument'],
             statuscode: 4,
-            output: {
-              target: :stdout,
-              content: 'fifth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fifth_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument),
             statuscode: 0,
-            output: {
-              target: :stdout,
-              content: 'first_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'first_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument),
             statuscode: 2,
-            output: {
-              target: :stdout,
-              content: 'third_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'third_content'
+              }
+            ]
           },
           {
             args: [anything, anything, anything, anything],
             statuscode: 5,
-            output: {
-              target: :stdout,
-              content: 'sixth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'sixth_content'
+              }
+            ]
           }
         ]
       end
@@ -92,50 +106,62 @@ describe 'CallConfArgumentListMatcher' do
           {
             args: %w(first_argument second_argument),
             statuscode: 0,
-            output: {
-              target: :stdout,
-              content: 'first_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'first_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument third_argument),
             statuscode: 1,
-            output: {
-              target: :stdout,
-              content: 'second_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'second_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument),
             statuscode: 2,
-            output: {
-              target: :stdout,
-              content: 'third_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'third_content'
+              }
+            ]
           },
           {
             args: ['first_argument', anything, 'third_argument'],
             statuscode: 3,
-            output: {
-              target: :stdout,
-              content: 'fourth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fourth_content'
+              }
+            ]
           },
           {
             args: [anything, 'second_argument'],
             statuscode: 4,
-            output: {
-              target: :stdout,
-              content: 'fifth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fifth_content'
+              }
+            ]
           },
           {
             args: [anything, anything, anything, anything],
             statuscode: 5,
-            output: {
-              target: :stdout,
-              content: 'sixth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'sixth_content'
+              }
+            ]
           }
         ]
       end
@@ -156,58 +182,72 @@ describe 'CallConfArgumentListMatcher' do
           {
             args: %w(first_argument second_argument),
             statuscode: 0,
-            output: {
-              target: :stdout,
-              content: 'first_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'first_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument third_argument),
             statuscode: 1,
-            output: {
-              target: :stdout,
-              content: 'second_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'second_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument),
             statuscode: 2,
-            output: {
-              target: :stdout,
-              content: 'third_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'third_content'
+              }
+            ]
           },
           {
             args: ['first_argument', anything, 'third_argument'],
             statuscode: 3,
-            output: {
-              target: :stdout,
-              content: 'fourth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fourth_content'
+              }
+            ]
           },
           {
             args: [anything, 'second_argument'],
             statuscode: 4,
-            output: {
-              target: :stdout,
-              content: 'fifth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fifth_content'
+              }
+            ]
           },
           {
             args: [anything, anything, anything, anything],
             statuscode: 5,
-            output: {
-              target: :stdout,
-              content: 'sixth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'sixth_content'
+              }
+            ]
           },
           {
             args: [],
             statuscode: 6,
-            output: {
-              target: :stdout,
-              content: 'seventh_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'seventh_content'
+              }
+            ]
           }
         ]
       end
@@ -241,58 +281,72 @@ describe 'CallConfArgumentListMatcher' do
           {
             args: %w(first_argument second_argument),
             statuscode: 0,
-            output: {
-              target: :stdout,
-              content: 'first_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'first_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument third_argument),
             statuscode: 1,
-            output: {
-              target: :stdout,
-              content: 'second_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'second_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument),
             statuscode: 2,
-            output: {
-              target: :stdout,
-              content: 'third_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'third_content'
+              }
+            ]
           },
           {
             args: ['first_argument', anything, 'third_argument'],
             statuscode: 3,
-            output: {
-              target: :stdout,
-              content: 'fourth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fourth_content'
+              }
+            ]
           },
           {
             args: [anything, 'second_argument'],
             statuscode: 4,
-            output: {
-              target: :stdout,
-              content: 'fifth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fifth_content'
+              }
+            ]
           },
           {
             args: [anything, anything, anything, anything],
             statuscode: 5,
-            output: {
-              target: :stdout,
-              content: 'sixth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'sixth_content'
+              }
+            ]
           },
           {
             args: [],
             statuscode: 6,
-            output: {
-              target: :stdout,
-              content: 'seventh_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'seventh_content'
+              }
+            ]
           }
         ]
       end
@@ -324,50 +378,62 @@ describe 'CallConfArgumentListMatcher' do
           {
             args: %w(first_argument second_argument),
             statuscode: 0,
-            output: {
-              target: :stdout,
-              content: 'first_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'first_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument third_argument),
             statuscode: 1,
-            output: {
-              target: :stdout,
-              content: 'second_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'second_content'
+              }
+            ]
           },
           {
             args: %w(first_argument second_argument),
             statuscode: 2,
-            output: {
-              target: :stdout,
-              content: 'third_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'third_content'
+              }
+            ]
           },
           {
             args: ['first_argument', anything, 'third_argument'],
             statuscode: 3,
-            output: {
-              target: :stdout,
-              content: 'fourth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fourth_content'
+              }
+            ]
           },
           {
             args: [anything, 'second_argument'],
             statuscode: 4,
-            output: {
-              target: :stdout,
-              content: 'fifth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'fifth_content'
+              }
+            ]
           },
           {
             args: [anything, anything, anything, anything],
             statuscode: 5,
-            output: {
-              target: :stdout,
-              content: 'sixth_content'
-            }
+            outputs: [
+              {
+                target: :stdout,
+                content: 'sixth_content'
+              }
+            ]
           }
         ]
       end
