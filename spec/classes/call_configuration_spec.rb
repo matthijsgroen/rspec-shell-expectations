@@ -242,11 +242,11 @@ describe 'CallConfiguration' do
       end
     end
   end
-  context '#read' do
+  context '#configuration' do
     context 'when there is no config_path' do
       subject { Rspec::Bash::CallConfiguration.new(nil, anything) }
       it 'raises an error' do
-        expect { subject.read }.to raise_exception(NoMethodError)
+        expect { subject.configuration }.to raise_exception(NoMethodError)
       end
     end
     context 'when setup is valid' do
@@ -275,7 +275,7 @@ describe 'CallConfiguration' do
         end
 
         it 'reads out what was in its configuration file' do
-          expect(subject.read).to eql conf
+          expect(subject.configuration).to eql conf
         end
       end
       context 'and configuration already exists' do
@@ -284,7 +284,7 @@ describe 'CallConfiguration' do
         end
 
         it 'reads out what was in its configuration file' do
-          expect(subject.read).to eql conf
+          expect(subject.configuration).to eql conf
         end
       end
     end

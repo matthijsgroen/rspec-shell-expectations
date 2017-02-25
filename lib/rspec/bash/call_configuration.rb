@@ -4,7 +4,6 @@ module Rspec
   module Bash
     class CallConfiguration
       attr_reader :command
-      attr_accessor :configuration
 
       def initialize(config_path, command)
         @config_path = config_path
@@ -27,11 +26,16 @@ module Rspec
         write
       end
 
-      def read
+      def configuration
         return @configuration unless @configuration.empty?
         @config_path.open('r') do |conf_file|
           YAML.load(conf_file.read)
         end
+      end
+
+      def configuration=(new_conf)
+        @configuration = new_conf
+        write
       end
 
       private
