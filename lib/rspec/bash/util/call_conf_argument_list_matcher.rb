@@ -18,10 +18,12 @@ module Rspec
         end
 
         def get_best_call_conf(*call_arguments)
-          get_call_conf_matches(*call_arguments).sort do |call_conf, next_call_conf|
-            [next_call_conf[:args].length, call_conf[:args].count(anything)] <=>
-              [call_conf[:args].length, next_call_conf[:args].count(anything)]
-          end.first || {}
+          get_call_conf_matches(*call_arguments).sort_by do |call_conf|
+            [
+              call_conf[:args].length,
+              call_conf[:args].length - call_conf[:args].count(anything)
+            ]
+          end.last || {}
         end
 
         def get_call_conf_matches(*call_arguments)

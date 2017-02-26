@@ -75,6 +75,46 @@ describe 'CallConfArgumentListMatcher' do
                 content: 'sixth_content'
               }
             ]
+          },
+          {
+            args: [anything, anything, 'third_argument', anything, anything],
+            statuscode: 7,
+            outputs: [
+              {
+                target: :stdout,
+                content: 'eighth_content'
+              }
+            ]
+          },
+          {
+            args: [anything, anything, anything, anything, anything],
+            statuscode: 8,
+            outputs: [
+              {
+                target: :stdout,
+                content: 'ninth_content'
+              }
+            ]
+          },
+          {
+            args: [anything],
+            statuscode: 9,
+            outputs: [
+              {
+                target: :stdout,
+                content: 'tenth_content'
+              }
+            ]
+          },
+          {
+            args: [anything],
+            statuscode: 10,
+            outputs: [
+              {
+                target: :stdout,
+                content: 'eleventh_content'
+              }
+            ]
           }
         ]
       end
@@ -98,6 +138,23 @@ describe 'CallConfArgumentListMatcher' do
         subject = CallConfArgumentListMatcher.new(call_conf_list)
         call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
         expect(call_conf_match).to eql call_conf_list.at(6)
+      end
+
+      it 'returns the longest conf match for matches with some anythings' do
+        argument_list_from_call = %w(
+          first_argument second_argument third_argument
+          fourth_argument fifth_argument
+        )
+        subject = CallConfArgumentListMatcher.new(call_conf_list)
+        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        expect(call_conf_match).to eql call_conf_list.at(7)
+      end
+
+      it 'returns the last anything match for multiple, all anything matches' do
+        argument_list_from_call = %w(first_argument)
+        subject = CallConfArgumentListMatcher.new(call_conf_list)
+        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        expect(call_conf_match).to eql call_conf_list.at(10)
       end
     end
     context 'given a call conf list with a with no all matchers' do
