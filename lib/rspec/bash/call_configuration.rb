@@ -26,14 +26,14 @@ module Rspec
         write
       end
 
-      def configuration
+      def call_configuration
         return @configuration unless @configuration.empty?
         @config_path.open('r') do |conf_file|
           YAML.load(conf_file.read)
         end
       end
 
-      def configuration=(new_conf)
+      def call_configuration=(new_conf)
         @configuration = new_conf
         write
       end

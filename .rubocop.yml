@@ -19,6 +19,11 @@ Security/YAMLLoad:
     - 'bin/stub.rb.erb'
     - 'spec/classes/stub_spec.rb'
     - 'lib/rspec/bash/call_configuration.rb'
+    - 'lib/rspec/bash/call_log.rb'
 
 Metrics/BlockLength:
   Max: 500
+
+Style/TrivialAccessors:
+  Exclude:
+    - 'lib/rspec/bash/call_log.rb'

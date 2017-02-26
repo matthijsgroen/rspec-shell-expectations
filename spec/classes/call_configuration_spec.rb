@@ -27,7 +27,7 @@ describe 'CallConfiguration' do
 
         it 'updates the status code conf for the arguments passed in' do
           subject.set_exitcode(1, %w(first_argument second_argument))
-          expect(subject.configuration).to eql expected_conf
+          expect(subject.call_configuration).to eql expected_conf
         end
 
         it 'writes that configuration to its conf file' do
@@ -52,7 +52,7 @@ describe 'CallConfiguration' do
           ]
         end
         before(:each) do
-          subject.configuration = [
+          subject.call_configuration = [
             {
               args: %w(first_argument),
               statuscode: 1,
@@ -62,7 +62,7 @@ describe 'CallConfiguration' do
         end
         it 'updates the status code conf for the arguments passed in' do
           subject.set_exitcode(1, %w(first_argument second_argument))
-          expect(subject.configuration).to eql expected_conf
+          expect(subject.call_configuration).to eql expected_conf
         end
 
         it 'writes that configuration to its conf file' do
@@ -82,7 +82,7 @@ describe 'CallConfiguration' do
           ]
         end
         before(:each) do
-          subject.configuration = [
+          subject.call_configuration = [
             {
               args: %w(first_argument second_argument),
               statuscode: 2,
@@ -93,7 +93,7 @@ describe 'CallConfiguration' do
 
         it 'updates the status code conf for the arguments passed in' do
           subject.set_exitcode(1, %w(first_argument second_argument))
-          expect(subject.configuration).to eql expected_conf
+          expect(subject.call_configuration).to eql expected_conf
         end
 
         it 'writes that configuration to its conf file' do
@@ -132,7 +132,7 @@ describe 'CallConfiguration' do
         end
         it 'updates the outputs for the arguments passed in' do
           subject.add_output('new_content', :stderr, %w(first_argument second_argument))
-          expect(subject.configuration).to eql expected_conf
+          expect(subject.call_configuration).to eql expected_conf
         end
 
         it 'writes that configuration to its conf file' do
@@ -166,7 +166,7 @@ describe 'CallConfiguration' do
           ]
         end
         before(:each) do
-          subject.configuration = [
+          subject.call_configuration = [
             {
               args: %w(first_argument),
               statuscode: 1,
@@ -181,7 +181,7 @@ describe 'CallConfiguration' do
         end
         it 'updates the outputs conf for the arguments passed in' do
           subject.add_output('new_content', :stderr, %w(first_argument second_argument))
-          expect(subject.configuration).to eql expected_conf
+          expect(subject.call_configuration).to eql expected_conf
         end
 
         it 'writes that configuration to its conf file' do
@@ -209,7 +209,7 @@ describe 'CallConfiguration' do
           ]
         end
         before(:each) do
-          subject.configuration = [
+          subject.call_configuration = [
             {
               args: %w(first_argument second_argument),
               statuscode: 1,
@@ -224,7 +224,7 @@ describe 'CallConfiguration' do
         end
         it 'adds to the outputs conf for the arguments passed in' do
           subject.add_output('new_content', :stderr, %w(first_argument second_argument))
-          expect(subject.configuration).to eql expected_conf
+          expect(subject.call_configuration).to eql expected_conf
         end
 
         it 'writes that configuration to its conf file' do
@@ -242,11 +242,11 @@ describe 'CallConfiguration' do
       end
     end
   end
-  context '#configuration' do
+  context '#call_configuration' do
     context 'when there is no config_path' do
       subject { Rspec::Bash::CallConfiguration.new(nil, anything) }
       it 'raises an error' do
-        expect { subject.configuration }.to raise_exception(NoMethodError)
+        expect { subject.call_configuration }.to raise_exception(NoMethodError)
       end
     end
     context 'when setup is valid' do
@@ -268,23 +268,23 @@ describe 'CallConfiguration' do
           ]
         }]
       end
-      context 'and no configuration exists' do
+      context 'and no in-memory configuration exists' do
         before(:each) do
           allow(mock_conf_file).to receive(:read).and_return(conf.to_yaml)
           allow(mock_conf_file).to receive(:open).with('r').and_yield(mock_conf_file)
         end
 
         it 'reads out what was in its configuration file' do
-          expect(subject.configuration).to eql conf
+          expect(subject.call_configuration).to eql conf
         end
       end
-      context 'and configuration already exists' do
+      context 'and an in-memory configuration already exists' do
         before(:each) do
-          subject.configuration = conf
+          subject.call_configuration = conf
         end
 
         it 'reads out what was in its configuration file' do
-          expect(subject.configuration).to eql conf
+          expect(subject.call_configuration).to eql conf
         end
       end
     end
