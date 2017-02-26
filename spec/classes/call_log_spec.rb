@@ -2,9 +2,10 @@ require 'spec_helper'
 
 describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }
-  let(:mock_log_file) { instance_double(Pathname) }
+  let(:mock_log_file) { instance_double(File) }
+  let(:mock_log_pathname) { instance_double(Pathname) }
   before(:each) do
-    allow(mock_log_file).to receive(:open).with('w').and_yield(mock_log_file)
+    allow(mock_log_pathname).to receive(:open).with('w').and_yield(mock_log_file)
     allow(mock_log_file).to receive(:write).with(anything)
   end
 
@@ -22,7 +23,7 @@ describe 'CallLog' do
         'args' => ['arbitrary argument'],
         'stdin' => ['correct value']
       }]
-      @subject = Rspec::Bash::CallLog.new(mock_log_file)
+      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
       allow(@subject).to receive(:call_log).and_return(actual_call_log)
 
       expect(@subject.stdin_for_args('arbitrary argument').first).to eql 'correct value'
@@ -32,7 +33,7 @@ describe 'CallLog' do
         'args' => ['arbitrary argument'],
         'stdin' => ['first value', 'second value']
       }]
-      @subject = Rspec::Bash::CallLog.new(mock_log_file)
+      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
       allow(@subject).to receive(:call_log).and_return(actual_call_log)
 
       expect(@subject.stdin_for_args('arbitrary argument').sort)
@@ -44,7 +45,7 @@ describe 'CallLog' do
           'args' => nil,
           'stdin' => ['correct value']
         }]
-      @subject = Rspec::Bash::CallLog.new(mock_log_file)
+      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
       allow(@subject).to receive(:call_log).and_return(actual_call_log)
 
       expect(@subject.stdin_for_args).to eql ['correct value']
@@ -306,7 +307,7 @@ describe 'CallLog' do
 
   context '#add_log' do
     context 'with any setup' do
-      subject { Rspec::Bash::CallLog.new(mock_log_file) }
+      subject { Rspec::Bash::CallLog.new(mock_log_pathname) }
 
       context 'with no existing configuration' do
         let(:expected_log) do
@@ -376,8 +377,9 @@ describe 'CallLog' do
       end
     end
     context 'when setup is valid' do
-      let(:mock_log_file) { instance_double(Pathname) }
-      subject { Rspec::Bash::CallLog.new(mock_log_file) }
+      let(:mock_log_file) { instance_double(File) }
+      let(:mock_log_pathname) { instance_double(Pathname) }
+      subject { Rspec::Bash::CallLog.new(mock_log_pathname) }
       let(:log) do
         [{
           args: %w(first_argument second_argument),
@@ -387,7 +389,7 @@ describe 'CallLog' do
       context 'and no in-memory call log exists' do
         before(:each) do
           allow(mock_log_file).to receive(:read).and_return(log.to_yaml)
-          allow(mock_log_file).to receive(:open).with('r').and_yield(mock_log_file)
+          allow(mock_log_pathname).to receive(:open).with('r').and_yield(mock_log_file)
         end
 
         it 'reads out what was in its configuration file' do

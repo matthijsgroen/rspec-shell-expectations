@@ -4,15 +4,16 @@ describe 'CallConfiguration' do
   let(:stubbed_env) { create_stubbed_env }
   include Rspec::Bash
 
-  let(:mock_conf_file) { instance_double(Pathname) }
+  let(:mock_conf_file) { instance_double(File) }
+  let(:mock_conf_pathname) { instance_double(Pathname) }
   before(:each) do
-    allow(mock_conf_file).to receive(:open).with('w').and_yield(mock_conf_file)
+    allow(mock_conf_pathname).to receive(:open).with('w').and_yield(mock_conf_file)
     allow(mock_conf_file).to receive(:write).with(anything)
   end
 
   context '#set_exitcode' do
     context 'with any setup' do
-      subject { Rspec::Bash::CallConfiguration.new(mock_conf_file, 'command_name') }
+      subject { Rspec::Bash::CallConfiguration.new(mock_conf_pathname, 'command_name') }
 
       context 'with no existing configuration' do
         let(:expected_conf) do
@@ -113,7 +114,7 @@ describe 'CallConfiguration' do
   end
   context '#add_output' do
     context 'with any setup' do
-      subject { Rspec::Bash::CallConfiguration.new(mock_conf_file, 'command_name') }
+      subject { Rspec::Bash::CallConfiguration.new(mock_conf_pathname, 'command_name') }
 
       context 'with no existing configuration' do
         let(:expected_conf) do
@@ -250,8 +251,9 @@ describe 'CallConfiguration' do
       end
     end
     context 'when setup is valid' do
-      let(:mock_conf_file) { instance_double(Pathname) }
-      subject { Rspec::Bash::CallConfiguration.new(mock_conf_file, 'command_name') }
+      let(:mock_conf_pathname) { instance_double(Pathname) }
+      let(:mock_conf_file) { instance_double(File) }
+      subject { Rspec::Bash::CallConfiguration.new(mock_conf_pathname, 'command_name') }
       let(:conf) do
         [{
           args: %w(first_argument second_argument),
@@ -271,7 +273,7 @@ describe 'CallConfiguration' do
       context 'and no in-memory configuration exists' do
         before(:each) do
           allow(mock_conf_file).to receive(:read).and_return(conf.to_yaml)
-          allow(mock_conf_file).to receive(:open).with('r').and_yield(mock_conf_file)
+          allow(mock_conf_pathname).to receive(:open).with('r').and_yield(mock_conf_file)
         end
 
         it 'reads out what was in its configuration file' do

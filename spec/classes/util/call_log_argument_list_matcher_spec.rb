@@ -1,6 +1,7 @@
 require 'spec_helper'
 include Rspec::Bash::Util
 
+# TODO: switch this to the new call log stye that uses symbols
 describe 'CallLogArgumentListMatcher' do
   context '#get_call_count' do
     context 'given a call log list with a with multiple sets of arguments' do

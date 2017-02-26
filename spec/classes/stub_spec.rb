@@ -1,6 +1,7 @@
 require 'spec_helper'
 include Rspec::Bash
 
+# TODO: switch this to the new call log stye that uses symbols
 describe 'bin/stub' do
   let!(:subject_command) { StubbedCommand.new('stub', Dir.mktmpdir) }
   let!(:subject_path) { subject_command.path }
