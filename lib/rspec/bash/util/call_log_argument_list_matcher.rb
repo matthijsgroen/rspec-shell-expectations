@@ -24,7 +24,7 @@ module Rspec
 
         def get_call_log_matches(actual_call_log_list)
           actual_call_log_list.select do |actual_call_list|
-            parent_args_match?(*actual_call_list['args'])
+            parent_args_match?(*actual_call_list[:args])
           end
         end
       end

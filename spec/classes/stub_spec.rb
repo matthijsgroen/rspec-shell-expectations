@@ -7,11 +7,12 @@ describe 'bin/stub' do
   let!(:subject_path) { subject_command.path }
   let!(:subject_file_name) { File.basename(subject_path) }
 
-  let(:stub_call_pathname) { instance_double('Pathname') }
-  let(:stub_directory_pathname) { instance_double('Pathname') }
-  let(:stub_config_pathname) { instance_double('Pathname') }
-  let(:stub_output_string_pathname) { instance_double('Pathname') }
-  let(:stub_call_file) { StringIO.new }
+  let(:stub_call_conf) { instance_double(CallConfiguration) }
+  let(:stub_call_pathname) { instance_double(Pathname) }
+  let(:stub_directory_pathname) { instance_double(Pathname) }
+  let(:stub_config_pathname) { instance_double(Pathname) }
+  let(:stub_output_string_pathname) { instance_double(Pathname) }
+  let(:stub_call_file) { StringFileIO.new }
   let(:stub_config_file) { StringIO.new }
   let(:stub_stderr_file) { StringIO.new }
   let(:stub_stdout_file) { StringIO.new }
@@ -19,7 +20,9 @@ describe 'bin/stub' do
   let(:exit_code_list) { [] }
 
   before(:each) do
-    allow(stub_call_pathname).to receive(:open).with('a')
+    allow(stub_call_pathname).to receive(:open).with('w')
+      .and_yield(stub_call_file)
+    allow(stub_call_pathname).to receive(:open).with('r')
       .and_yield(stub_call_file)
     allow(stub_output_string_pathname).to receive(:open).with('w')
       .and_yield(stub_output_string_file)
@@ -68,11 +71,11 @@ describe 'bin/stub' do
         end
 
         it 'logs a blank STDIN' do
-          expect(stub_call_log[0]['stdin']).to be_empty
+          expect(stub_call_log[0][:stdin]).to be_empty
         end
 
         it 'logs no arguments' do
-          expect(stub_call_log[0]['args']).to be_nil
+          expect(stub_call_log[0][:args]).to be_empty
         end
 
         it 'exits with appropriate code' do
@@ -88,11 +91,11 @@ describe 'bin/stub' do
         end
 
         it 'logs some STDIN' do
-          expect(stub_call_log[0]['stdin']).to eql "dog\ncat\n"
+          expect(stub_call_log[0][:stdin]).to eql "dog\ncat\n"
         end
 
         it 'logs no arguments' do
-          expect(stub_call_log[0]['args']).to be_nil
+          expect(stub_call_log[0][:args]).to be_empty
         end
 
         it 'exits with appropriate code' do
@@ -113,11 +116,11 @@ describe 'bin/stub' do
         end
 
         it 'logs a blank STDIN' do
-          expect(stub_call_log[0]['stdin']).to be_empty
+          expect(stub_call_log[0][:stdin]).to be_empty
         end
 
         it 'logs some arguments' do
-          expect(stub_call_log[0]['args']).to eql %w(first_argument second_argument)
+          expect(stub_call_log[0][:args]).to eql %w(first_argument second_argument)
         end
 
         it 'exits with appropriate code' do
@@ -133,11 +136,11 @@ describe 'bin/stub' do
         end
 
         it 'logs some STDIN' do
-          expect(stub_call_log[0]['stdin']).to eql "dog\ncat\n"
+          expect(stub_call_log[0][:stdin]).to eql "dog\ncat\n"
         end
 
         it 'logs some arguments' do
-          expect(stub_call_log[0]['args']).to eql %w(first_argument second_argument)
+          expect(stub_call_log[0][:args]).to eql %w(first_argument second_argument)
         end
 
         it 'exits with appropriate code' do
@@ -167,35 +170,35 @@ describe 'bin/stub' do
       end
 
       it 'logs a blank STDIN for the first call' do
-        expect(stub_call_log[0]['stdin']).to be_empty
+        expect(stub_call_log[0][:stdin]).to be_empty
       end
 
       it 'logs no arguments for the first call' do
-        expect(stub_call_log[0]['args']).to be_nil
+        expect(stub_call_log[0][:args]).to be_empty
       end
 
       it 'logs some STDIN for the second call' do
-        expect(stub_call_log[1]['stdin']).to eql "dog\ncat\n"
+        expect(stub_call_log[1][:stdin]).to eql "dog\ncat\n"
       end
 
       it 'logs no arguments for the second call' do
-        expect(stub_call_log[1]['args']).to be_nil
+        expect(stub_call_log[1][:args]).to be_empty
       end
 
       it 'logs a blank STDIN for the third call' do
-        expect(stub_call_log[2]['stdin']).to be_empty
+        expect(stub_call_log[2][:stdin]).to be_empty
       end
 
       it 'logs some arguments for the third call' do
-        expect(stub_call_log[2]['args']).to eql %w(first_argument second_argument)
+        expect(stub_call_log[2][:args]).to eql %w(first_argument second_argument)
       end
 
       it 'logs some STDIN for the fourth call' do
-        expect(stub_call_log[3]['stdin']).to eql "dog\ncat\n"
+        expect(stub_call_log[3][:stdin]).to eql "dog\ncat\n"
       end
 
       it 'logs some arguments for the fourth call' do
-        expect(stub_call_log[3]['args']).to eql %w(first_argument second_argument)
+        expect(stub_call_log[3][:args]).to eql %w(first_argument second_argument)
       end
 
       it 'exits with appropriate code for first call' do
@@ -234,7 +237,8 @@ describe 'bin/stub' do
             statuscode: 1
           }
         ]
-        allow(stub_config_pathname).to receive(:read).and_return(stdout_configuration.to_yaml)
+        allow(stub_config_file).to receive(:read).and_return(stdout_configuration.to_yaml)
+        allow(stub_config_pathname).to receive(:open).with('r').and_yield(stub_config_file)
       end
       context 'and it is called with no arguments' do
         before(:each) do
@@ -370,7 +374,8 @@ describe 'bin/stub' do
             statuscode: 4
           }
         ]
-        allow(stub_config_pathname).to receive(:read).and_return(stdout_configuration.to_yaml)
+        allow(stub_config_file).to receive(:read).and_return(stdout_configuration.to_yaml)
+        allow(stub_config_pathname).to receive(:open).with('r').and_yield(stub_config_file)
       end
       context 'and it is called with no arguments' do
         before(:each) do

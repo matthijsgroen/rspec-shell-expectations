@@ -8,16 +8,16 @@ describe 'CallLogArgumentListMatcher' do
       let(:call_log_list) do
         [
           {
-            'stdin' => 'first_stdin',
-            'args' => %w(first_argument second_argument)
+            stdin: 'first_stdin',
+            args: %w(first_argument second_argument)
           },
           {
-            'stdin' => 'second_stdin',
-            'args' => %w(first_argument second_argument third_argument)
+            stdin: 'second_stdin',
+            args: %w(first_argument second_argument third_argument)
           },
           {
-            'stdin' => 'third_stdin',
-            'args' => %w(first_argument second_argument)
+            stdin: 'third_stdin',
+            args: %w(first_argument second_argument)
           }
         ]
       end
@@ -77,16 +77,16 @@ describe 'CallLogArgumentListMatcher' do
       let(:call_log_list) do
         [
           {
-            'stdin' => 'first_stdin',
-            'args' => %w(first_argument second_argument)
+            stdin: 'first_stdin',
+            args: %w(first_argument second_argument)
           },
           {
-            'stdin' => 'second_stdin',
-            'args' => %w(first_argument second_argument third_argument)
+            stdin: 'second_stdin',
+            args: %w(first_argument second_argument third_argument)
           },
           {
-            'stdin' => 'third_stdin',
-            'args' => %w(first_argument second_argument)
+            stdin: 'third_stdin',
+            args: %w(first_argument second_argument)
           }
         ]
       end
@@ -146,16 +146,16 @@ describe 'CallLogArgumentListMatcher' do
       let(:call_log_list) do
         [
           {
-            'stdin' => 'first_stdin',
-            'args' => %w(first_argument second_argument)
+            stdin: 'first_stdin',
+            args: %w(first_argument second_argument)
           },
           {
-            'stdin' => 'second_stdin',
-            'args' => %w(first_argument second_argument third_argument)
+            stdin: 'second_stdin',
+            args: %w(first_argument second_argument third_argument)
           },
           {
-            'stdin' => 'third_stdin',
-            'args' => %w(first_argument second_argument)
+            stdin: 'third_stdin',
+            args: %w(first_argument second_argument)
           }
         ]
       end

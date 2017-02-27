@@ -13,7 +13,7 @@ module Rspec
       def stdin_for_args(*argument_list)
         call_argument_list_matcher = Util::CallLogArgumentListMatcher.new(*argument_list)
         matching_call_log_list = call_argument_list_matcher.get_call_log_matches(call_log)
-        matching_call_log_list.first['stdin'] unless matching_call_log_list.empty?
+        matching_call_log_list.first[:stdin] unless matching_call_log_list.empty?
       end
 
       def call_count(*argument_list)
@@ -31,6 +31,7 @@ module Rspec
       end
 
       def add_log(stdin, argument_list)
+        @call_log = call_log
         @call_log << {
           args: argument_list,
           stdin: stdin
@@ -41,10 +42,10 @@ module Rspec
       def call_log
         return @call_log unless @call_log.empty?
         begin
-          @call_log_path.open('r') do |call_log_file|
-            YAML.load(call_log_file.read)
+          @call_log_path.open('r') do |call_log|
+            YAML.load(call_log.read) || []
           end
-        rescue NoMethodError
+        rescue NoMethodError, Errno::ENOENT
           return []
         end
       end
@@ -56,7 +57,7 @@ module Rspec
       private
 
       def call_log_arguments
-        call_log.map { |call_log| call_log['args'] || [] }.compact
+        call_log.map { |call_log| call_log[:args] || [] }.compact
       end
 
       def write

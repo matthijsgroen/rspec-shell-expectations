@@ -5,17 +5,14 @@ require 'rspec/bash'
 require 'pathname'
 require 'yaml'
 
-include Rspec::Bash::Util
+include Rspec::Bash
 
 command = File.basename(__FILE__)
 folder = File.dirname(__FILE__)
 
-call_logs = Pathname.new(folder).join("#{command}_calls.yml")
-call_logs.open('a') do |f|
-  f.puts '- args:'
-  ARGV.each { |arg| f.puts "  - #{arg.inspect}" }
-  f.puts "  stdin: #{$stdin.read.inspect}" unless STDIN.tty?
-end
+call_log_path = Pathname.new(folder).join("#{command}_calls.yml")
+call_log = CallLog.new(call_log_path)
+call_log.add_log(STDIN.tty? ? '' : $stdin.read, ARGV)
 
 def interpolate_filename(elements)
   return elements if elements.is_a? String
@@ -23,8 +20,10 @@ def interpolate_filename(elements)
 
   elements.map do |element|
     case element
-    when String then element
-    when Symbol then interpolate_argument(element)
+    when String then
+      element
+    when Symbol then
+      interpolate_argument(element)
     end
   end.join
 end
@@ -34,11 +33,12 @@ def interpolate_argument(name)
   ARGV[data[1].to_i - 1]
 end
 
-call_configurations = Pathname.new(folder).join("#{command}_stub.yml")
-if call_configurations.exist?
-  config = YAML.load call_configurations.read
+call_conf_path = Pathname.new(folder).join("#{command}_stub.yml")
+if call_conf_path.exist?
+  call_conf = CallConfiguration.new(call_conf_path, command)
+  config = call_conf.call_configuration
 
-  call_conf_arg_matcher = CallConfArgumentListMatcher.new(config)
+  call_conf_arg_matcher = Util::CallConfArgumentListMatcher.new(config)
   best_matching_call_conf = call_conf_arg_matcher.get_best_call_conf(*ARGV)
   exit 0 if best_matching_call_conf.empty?
 
