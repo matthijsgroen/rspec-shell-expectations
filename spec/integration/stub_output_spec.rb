@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# TODO: add tests for anything, any_args, etc.
 describe 'Stub command output' do
   include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }

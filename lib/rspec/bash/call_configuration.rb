@@ -28,8 +28,12 @@ module Rspec
 
       def call_configuration
         return @configuration unless @configuration.empty?
-        @config_path.open('r') do |conf_file|
-          YAML.load(conf_file.read)
+        begin
+          @config_path.open('r') do |conf_file|
+            YAML.load(conf_file.read) || []
+          end
+        rescue NoMethodError, Errno::ENOENT
+          return []
         end
       end
 
@@ -47,15 +51,13 @@ module Rspec
       end
 
       def create_or_get_conf(args)
+        @configuration = call_configuration
         new_conf = {
           args: args,
           statuscode: 0,
           outputs: []
         }
-        current_conf = @configuration.select do |conf|
-          conf[:args] == args
-        end
-
+        current_conf = @configuration.select { |conf| conf[:args] == args }
         @configuration << new_conf if current_conf.empty?
         current_conf.first || new_conf
       end
