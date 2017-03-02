@@ -267,7 +267,7 @@ describe 'CallConfArgumentListMatcher' do
             ]
           },
           {
-            args: ['first_argument', anything, 'third_argument'],
+            args: ['first_argument', YAML.load(YAML.dump(anything)), 'third_argument'],
             statuscode: 3,
             outputs: [
               {
@@ -305,6 +305,32 @@ describe 'CallConfArgumentListMatcher' do
                 content: 'seventh_content'
               }
             ]
+          },
+          {
+            args: [
+              'first_argument', 'second_argument',
+              'third_argument', 'fourth_argument', any_args
+            ],
+            statuscode: 6,
+            outputs: [
+              {
+                target: :stdout,
+                content: 'seventh_content'
+              }
+            ]
+          },
+          {
+            args: [
+              'first_argument', 'second_argument',
+              'third_argument', 'fourth_argument', YAML.load(YAML.dump(any_args))
+            ],
+            statuscode: 6,
+            outputs: [
+              {
+                target: :stdout,
+                content: 'seventh_content'
+              }
+            ]
           }
         ]
       end
@@ -328,6 +354,16 @@ describe 'CallConfArgumentListMatcher' do
         subject = CallConfArgumentListMatcher.new(call_conf_list)
         call_conf_match_list = subject.get_call_conf_matches(*argument_list_from_call)
         expect(call_conf_match_list).to eql call_conf_list.values_at(6)
+      end
+
+      it 'returns the correct confs for an any_args match' do
+        argument_list_from_call = %w(
+          first_argument second_argument
+          third_argument fourth_argument fifth_argument
+        )
+        subject = CallConfArgumentListMatcher.new(call_conf_list)
+        actual_args_match = subject.get_call_conf_matches(*argument_list_from_call)
+        expect(actual_args_match).to eql call_conf_list.values_at(6, 7, 8)
       end
     end
   end
@@ -397,11 +433,11 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [],
-            statuscode: 6,
+            statuscode: 7,
             outputs: [
               {
                 target: :stdout,
-                content: 'seventh_content'
+                content: 'eighth_content'
               }
             ]
           }
@@ -491,6 +527,19 @@ describe 'CallConfArgumentListMatcher' do
                 content: 'sixth_content'
               }
             ]
+          },
+          {
+            args: [
+              'first_argument', 'second_argument',
+              'third_argument', 'fourth_argument', any_args
+            ],
+            statuscode: 6,
+            outputs: [
+              {
+                target: :stdout,
+                content: 'seventh_content'
+              }
+            ]
           }
         ]
       end
@@ -514,6 +563,16 @@ describe 'CallConfArgumentListMatcher' do
         subject = CallConfArgumentListMatcher.new(call_conf_list)
         actual_args_match = subject.args_match?(*argument_list_from_call)
         expect(actual_args_match).to be false
+      end
+
+      it 'returns the correct confs for an any_args match' do
+        argument_list_from_call = %w(
+          first_argument second_argument
+          third_argument fourth_argument fifth_argument
+        )
+        subject = CallConfArgumentListMatcher.new(call_conf_list)
+        actual_args_match = subject.args_match?(*argument_list_from_call)
+        expect(actual_args_match).to be true
       end
     end
   end

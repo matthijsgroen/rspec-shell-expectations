@@ -28,10 +28,19 @@ module Rspec
 
         def get_call_conf_matches(*call_arguments)
           @expected_call_conf_list.select do |expected_call_conf|
-            expected_call_conf_args = expected_call_conf[:args]
-            @expected_args = expected_call_conf_args.empty? ? [any_args] : expected_call_conf_args
+            @expected_args = remap_argument_matchers(expected_call_conf[:args])
             parent_args_match?(*call_arguments)
           end
+        end
+
+        private
+
+        def remap_argument_matchers(expected_call_conf_args)
+          expected_call_conf_args.map! do |expected_arg|
+            next expected_arg unless expected_arg.is_a?(ArgumentMatchers::SingletonMatcher)
+            Object.const_get("#{expected_arg.class}::INSTANCE")
+          end
+          expected_call_conf_args.empty? ? [any_args] : expected_call_conf_args
         end
       end
     end

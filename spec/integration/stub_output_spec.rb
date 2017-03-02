@@ -30,6 +30,71 @@ describe 'Stub command output' do
       expect(output).to eql 'hello'
       expect(error).to be_empty
     end
+    context 'when given an exact argument match' do
+      let(:output) do
+        command1_stub
+          .with_args('first_argument', 'second_argument')
+          .outputs('hello', to: :stdout)
+        output, = stubbed_env.execute_inline('command1 first_argument second_argument')
+        output
+      end
+
+      it 'outputs the expected output to stdout' do
+        expect(output).to eql 'hello'
+      end
+    end
+    context 'when given an anything argument match' do
+      let(:output) do
+        command1_stub
+          .with_args('first_argument', anything)
+          .outputs('i respond to anything', to: :stdout)
+        output, = stubbed_env.execute_inline('command1 first_argument piglet')
+        output
+      end
+
+      it 'outputs the expected output to stdout' do
+        expect(output).to eql 'i respond to anything'
+      end
+    end
+    context 'when given any_args argument match' do
+      let(:output) do
+        command1_stub
+          .with_args(any_args)
+          .outputs('i respond to any_args', to: :stdout)
+        output, = stubbed_env.execute_inline('command1 poglet piglet')
+        output
+      end
+
+      it 'outputs the expected output to stdout' do
+        expect(output).to eql 'i respond to any_args'
+      end
+    end
+    context 'when given other types of RSpec::Mock::ArgumentMatcher argument match' do
+      let(:output) do
+        command1_stub
+          .with_args(instance_of(String), instance_of(String))
+          .outputs('i respond to instance_of', to: :stdout)
+        output, = stubbed_env.execute_inline('command1 poglet 1')
+        output
+      end
+
+      it 'outputs the expected output to stdout' do
+        expect(output).to eql 'i respond to instance_of'
+      end
+    end
+    context 'when given regex argument match' do
+      let(:output) do
+        command1_stub
+          .with_args(/p.glet/, /p.glet/)
+          .outputs('i respond to regex', to: :stdout)
+        output, = stubbed_env.execute_inline('command1 poglet piglet')
+        output
+      end
+
+      it 'outputs the expected output to stdout' do
+        expect(output).to eql 'i respond to regex'
+      end
+    end
   end
 
   describe 'stubbing standard-err' do
@@ -84,7 +149,9 @@ describe 'Stub command output' do
     end
 
     it 'outputs correctly when all arguments match' do
-      command1_stub.with_args('input', 'output').outputs('world', to: :stdout)
+      command1_stub
+        .with_args('input', 'output')
+        .outputs('world', to: :stdout)
       output, error, _status = stubbed_env.execute script_path.to_s
 
       expect(error).to be_empty
@@ -92,8 +159,9 @@ describe 'Stub command output' do
     end
 
     it 'does not output when called with extra arguments, even if some match' do
-      command1_stub.with_args('input', 'output', 'anything')
-                   .outputs('arbitrary string', to: :stdout)
+      command1_stub
+        .with_args('input', 'output', 'anything')
+        .outputs('arbitrary string', to: :stdout)
       output, error, _status = stubbed_env.execute script_path.to_s
 
       expect(error).to be_empty
@@ -101,7 +169,9 @@ describe 'Stub command output' do
     end
 
     it 'does not output when called with only one matching argument out of many' do
-      command1_stub.with_args('input').outputs('arbitrary string', to: :stdout)
+      command1_stub
+        .with_args('input')
+        .outputs('arbitrary string', to: :stdout)
       output, error, _status = stubbed_env.execute script_path.to_s
 
       expect(error).to be_empty
