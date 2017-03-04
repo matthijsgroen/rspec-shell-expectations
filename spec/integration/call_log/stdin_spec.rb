@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Assert stdin' do
+describe 'CallLog' do
   include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   let!(:command1_stub) { stubbed_env.stub_command('command1') }
@@ -24,7 +24,7 @@ describe 'Assert stdin' do
     script_path.delete
   end
 
-  describe '#stdin' do
+  context '#stdin' do
     it 'returns the stdin' do
       expect(command1_stub.stdin).to match 'foo bar'
     end
