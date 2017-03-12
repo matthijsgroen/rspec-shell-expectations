@@ -1,271 +1,60 @@
 require 'spec_helper'
+include Rspec::Bash
+include Rspec::Bash::Util
 
 describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }
   let(:mock_log_file) { instance_double(File) }
   let(:mock_log_pathname) { instance_double(Pathname) }
+  let(:mock_call_log_matcher) { instance_double(CallLogArgumentListMatcher) }
   before(:each) do
+    allow(mock_call_log_matcher).to receive(:get_call_log_matches).and_return(
+      [
+        {
+          args: %w(first_argument second_argument),
+          stdin: 'first_stdin'
+        },
+        {
+          args: %w(first_argument second_argument),
+          stdin: 'second_stdin'
+        },
+        {
+          args: %w(first_argument second_argument),
+          stdin: 'third_stdin'
+        }
+      ]
+    )
+    allow(mock_call_log_matcher).to receive(:get_call_count).and_return(3)
+    allow(mock_call_log_matcher).to receive(:args_match?).and_return(true)
+    allow(CallLogArgumentListMatcher).to receive(:new).with(any_args)
+      .and_return(mock_call_log_matcher)
     allow(mock_log_pathname).to receive(:open).with('r').and_yield(mock_log_file)
     allow(mock_log_pathname).to receive(:open).with('w').and_yield(mock_log_file)
     allow(mock_log_file).to receive(:write).with(anything)
     allow(mock_log_file).to receive(:read).and_return([].to_yaml)
   end
 
-  include Rspec::Bash
+  subject { CallLog.new(anything) }
 
   context '#stdin_for_args' do
-    it 'returns nil when no YAML file is used for call log' do
-      @subject = Rspec::Bash::CallLog.new(nil)
-      allow(YAML).to receive(:load_file).and_return([])
-
-      expect(@subject.stdin_for_args(anything)).to be nil
-    end
-    it 'returns the stdin from call log when there is a single value for stdin' do
-      actual_call_log = [{
-        args: ['arbitrary argument'],
-        stdin: ['correct value']
-      }]
-      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
-      allow(@subject).to receive(:call_log).and_return(actual_call_log)
-
-      expect(@subject.stdin_for_args('arbitrary argument').first).to eql 'correct value'
-    end
-    it 'returns the stdin from call log when there are multiple values for stdin' do
-      actual_call_log = [{
-        args: ['arbitrary argument'],
-        stdin: ['first value', 'second value']
-      }]
-      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
-      allow(@subject).to receive(:call_log).and_return(actual_call_log)
-
-      expect(@subject.stdin_for_args('arbitrary argument').sort)
-        .to eql ['first value', 'second value'].sort
-    end
-    it 'returns the stdin from call log when no arguments are provided' do
-      actual_call_log =
-        [{
-          args: nil,
-          stdin: ['correct value']
-        }]
-      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
-      allow(@subject).to receive(:call_log).and_return(actual_call_log)
-
-      expect(@subject.stdin_for_args).to eql ['correct value']
+    it 'returns the first matching stdin via the specialized matcher' do
+      expect(mock_call_log_matcher).to receive(:get_call_log_matches)
+        .with(any_args)
+      expect(subject.stdin_for_args('first_argument', 'second_argument')).to eql 'first_stdin'
     end
   end
   context '#call_count?' do
-    context 'with no calls made at all (missing call log file)' do
-      before(:each) do
-        @subject = Rspec::Bash::CallLog.new('command_with_no_call_log_file')
-        allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
-      end
-
-      it 'does not find an un-passed argument anywhere in the series' do
-        expect(@subject.call_count('not_an_argument')).to eql 0
-      end
-    end
-    context 'with only an series of arguments provided' do
-      context 'and a command log with only one argument' do
-        before(:each) do
-          actual_call_log = [{
-            args: ['first_arg'],
-            stdin: []
-          }]
-          @subject = Rspec::Bash::CallLog.new('command_with_one_argument_log')
-          allow(@subject).to receive(:call_log).and_return(actual_call_log)
-        end
-
-        it 'finds the single argument anywhere in the series exactly once' do
-          expect(@subject.call_count('first_arg')).to eql 1
-        end
-
-        it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.call_count('not_an_argument')).to eql 0
-        end
-
-        it 'finds the single wildcard argument exactly once' do
-          expect(@subject.call_count(anything)).to eql 1
-        end
-      end
-      context 'and a command called with two arguments' do
-        before(:each) do
-          actual_call_log = [{
-            args: %w(first_arg second_arg),
-            stdin: []
-          }]
-          @subject = Rspec::Bash::CallLog.new('command_with_two_arguments_log')
-          allow(@subject).to receive(:call_log).and_return(actual_call_log)
-        end
-
-        it 'does not find the first argument when other argument is not provided' do
-          expect(@subject.call_count('first_arg')).to eql 0
-        end
-
-        it 'finds the first argument anywhere in the series exactly once' do
-          expect(@subject.call_count('first_arg', anything)).to eql 1
-        end
-
-        it 'does not find the second argument when first argument is not provided' do
-          expect(@subject.call_count('second_arg')).to eql 0
-        end
-
-        it 'finds the second argument anywhere in the series exactly once' do
-          expect(@subject.call_count(anything, 'second_arg')).to eql 1
-        end
-
-        it 'finds two contiguous arguments in the series exactly once' do
-          expect(@subject.call_count('first_arg', 'second_arg')).to eql 1
-        end
-
-        it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.call_count('not_an_argument')).to eql 0
-        end
-
-        it 'does not find a wildcard argument when other argument is not provided' do
-          expect(@subject.call_count(anything)).to eql 0
-        end
-
-        it 'finds when both arguments are wildcards exactly once' do
-          expect(@subject.call_count(anything, anything)).to eql 1
-        end
-
-        it 'finds when only the first argument is a wildcard exactly once' do
-          expect(@subject.call_count(anything, 'second_arg')).to eql 1
-        end
-
-        it 'finds when only the second argument is a wildcard exactly once' do
-          expect(@subject.call_count('first_arg', anything)).to eql 1
-        end
-
-        it 'does not find when wildcard is in wrong position' do
-          expect(@subject.call_count('first_arg', anything, 'second_arg')).to eql 0
-        end
-      end
-      context 'and a command called with three arguments' do
-        before(:each) do
-          actual_call_log = [{
-            args: %w(first_arg second_arg third_arg),
-            stdin: []
-          }]
-          @subject = Rspec::Bash::CallLog.new('command_with_three_arguments_log')
-          allow(@subject).to receive(:call_log).and_return(actual_call_log)
-        end
-
-        it 'does not find first argument when other arguments are not provided' do
-          expect(@subject.call_count('first_arg')).to eql 0
-        end
-
-        it 'finds the first argument anywhere in the series exactly once' do
-          expect(@subject.call_count('first_arg', anything, anything)).to eql 1
-        end
-
-        it 'does not find second argument when other arguments are not provided' do
-          expect(@subject.call_count('second_arg')).to eql 0
-        end
-
-        it 'finds the second argument anywhere in the series exactly once' do
-          expect(@subject.call_count(anything, 'second_arg', anything)).to eql 1
-        end
-
-        it 'does not find third argument when other arguments are not provided' do
-          expect(@subject.call_count('third_arg')).to eql 0
-        end
-
-        it 'finds the third argument anywhere in the series exactly once' do
-          expect(@subject.call_count(anything, anything, 'third_arg')).to eql 1
-        end
-
-        it 'finds three contiguous arguments in the series exactly once' do
-          expect(@subject.call_count('first_arg', 'second_arg', 'third_arg')).to eql 1
-        end
-
-        it 'does not find two non-contiguous arguments in the series exactly once' do
-          expect(@subject.call_count('first_arg', 'third_arg')).to eql 0
-        end
-
-        it 'does not find an un-passed argument anywhere in the series' do
-          expect(@subject.call_count('not_an_argument')).to eql 0
-        end
-
-        it 'finds when only the first argument is a wildcard' do
-          expect(@subject.call_count(anything, 'second_arg', 'third_arg')).to eql 1
-        end
-
-        it 'finds when only the second argument is a wildcard' do
-          expect(@subject.call_count('first_arg', anything, 'third_arg')).to eql 1
-        end
-
-        it 'finds when only the third argument is a wildcard' do
-          expect(@subject.call_count('first_arg', 'second_arg', anything)).to eql 1
-        end
-
-        it 'finds when both the first and second arguments are wildcards' do
-          expect(@subject.call_count(anything, anything, 'third_arg')).to eql 1
-        end
-
-        it 'finds when both the first and third arguments are wildcards' do
-          expect(@subject.call_count(anything, 'second_arg', anything)).to eql 1
-        end
-
-        it 'finds when both the second and third arguments are wildcards' do
-          expect(@subject.call_count('first_arg', anything, anything)).to eql 1
-        end
-
-        it 'does not find when wildcard is in wrong position' do
-          expect(@subject.call_count('first_arg', anything, 'second_arg', 'third_arg')).to eql 0
-        end
-      end
-      context 'with an argument called multiple times' do
-        before(:each) do
-          actual_call_log = [
-            {
-              args: ['twice_called_arg'],
-              stdin: []
-            },
-            {
-              args: ['twice_called_arg'],
-              stdin: []
-            }
-          ]
-          @subject = Rspec::Bash::CallLog.new(anything)
-          allow(@subject).to receive(:call_log).and_return(actual_call_log)
-        end
-        it 'returns 2 when argument is called 2 times' do
-          expect(@subject.call_count('twice_called_arg')).to eql 2
-        end
-      end
+    it 'returns the expected call count via the specialized matcher' do
+      expect(mock_call_log_matcher).to receive(:get_call_count)
+        .with(any_args)
+      expect(subject.call_count('first_argument', 'second_argument')).to eql 3
     end
   end
   context '#called_with_args' do
-    before(:each) do
-      actual_call_log = [
-        {
-          args: ['once_called_arg'],
-          stdin: []
-        },
-        {
-          args: ['twice_called_arg'],
-          stdin: []
-        },
-        {
-          args: ['twice_called_arg'],
-          stdin: []
-        }
-      ]
-      @subject = Rspec::Bash::CallLog.new(anything)
-      allow(@subject).to receive(:call_log).and_return(actual_call_log)
-    end
-
-    it 'returns false when there are no matching args' do
-      expect(@subject.called_with_args?('no-match')).to be_falsey
-    end
-
-    it 'returns false when there is a single matching arg, but an extra argument' do
-      expect(@subject.called_with_args?('once_called_arg', anything)).to be_falsey
-    end
-
-    it 'returns true when there are multiple matching args' do
-      expect(@subject.called_with_args?('twice_called_arg')).to be_truthy
+    it 'returns the expected value via the specialized matcher' do
+      expect(mock_call_log_matcher).to receive(:args_match?)
+        .with(any_args)
+      expect(subject.called_with_args?('first_argument', 'second_argument')).to eql true
     end
   end
   context '#called_with_no_args?' do
