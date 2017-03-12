@@ -119,14 +119,14 @@ describe 'CallConfArgumentListMatcher' do
         ]
       end
 
-      it 'returns the longest, non-anything conf match' do
+      it 'returns the longest conf match' do
         argument_list_from_call = %w(first_argument second_argument third_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
         call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
-        expect(call_conf_match).to eql call_conf_list.at(1)
+        expect(call_conf_match).to eql call_conf_list.at(2)
       end
 
-      it 'returns the last longest, non-anything conf match for multiple exact matches' do
+      it 'returns the last longest conf match for multiple exact matches' do
         argument_list_from_call = %w(first_argument second_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
         call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
@@ -140,14 +140,14 @@ describe 'CallConfArgumentListMatcher' do
         expect(call_conf_match).to eql call_conf_list.at(6)
       end
 
-      it 'returns the longest conf match for matches with some anythings' do
+      it 'returns the last longest conf match for matches with some anythings' do
         argument_list_from_call = %w(
           first_argument second_argument third_argument
           fourth_argument fifth_argument
         )
         subject = CallConfArgumentListMatcher.new(call_conf_list)
         call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
-        expect(call_conf_match).to eql call_conf_list.at(7)
+        expect(call_conf_match).to eql call_conf_list.at(8)
       end
 
       it 'returns the last anything match for multiple, all anything matches' do

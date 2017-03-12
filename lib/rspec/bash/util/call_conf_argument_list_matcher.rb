@@ -20,8 +20,7 @@ module Rspec
         def get_best_call_conf(*call_arguments)
           get_call_conf_matches(*call_arguments).sort_by do |call_conf|
             [
-              call_conf[:args].length,
-              call_conf[:args].length - call_conf[:args].count(anything)
+              call_conf[:args].length
             ]
           end.last || {}
         end
