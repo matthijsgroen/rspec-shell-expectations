@@ -5,42 +5,43 @@ describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }
   let!(:first_command) { stubbed_env.stub_command('first_command') }
 
-  let(:script) do
-    <<-SCRIPT
-      first_command "foo bar" rake 'foo:bar'
-    SCRIPT
-  end
-  let(:script_path) { Pathname.new '/tmp/test_script.sh' }
-
-  before do
-    script_path.open('w') { |f| f.puts script }
-    script_path.chmod 0777
-
-    stubbed_env.execute script_path.to_s
-  end
-
-  after do
-    script_path.delete
-  end
-
-  describe '#called_with_args?' do
-    it 'returns called status' do
-      expect(first_command).to be_called
-    end
-
-    context 'assert with args' do
-      it 'is called with correct argument sequence' do
-        expect(first_command).to be_called_with_arguments('foo bar', 'rake', 'foo:bar')
-        expect(first_command).to be_called_with_arguments('foo bar', anything, 'foo:bar')
-        expect(first_command).not_to be_called_with_arguments('foo bar', 'rake', 'foo')
+  context '#called_with_args?' do
+    context 'when given multiple command calls' do
+      before(:each) do
+        stubbed_env.execute_inline(
+          <<-multiline_script
+              first_command first_argument second_argument
+              first_command first_argument second_argument third_argument
+        multiline_script
+        )
       end
-    end
 
-    describe 'assertion message' do
-      it 'provides a helpful message' do
-        expect(first_command.inspect).to eql '<Stubbed "first_command">'
-        expect(first_command.with_args('foo bar').inspect).to \
-          eql '<Stubbed "first_command" args: "foo bar">'
+      it 'matches for implied anything matches' do
+        expect(first_command).to be_called_with_arguments
+      end
+
+      it 'does not match for non-matches' do
+        expect(first_command).to_not be_called_with_arguments('first_argument')
+      end
+
+      it 'matches for exact matches' do
+        expect(first_command).to be_called_with_arguments('first_argument', 'second_argument')
+      end
+
+      it 'matches for anything matches' do
+        expect(first_command).to be_called_with_arguments(anything, anything, 'third_argument')
+      end
+
+      it 'matches for anyd_args matches' do
+        expect(first_command).to be_called_with_arguments(any_args)
+      end
+
+      it 'matches for other types of RSpec::Mock::ArgumentMatcher matches' do
+        expect(first_command).to be_called_with_arguments(instance_of(String), instance_of(String))
+      end
+
+      it 'matches for regex matches' do
+        expect(first_command).to be_called_with_arguments(/f..st_argument/, /se..nd_argument/)
       end
     end
   end

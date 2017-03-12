@@ -6,7 +6,7 @@ describe 'StubbedCommand' do
   let!(:command1_stub) { stubbed_env.stub_command('command1') }
 
   context '#returns_exitstatus' do
-    context 'when given exit status to return' do
+    context 'when given no exit status to return' do
       let(:status) do
         _, _, status = stubbed_env.execute_inline('command1 first_argument second_argument')
         status.exitstatus
