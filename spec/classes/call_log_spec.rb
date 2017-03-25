@@ -4,7 +4,7 @@ include Rspec::Bash::Util
 
 describe 'CallLog' do
   let(:stubbed_env) { create_stubbed_env }
-  let(:mock_log_file) { instance_double(File) }
+  let(:mock_log_file) { StringFileIO.new }
   let(:mock_log_pathname) { instance_double(Pathname) }
   let(:mock_call_log_matcher) { instance_double(CallLogArgumentListMatcher) }
   before(:each) do
@@ -30,11 +30,9 @@ describe 'CallLog' do
       .and_return(mock_call_log_matcher)
     allow(mock_log_pathname).to receive(:open).with('r').and_yield(mock_log_file)
     allow(mock_log_pathname).to receive(:open).with('w').and_yield(mock_log_file)
-    allow(mock_log_file).to receive(:write).with(anything)
-    allow(mock_log_file).to receive(:read).and_return([].to_yaml)
   end
 
-  subject { CallLog.new(anything) }
+  subject { CallLog.new(mock_log_pathname) }
 
   context '#stdin_for_args' do
     it 'returns the first matching stdin via the specialized matcher' do
@@ -59,8 +57,8 @@ describe 'CallLog' do
   end
   context '#called_with_no_args?' do
     it 'returns false if no call log is found' do
-      @subject = Rspec::Bash::CallLog.new(anything)
-      allow(@subject).to receive(:call_log).and_return([])
+      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
+      @subject.call_log = []
 
       expect(@subject.called_with_no_args?).to be_falsey
     end
@@ -69,8 +67,8 @@ describe 'CallLog' do
         args: nil,
         stdin: []
       }]
-      @subject = Rspec::Bash::CallLog.new(anything)
-      allow(@subject).to receive(:call_log).and_return(actual_call_log)
+      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
+      @subject.call_log = actual_call_log
 
       expect(@subject.called_with_no_args?).to be_truthy
     end
@@ -79,8 +77,8 @@ describe 'CallLog' do
         args: ['I am an argument'],
         stdin: []
       }]
-      @subject = Rspec::Bash::CallLog.new(anything)
-      allow(@subject).to receive(:call_log).and_return(actual_call_log)
+      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
+      @subject.call_log = actual_call_log
 
       expect(@subject.called_with_no_args?).to be_falsey
     end
@@ -89,8 +87,8 @@ describe 'CallLog' do
         args: ['I am an argument', 'as am I'],
         stdin: []
       }]
-      @subject = Rspec::Bash::CallLog.new(anything)
-      allow(@subject).to receive(:call_log).and_return(actual_call_log)
+      @subject = Rspec::Bash::CallLog.new(mock_log_pathname)
+      @subject.call_log = actual_call_log
 
       expect(@subject.called_with_no_args?).to be_falsey
     end
@@ -119,7 +117,7 @@ describe 'CallLog' do
           subject.add_log('first_stdin', %w(first_argument second_argument))
         end
       end
-      context 'with an existing in-memory log' do
+      context 'with an existing log' do
         let(:expected_log) do
           [
             {
@@ -139,38 +137,6 @@ describe 'CallLog' do
               stdin: 'first_stdin'
             }
           ]
-        end
-        it 'adds a call log for the arguments passed in' do
-          subject.add_log('second_stdin', %w(first_argument))
-          expect(subject.call_log).to eql expected_log
-        end
-
-        it 'writes that log to its log file' do
-          expect(mock_log_file).to receive(:write).with(expected_log.to_yaml)
-          subject.add_log('second_stdin', %w(first_argument))
-        end
-      end
-      context 'with an existing in-file log' do
-        let(:expected_log) do
-          [
-            {
-              args: %w(first_argument second_argument),
-              stdin: 'first_stdin'
-            },
-            {
-              args: %w(first_argument),
-              stdin: 'second_stdin'
-            }
-          ]
-        end
-        before(:each) do
-          call_log = [
-            {
-              args: %w(first_argument second_argument),
-              stdin: 'first_stdin'
-            }
-          ]
-          allow(mock_log_file).to receive(:read).and_return(call_log.to_yaml)
         end
         it 'adds a call log for the arguments passed in' do
           subject.add_log('second_stdin', %w(first_argument))
@@ -218,7 +184,6 @@ describe 'CallLog' do
       end
     end
     context 'when setup is valid' do
-      let(:mock_log_pathname) { instance_double(Pathname) }
       subject { Rspec::Bash::CallLog.new(mock_log_pathname) }
       let(:log) do
         [{
@@ -226,18 +191,9 @@ describe 'CallLog' do
           stdin: 'first_stdin'
         }]
       end
-      context 'and no in-memory call log exists' do
+      context 'and a call log exists' do
         before(:each) do
           allow(mock_log_file).to receive(:read).and_return(log.to_yaml)
-        end
-
-        it 'reads out what was in its configuration file' do
-          expect(subject.call_log).to eql log
-        end
-      end
-      context 'and an in-memory call log already exists' do
-        before(:each) do
-          subject.call_log = log
         end
 
         it 'reads out what was in its configuration file' do

@@ -3,7 +3,6 @@ module Rspec
     class CallLog
       def initialize(call_log_path)
         @call_log_path = call_log_path
-        @call_log = []
       end
 
       def exist?
@@ -36,34 +35,31 @@ module Rspec
       end
 
       def add_log(stdin, argument_list)
-        @call_log = call_log
-        @call_log << {
+        updated_log = call_log
+        updated_log << {
           args: argument_list,
           stdin: stdin
         }
-        write
+        write updated_log
       end
 
       def call_log
-        return @call_log unless @call_log.empty?
-        begin
-          @call_log_path.open('r') do |call_log|
-            YAML.load(call_log.read) || []
-          end
-        rescue NoMethodError, Errno::ENOENT
-          return []
+        @call_log_path.open('r') do |call_log|
+          YAML.load(call_log.read) || []
         end
+      rescue NoMethodError, Errno::ENOENT
+        return []
       end
 
       def call_log=(new_log)
-        @call_log = new_log
+        write new_log
       end
 
       private
 
-      def write
+      def write(call_log_to_write)
         @call_log_path.open('w') do |call_log|
-          call_log.write @call_log.to_yaml
+          call_log.write call_log_to_write.to_yaml
         end
       end
     end
