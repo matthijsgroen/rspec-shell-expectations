@@ -27,7 +27,12 @@ module Rspec
       end
 
       def called_with_no_args?
-        !call_log_arguments.empty? && call_log_arguments.all?(&:empty?)
+        return false if call_log.empty?
+
+        call_log.all? do |call_log|
+          argument_list = call_log[:args] || []
+          argument_list.empty?
+        end
       end
 
       def add_log(stdin, argument_list)
@@ -55,10 +60,6 @@ module Rspec
       end
 
       private
-
-      def call_log_arguments
-        call_log.map { |call_log| call_log[:args] || [] }.compact
-      end
 
       def write
         @call_log_path.open('w') do |call_log|
