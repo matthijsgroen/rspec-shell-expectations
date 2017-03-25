@@ -4,13 +4,13 @@ describe 'CallConfiguration' do
   let(:stubbed_env) { create_stubbed_env }
   include Rspec::Bash
 
-  let(:mock_conf_file) { instance_double(File) }
+  let(:mock_conf_file) { StringFileIO.new }
   let(:mock_conf_pathname) { instance_double(Pathname) }
   before(:each) do
     allow(mock_conf_pathname).to receive(:open).with('r').and_yield(mock_conf_file)
     allow(mock_conf_pathname).to receive(:open).with('w').and_yield(mock_conf_file)
-    allow(mock_conf_file).to receive(:write).with(anything)
-    allow(mock_conf_file).to receive(:read).and_return([].to_yaml)
+    # allow(mock_conf_file).to receive(:write).with(anything)
+    # allow(mock_conf_file).to receive(:read).and_return([].to_yaml)
   end
 
   context '#set_exitcode' do
@@ -38,7 +38,7 @@ describe 'CallConfiguration' do
           subject.set_exitcode(1, %w(first_argument second_argument))
         end
       end
-      context 'with an existing in-memory, non-matching configuration' do
+      context 'with an existing, non-matching configuration' do
         let(:expected_conf) do
           [
             {
@@ -73,79 +73,10 @@ describe 'CallConfiguration' do
           subject.set_exitcode(1, %w(first_argument second_argument))
         end
       end
-      context 'with an existing in-memory, matching configuration' do
+      context 'with an existing, matching configuration' do
         let(:expected_conf) do
           [
             {
-
-              args: %w(first_argument second_argument),
-              exitcode: 1,
-              outputs: []
-            }
-          ]
-        end
-        before(:each) do
-          call_configuration = [
-            {
-              args: %w(first_argument second_argument),
-              exitcode: 2,
-              outputs: []
-            }
-          ]
-          allow(mock_conf_file).to receive(:read).and_return(call_configuration.to_yaml)
-        end
-
-        it 'updates the status code conf for the arguments passed in' do
-          subject.set_exitcode(1, %w(first_argument second_argument))
-          expect(subject.call_configuration).to eql expected_conf
-        end
-
-        it 'writes that configuration to its conf file' do
-          expect(mock_conf_file).to receive(:write).with(expected_conf.to_yaml)
-          subject.set_exitcode(1, %w(first_argument second_argument))
-        end
-      end
-      context 'with an existing in-file, non-matching configuration' do
-        let(:expected_conf) do
-          [
-            {
-              args: %w(first_argument),
-              exitcode: 1,
-              outputs: []
-            },
-            {
-
-              args: %w(first_argument second_argument),
-              exitcode: 1,
-              outputs: []
-            }
-          ]
-        end
-        before(:each) do
-          call_configuration = [
-            {
-              args: %w(first_argument),
-              exitcode: 1,
-              outputs: []
-            }
-          ]
-          allow(mock_conf_file).to receive(:read).and_return(call_configuration.to_yaml)
-        end
-        it 'updates the status code conf for the arguments passed in' do
-          subject.set_exitcode(1, %w(first_argument second_argument))
-          expect(subject.call_configuration).to eql expected_conf
-        end
-
-        it 'writes that configuration to its conf file' do
-          expect(mock_conf_file).to receive(:write).with(expected_conf.to_yaml)
-          subject.set_exitcode(1, %w(first_argument second_argument))
-        end
-      end
-      context 'with an existing in-file, matching configuration' do
-        let(:expected_conf) do
-          [
-            {
-
               args: %w(first_argument second_argument),
               exitcode: 1,
               outputs: []
@@ -211,7 +142,7 @@ describe 'CallConfiguration' do
           subject.add_output('new_content', :stderr, %w(first_argument second_argument))
         end
       end
-      context 'with an existing in-memory, non-matching configuration' do
+      context 'with an existing, non-matching configuration' do
         let(:expected_conf) do
           [
             {
@@ -260,7 +191,7 @@ describe 'CallConfiguration' do
           subject.add_output('new_content', :stderr, %w(first_argument second_argument))
         end
       end
-      context 'with an existing in-memory, matching configuration' do
+      context 'with an existing, matching configuration' do
         let(:expected_conf) do
           [
             {
@@ -292,100 +223,6 @@ describe 'CallConfiguration' do
               ]
             }
           ]
-        end
-        it 'adds to the outputs conf for the arguments passed in' do
-          subject.add_output('new_content', :stderr, %w(first_argument second_argument))
-          expect(subject.call_configuration).to eql expected_conf
-        end
-
-        it 'writes that configuration to its conf file' do
-          expect(mock_conf_file).to receive(:write).with(expected_conf.to_yaml)
-          subject.add_output('new_content', :stderr, %w(first_argument second_argument))
-        end
-      end
-      context 'with an existing in-file, non-matching configuration' do
-        let(:expected_conf) do
-          [
-            {
-              args: %w(first_argument),
-              exitcode: 1,
-              outputs: [
-                {
-                  target: :stdout,
-                  content: 'different_content'
-                }
-              ]
-            },
-            {
-              args: %w(first_argument second_argument),
-              exitcode: 0,
-              outputs: [
-                {
-                  target: :stderr,
-                  content: 'new_content'
-                }
-              ]
-            }
-          ]
-        end
-        before(:each) do
-          call_configuration = [
-            {
-              args: %w(first_argument),
-              exitcode: 1,
-              outputs: [
-                {
-                  target: :stdout,
-                  content: 'different_content'
-                }
-              ]
-            }
-          ]
-          allow(mock_conf_file).to receive(:read).and_return(call_configuration.to_yaml)
-        end
-        it 'updates the outputs conf for the arguments passed in' do
-          subject.add_output('new_content', :stderr, %w(first_argument second_argument))
-          expect(subject.call_configuration).to eql expected_conf
-        end
-
-        it 'writes that configuration to its conf file' do
-          expect(mock_conf_file).to receive(:write).with(expected_conf.to_yaml)
-          subject.add_output('new_content', :stderr, %w(first_argument second_argument))
-        end
-      end
-      context 'with an existing in-file, matching configuration' do
-        let(:expected_conf) do
-          [
-            {
-              args: %w(first_argument second_argument),
-              exitcode: 1,
-              outputs: [
-                {
-                  target: :stdout,
-                  content: 'old_content'
-                },
-                {
-                  target: :stderr,
-                  content: 'new_content'
-                }
-              ]
-            }
-          ]
-        end
-        before(:each) do
-          call_configuration = [
-            {
-              args: %w(first_argument second_argument),
-              exitcode: 1,
-              outputs: [
-                {
-                  target: :stdout,
-                  content: 'old_content'
-                }
-              ]
-            }
-          ]
-          allow(mock_conf_file).to receive(:read).and_return(call_configuration.to_yaml)
         end
         it 'adds to the outputs conf for the arguments passed in' do
           subject.add_output('new_content', :stderr, %w(first_argument second_argument))
@@ -433,8 +270,6 @@ describe 'CallConfiguration' do
       end
     end
     context 'when setup is valid' do
-      let(:mock_conf_pathname) { instance_double(Pathname) }
-      let(:mock_conf_file) { instance_double(File) }
       subject { Rspec::Bash::CallConfiguration.new(mock_conf_pathname, 'command_name') }
       let(:conf) do
         [{
@@ -452,7 +287,7 @@ describe 'CallConfiguration' do
           ]
         }]
       end
-      context 'and no in-memory configuration exists' do
+      context 'and no configuration exists' do
         before(:each) do
           allow(mock_conf_file).to receive(:read).and_return(conf.to_yaml)
           allow(mock_conf_pathname).to receive(:open).with('r').and_yield(mock_conf_file)
@@ -462,7 +297,7 @@ describe 'CallConfiguration' do
           expect(subject.call_configuration).to eql conf
         end
       end
-      context 'and an in-memory configuration already exists' do
+      context 'and a configuration already exists' do
         before(:each) do
           subject.call_configuration = conf
         end

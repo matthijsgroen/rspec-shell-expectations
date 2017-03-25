@@ -14,7 +14,7 @@ module Rspec
       def set_exitcode(exitcode, args = [])
         current_conf = create_or_get_conf(args)
         current_conf[:exitcode] = exitcode
-        write
+        write @configuration
       end
 
       def add_output(content, target, args = [])
@@ -23,30 +23,26 @@ module Rspec
           target: target,
           content: content
         }
-        write
+        write @configuration
       end
 
       def call_configuration
-        return @configuration unless @configuration.empty?
-        begin
-          @config_path.open('r') do |conf_file|
-            YAML.load(conf_file.read) || []
-          end
-        rescue NoMethodError, Errno::ENOENT
-          return []
+        @config_path.open('r') do |conf_file|
+          YAML.load(conf_file.read) || []
         end
+      rescue NoMethodError, Errno::ENOENT
+        return []
       end
 
       def call_configuration=(new_conf)
-        @configuration = new_conf
-        write
+        write new_conf
       end
 
       private
 
-      def write
+      def write(call_conf_to_write)
         @config_path.open('w') do |conf_file|
-          conf_file.write @configuration.to_yaml
+          conf_file.write call_conf_to_write.to_yaml
         end
       end
 
