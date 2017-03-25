@@ -4,25 +4,9 @@ describe 'StubbedEnv' do
   include Rspec::Bash
 
   context '#execute(path, ...)' do
-    let(:script) do
-      <<-SCRIPT
-      command1 "foo bar"
-      SCRIPT
-    end
-    let(:script_path) { Pathname.new '/tmp/test_script.sh' }
-
-    before do
-      script_path.open('w') { |f| f.puts script }
-      script_path.chmod 0777
-    end
-
-    after do
-      script_path.delete
-    end
-
     describe 'running a file with non-existing commands' do
       it 'exits with an error' do
-        `#{script_path} 2>&1`
+        `command1 "foo bar" 2>&1`
         expect($CHILD_STATUS.exitstatus).not_to eq 0
       end
 
@@ -30,7 +14,7 @@ describe 'StubbedEnv' do
         let(:stubbed_env) { create_stubbed_env }
 
         it 'exits with an error' do
-          stubbed_env.execute "#{script_path} 2>&1"
+          stubbed_env.execute_inline 'command1 "foo bar" 2>&1'
           expect($CHILD_STATUS.exitstatus).not_to eq 0
         end
 
@@ -40,8 +24,8 @@ describe 'StubbedEnv' do
           end
 
           it 'exits with status code 0' do
-            _o, _e, s = stubbed_env.execute "#{script_path} 2>&1"
-            expect(s.exitstatus).to eq 0
+            _, _, status = stubbed_env.execute_inline 'command1 "foo bar" 2>&1'
+            expect(status.exitstatus).to eq 0
           end
         end
       end

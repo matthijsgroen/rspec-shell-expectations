@@ -9,8 +9,6 @@ describe 'CallConfiguration' do
   before(:each) do
     allow(mock_conf_pathname).to receive(:open).with('r').and_yield(mock_conf_file)
     allow(mock_conf_pathname).to receive(:open).with('w').and_yield(mock_conf_file)
-    # allow(mock_conf_file).to receive(:write).with(anything)
-    # allow(mock_conf_file).to receive(:read).and_return([].to_yaml)
   end
 
   context '#set_exitcode' do
