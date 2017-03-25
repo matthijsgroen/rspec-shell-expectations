@@ -7,3 +7,4 @@ require 'tempfile'
 require 'yaml'
 
 require 'helper/string_file_io'
+require 'helper/shared_tmpdir'

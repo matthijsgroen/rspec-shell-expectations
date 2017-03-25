@@ -2,7 +2,9 @@ require 'spec_helper'
 include Rspec::Bash
 
 describe 'bin/stub' do
-  let!(:subject_command) { StubbedCommand.new('stub', Dir.mktmpdir) }
+  include_examples 'manage a :temp_directory'
+
+  let!(:subject_command) { StubbedCommand.new('stub', temp_directory) }
   let!(:subject_path) { subject_command.path }
   let!(:subject_file_name) { File.basename(subject_path) }
 
@@ -47,10 +49,6 @@ describe 'bin/stub' do
       exit_code_list << exit_code
       raise SystemExit
     end
-  end
-
-  after(:each) do
-    FileUtils.remove_entry_secure File.dirname(subject_path)
   end
 
   context 'with no configuration' do

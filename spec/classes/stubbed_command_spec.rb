@@ -1,8 +1,9 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'StubbedCommand' do
-  include Rspec::Bash
-  let(:stubbed_env) { create_stubbed_env }
+  include_examples 'manage a :temp_directory'
+
   before(:each) do
     allow(FileUtils).to receive(:cp)
   end
@@ -11,7 +12,7 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     context 'with only a series of arguments' do
       it 'passes the check to its CallLog\'s #called_with_args? method' do
@@ -21,21 +22,15 @@ describe 'StubbedCommand' do
         @subject.called_with_args?('first_argument', 'second_argument')
       end
     end
-    after(:each) do
-      FileUtils.remove_entry_secure File.dirname(@subject.path)
-    end
   end
 
   context '#with_args' do
     before(:each) do
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
       @subject.with_args('argument_one', 'argument_two')
     end
     it 'sets the arguments array on the StubbedCommand to the arguments that were passed in' do
       expect(@subject.arguments).to eql %w(argument_one argument_two)
-    end
-    after(:each) do
-      FileUtils.remove_entry_secure File.dirname(@subject.path)
     end
   end
 
@@ -43,7 +38,7 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'returns value returned from call_log argument count when there are no arguments' do
       expect(@call_log).to receive(:call_count).with([]).and_return('arbitrary return value')
@@ -60,16 +55,13 @@ describe 'StubbedCommand' do
         .and_return('arbitrary return value')
       expect(@subject.call_count(['first arg', 'second arg'])).to eql 'arbitrary return value'
     end
-    after(:each) do
-      FileUtils.remove_entry_secure File.dirname(@subject.path)
-    end
   end
 
   context '#called?' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'returns false when there is no call_log' do
       expect(@call_log).to receive(:exist?).and_return(false)
@@ -85,16 +77,13 @@ describe 'StubbedCommand' do
       expect(@call_log).to receive(:called_with_args?).and_return(true)
       expect(@subject.called?).to be_truthy
     end
-    after(:each) do
-      FileUtils.remove_entry_secure File.dirname(@subject.path)
-    end
   end
 
   context '#stdin' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'returns nil when there is no call_log' do
       expect(@call_log).to receive(:exist?).and_return(false)
@@ -105,16 +94,13 @@ describe 'StubbedCommand' do
       expect(@call_log).to receive(:stdin_for_args).and_return('arbitrary stdin')
       expect(@subject.stdin).to eql 'arbitrary stdin'
     end
-    after(:each) do
-      FileUtils.remove_entry_secure File.dirname(@subject.path)
-    end
   end
 
   context '#returns_exitstatus' do
     before(:each) do
       @call_configuration = double(Rspec::Bash::CallConfiguration)
       allow(Rspec::Bash::CallConfiguration).to receive(:new).and_return(@call_configuration)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'sets the exitcode on call_configuration' do
       expect(@call_configuration).to receive(:set_exitcode).with('exit code', anything)
@@ -124,16 +110,13 @@ describe 'StubbedCommand' do
       expect(@call_configuration).to receive(:set_exitcode)
       expect(@subject.returns_exitstatus(anything)).to eql @subject
     end
-    after(:each) do
-      FileUtils.remove_entry_secure File.dirname(@subject.path)
-    end
   end
 
   context '#outputs' do
     before(:each) do
       @call_configuration = double(Rspec::Bash::CallConfiguration)
       allow(Rspec::Bash::CallConfiguration).to receive(:new).and_return(@call_configuration)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'sets the output on the call_configuration' do
       expect(@call_configuration).to receive(:add_output).with('contents', 'stderr', anything)
@@ -146,9 +129,6 @@ describe 'StubbedCommand' do
     it 'returns itself' do
       expect(@call_configuration).to receive(:add_output)
       expect(@subject.outputs(anything)).to eql @subject
-    end
-    after(:each) do
-      FileUtils.remove_entry_secure File.dirname(@subject.path)
     end
   end
 end
