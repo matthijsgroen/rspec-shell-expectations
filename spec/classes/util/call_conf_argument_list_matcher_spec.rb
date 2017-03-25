@@ -3,12 +3,12 @@ include Rspec::Bash::Util
 
 describe 'CallConfArgumentListMatcher' do
   context '#get_best_call_conf' do
-    context 'given a call conf list with a with multiple sets of args, output and statuscodes' do
+    context 'given a call conf list with a with multiple sets of args, output and exitcodes' do
       let(:call_conf_list) do
         [
           {
             args: [],
-            statuscode: 6,
+            exitcode: 6,
             outputs: [
               {
                 target: :stdout,
@@ -18,7 +18,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument third_argument),
-            statuscode: 1,
+            exitcode: 1,
             outputs: [
               {
                 target: :stdout,
@@ -28,7 +28,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: ['first_argument', anything, anything],
-            statuscode: 3,
+            exitcode: 3,
             outputs: [
               {
                 target: :stdout,
@@ -38,7 +38,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, 'second_argument'],
-            statuscode: 4,
+            exitcode: 4,
             outputs: [
               {
                 target: :stdout,
@@ -48,7 +48,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument),
-            statuscode: 0,
+            exitcode: 0,
             outputs: [
               {
                 target: :stdout,
@@ -58,7 +58,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument),
-            statuscode: 2,
+            exitcode: 2,
             outputs: [
               {
                 target: :stdout,
@@ -68,7 +68,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, anything, anything, anything],
-            statuscode: 5,
+            exitcode: 5,
             outputs: [
               {
                 target: :stdout,
@@ -78,7 +78,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, anything, 'third_argument', anything, anything],
-            statuscode: 7,
+            exitcode: 7,
             outputs: [
               {
                 target: :stdout,
@@ -88,7 +88,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, anything, anything, anything, anything],
-            statuscode: 8,
+            exitcode: 8,
             outputs: [
               {
                 target: :stdout,
@@ -98,7 +98,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything],
-            statuscode: 9,
+            exitcode: 9,
             outputs: [
               {
                 target: :stdout,
@@ -108,7 +108,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything],
-            statuscode: 10,
+            exitcode: 10,
             outputs: [
               {
                 target: :stdout,
@@ -162,7 +162,7 @@ describe 'CallConfArgumentListMatcher' do
         [
           {
             args: %w(first_argument second_argument),
-            statuscode: 0,
+            exitcode: 0,
             outputs: [
               {
                 target: :stdout,
@@ -172,7 +172,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument third_argument),
-            statuscode: 1,
+            exitcode: 1,
             outputs: [
               {
                 target: :stdout,
@@ -182,7 +182,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument),
-            statuscode: 2,
+            exitcode: 2,
             outputs: [
               {
                 target: :stdout,
@@ -192,7 +192,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: ['first_argument', anything, 'third_argument'],
-            statuscode: 3,
+            exitcode: 3,
             outputs: [
               {
                 target: :stdout,
@@ -202,7 +202,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, 'second_argument'],
-            statuscode: 4,
+            exitcode: 4,
             outputs: [
               {
                 target: :stdout,
@@ -212,7 +212,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, anything, anything, anything],
-            statuscode: 5,
+            exitcode: 5,
             outputs: [
               {
                 target: :stdout,
@@ -233,12 +233,12 @@ describe 'CallConfArgumentListMatcher' do
     end
   end
   context '#get_call_conf_matches' do
-    context 'given a call conf list with a with multiple sets of args, output and statuscodes' do
+    context 'given a call conf list with a with multiple sets of args, output and exitcodes' do
       let(:call_conf_list) do
         [
           {
             args: %w(first_argument second_argument),
-            statuscode: 0,
+            exitcode: 0,
             outputs: [
               {
                 target: :stdout,
@@ -248,7 +248,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument third_argument),
-            statuscode: 1,
+            exitcode: 1,
             outputs: [
               {
                 target: :stdout,
@@ -258,7 +258,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument),
-            statuscode: 2,
+            exitcode: 2,
             outputs: [
               {
                 target: :stdout,
@@ -268,7 +268,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: ['first_argument', YAML.load(YAML.dump(anything)), 'third_argument'],
-            statuscode: 3,
+            exitcode: 3,
             outputs: [
               {
                 target: :stdout,
@@ -278,7 +278,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, 'second_argument'],
-            statuscode: 4,
+            exitcode: 4,
             outputs: [
               {
                 target: :stdout,
@@ -288,7 +288,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, anything, anything, anything],
-            statuscode: 5,
+            exitcode: 5,
             outputs: [
               {
                 target: :stdout,
@@ -298,7 +298,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [],
-            statuscode: 6,
+            exitcode: 6,
             outputs: [
               {
                 target: :stdout,
@@ -311,7 +311,7 @@ describe 'CallConfArgumentListMatcher' do
               'first_argument', 'second_argument',
               'third_argument', 'fourth_argument', any_args
             ],
-            statuscode: 6,
+            exitcode: 6,
             outputs: [
               {
                 target: :stdout,
@@ -324,7 +324,7 @@ describe 'CallConfArgumentListMatcher' do
               'first_argument', 'second_argument',
               'third_argument', 'fourth_argument', YAML.load(YAML.dump(any_args))
             ],
-            statuscode: 6,
+            exitcode: 6,
             outputs: [
               {
                 target: :stdout,
@@ -368,12 +368,12 @@ describe 'CallConfArgumentListMatcher' do
     end
   end
   context '#args_match?' do
-    context 'given a call conf list with a with multiple sets of args, output and statuscodes' do
+    context 'given a call conf list with a with multiple sets of args, output and exitcodes' do
       let(:call_conf_list) do
         [
           {
             args: %w(first_argument second_argument),
-            statuscode: 0,
+            exitcode: 0,
             outputs: [
               {
                 target: :stdout,
@@ -383,7 +383,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument third_argument),
-            statuscode: 1,
+            exitcode: 1,
             outputs: [
               {
                 target: :stdout,
@@ -393,7 +393,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument),
-            statuscode: 2,
+            exitcode: 2,
             outputs: [
               {
                 target: :stdout,
@@ -403,7 +403,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: ['first_argument', anything, 'third_argument'],
-            statuscode: 3,
+            exitcode: 3,
             outputs: [
               {
                 target: :stdout,
@@ -413,7 +413,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, 'second_argument'],
-            statuscode: 4,
+            exitcode: 4,
             outputs: [
               {
                 target: :stdout,
@@ -423,7 +423,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, anything, anything, anything],
-            statuscode: 5,
+            exitcode: 5,
             outputs: [
               {
                 target: :stdout,
@@ -433,7 +433,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [],
-            statuscode: 7,
+            exitcode: 7,
             outputs: [
               {
                 target: :stdout,
@@ -470,7 +470,7 @@ describe 'CallConfArgumentListMatcher' do
         [
           {
             args: %w(first_argument second_argument),
-            statuscode: 0,
+            exitcode: 0,
             outputs: [
               {
                 target: :stdout,
@@ -480,7 +480,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument third_argument),
-            statuscode: 1,
+            exitcode: 1,
             outputs: [
               {
                 target: :stdout,
@@ -490,7 +490,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: %w(first_argument second_argument),
-            statuscode: 2,
+            exitcode: 2,
             outputs: [
               {
                 target: :stdout,
@@ -500,7 +500,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: ['first_argument', anything, 'third_argument'],
-            statuscode: 3,
+            exitcode: 3,
             outputs: [
               {
                 target: :stdout,
@@ -510,7 +510,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, 'second_argument'],
-            statuscode: 4,
+            exitcode: 4,
             outputs: [
               {
                 target: :stdout,
@@ -520,7 +520,7 @@ describe 'CallConfArgumentListMatcher' do
           },
           {
             args: [anything, anything, anything, anything],
-            statuscode: 5,
+            exitcode: 5,
             outputs: [
               {
                 target: :stdout,
@@ -533,7 +533,7 @@ describe 'CallConfArgumentListMatcher' do
               'first_argument', 'second_argument',
               'third_argument', 'fourth_argument', any_args
             ],
-            statuscode: 6,
+            exitcode: 6,
             outputs: [
               {
                 target: :stdout,

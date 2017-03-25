@@ -52,5 +52,5 @@ if call_conf_path.exist?
       f.print data[:content]
     end
   end
-  exit best_matching_call_conf[:statuscode] || 0
+  exit best_matching_call_conf[:exitcode] || 0
 end

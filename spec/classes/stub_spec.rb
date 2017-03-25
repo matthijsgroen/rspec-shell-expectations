@@ -231,7 +231,7 @@ describe 'bin/stub' do
                 content: "no args content\n"
               }
             ],
-            statuscode: 1
+            exitcode: 1
           }
         ]
         allow(stub_config_file).to receive(:read).and_return(stdout_configuration.to_yaml)
@@ -326,7 +326,7 @@ describe 'bin/stub' do
                 content: "more no args content\n"
               }
             ],
-            statuscode: 1
+            exitcode: 1
           },
           {
             args: %w(first_argument second_argument),
@@ -340,7 +340,7 @@ describe 'bin/stub' do
                 content: "more some args content\n"
               }
             ],
-            statuscode: 2
+            exitcode: 2
           },
           {
             args: %w(first_argument second_argument third_argument),
@@ -354,7 +354,7 @@ describe 'bin/stub' do
                 content: "more some args file content\n"
               }
             ],
-            statuscode: 3
+            exitcode: 3
           },
           {
             args: %w(first_argument second_argument third_argument fourth_argument),
@@ -368,7 +368,7 @@ describe 'bin/stub' do
                 content: "more some concatenated filename output\n"
               }
             ],
-            statuscode: 4
+            exitcode: 4
           }
         ]
         allow(stub_config_file).to receive(:read).and_return(stdout_configuration.to_yaml)

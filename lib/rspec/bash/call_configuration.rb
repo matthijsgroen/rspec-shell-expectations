@@ -11,9 +11,9 @@ module Rspec
         @command = command
       end
 
-      def set_exitcode(statuscode, args = [])
+      def set_exitcode(exitcode, args = [])
         current_conf = create_or_get_conf(args)
-        current_conf[:statuscode] = statuscode
+        current_conf[:exitcode] = exitcode
         write
       end
 
@@ -54,7 +54,7 @@ module Rspec
         @configuration = call_configuration
         new_conf = {
           args: args,
-          statuscode: 0,
+          exitcode: 0,
           outputs: []
         }
         current_conf = @configuration.select { |conf| conf[:args] == args }

@@ -22,7 +22,7 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             }
           ]
@@ -43,13 +43,13 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             },
             {
 
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             }
           ]
@@ -58,7 +58,7 @@ describe 'CallConfiguration' do
           subject.call_configuration = [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             }
           ]
@@ -79,7 +79,7 @@ describe 'CallConfiguration' do
             {
 
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             }
           ]
@@ -88,7 +88,7 @@ describe 'CallConfiguration' do
           call_configuration = [
             {
               args: %w(first_argument second_argument),
-              statuscode: 2,
+              exitcode: 2,
               outputs: []
             }
           ]
@@ -110,13 +110,13 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             },
             {
 
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             }
           ]
@@ -125,7 +125,7 @@ describe 'CallConfiguration' do
           call_configuration = [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             }
           ]
@@ -147,7 +147,7 @@ describe 'CallConfiguration' do
             {
 
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: []
             }
           ]
@@ -156,7 +156,7 @@ describe 'CallConfiguration' do
           subject.call_configuration = [
             {
               args: %w(first_argument second_argument),
-              statuscode: 2,
+              exitcode: 2,
               outputs: []
             }
           ]
@@ -191,7 +191,7 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument second_argument),
-              statuscode: 0,
+              exitcode: 0,
               outputs: [
                 {
                   target: :stderr,
@@ -216,7 +216,7 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -226,7 +226,7 @@ describe 'CallConfiguration' do
             },
             {
               args: %w(first_argument second_argument),
-              statuscode: 0,
+              exitcode: 0,
               outputs: [
                 {
                   target: :stderr,
@@ -240,7 +240,7 @@ describe 'CallConfiguration' do
           subject.call_configuration = [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -265,7 +265,7 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -283,7 +283,7 @@ describe 'CallConfiguration' do
           subject.call_configuration = [
             {
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -308,7 +308,7 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -318,7 +318,7 @@ describe 'CallConfiguration' do
             },
             {
               args: %w(first_argument second_argument),
-              statuscode: 0,
+              exitcode: 0,
               outputs: [
                 {
                   target: :stderr,
@@ -332,7 +332,7 @@ describe 'CallConfiguration' do
           call_configuration = [
             {
               args: %w(first_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -358,7 +358,7 @@ describe 'CallConfiguration' do
           [
             {
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -376,7 +376,7 @@ describe 'CallConfiguration' do
           call_configuration = [
             {
               args: %w(first_argument second_argument),
-              statuscode: 1,
+              exitcode: 1,
               outputs: [
                 {
                   target: :stdout,
@@ -439,7 +439,7 @@ describe 'CallConfiguration' do
       let(:conf) do
         [{
           args: %w(first_argument second_argument),
-          statuscode: 1,
+          exitcode: 1,
           outputs: [
             {
               target: :stdout,
