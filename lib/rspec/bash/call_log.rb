@@ -1,6 +1,5 @@
 module Rspec
   module Bash
-    # Log of calls to a command
     class CallLog
       def initialize(call_log_path)
         @call_log_path = call_log_path
@@ -10,65 +9,58 @@ module Rspec
         @call_log_path.exist?
       end
 
-      def called_with_args?(*args)
-        call_count(*args) > 0
+      def stdin_for_args(*argument_list)
+        call_argument_list_matcher = Util::CallLogArgumentListMatcher.new(*argument_list)
+        matching_call_log_list = call_argument_list_matcher.get_call_log_matches(call_log)
+        matching_call_log_list.first[:stdin] unless matching_call_log_list.empty?
       end
 
-      def stdin_for_args(*args)
-        call = find_call(*args)
-        call['stdin'] unless call.nil?
+      def call_count(*argument_list)
+        call_argument_list_matcher = Util::CallLogArgumentListMatcher.new(*argument_list)
+        call_argument_list_matcher.get_call_count(call_log)
       end
 
-      def call_count(*expected_argument_series)
-        call_log_arguments.count do |actual_argument_series|
-          argument_series_contains?(actual_argument_series, expected_argument_series || [])
-        end
+      def called_with_args?(*argument_list)
+        call_argument_list_matcher = Util::CallLogArgumentListMatcher.new(*argument_list)
+        call_argument_list_matcher.args_match?(call_log)
       end
 
       def called_with_no_args?
-        call_log_list = load_call_log_list
-        !call_log_list.empty? && call_log_list.first['args'].nil?
+        return false if call_log.empty?
+
+        call_log.all? do |call_log|
+          argument_list = call_log[:args] || []
+          argument_list.empty?
+        end
+      end
+
+      def add_log(stdin, argument_list)
+        updated_log = call_log
+        updated_log << {
+          args: argument_list,
+          stdin: stdin
+        }
+        write updated_log
+      end
+
+      def call_log
+        @call_log_path.open('r') do |call_log|
+          YAML.load(call_log.read) || []
+        end
+      rescue NoMethodError, Errno::ENOENT
+        return []
+      end
+
+      def call_log=(new_log)
+        write new_log
       end
 
       private
 
-      def find_call(*args)
-        load_call_log_list.find do |call|
-          call_args = call['args'] || []
-          (args - call_args).empty?
+      def write(call_log_to_write)
+        @call_log_path.open('w') do |call_log|
+          call_log.write call_log_to_write.to_yaml
         end
-      end
-
-      def get_position_range_from_argument_list(argument_list, start_position, range_length)
-        argument_list.map do |argument_series|
-          start_position ? argument_series[start_position, range_length] : argument_series
-        end
-      end
-
-      def call_log_arguments
-        load_call_log_list.map { |call_log| call_log['args'] || [] }.compact
-      end
-
-      def argument_series_contains?(actual_argument_series, expected_argument_series)
-        ensure_wildcards_match(actual_argument_series, expected_argument_series)
-        expected_argument_series.empty? || (actual_argument_series == expected_argument_series)
-      end
-
-      def ensure_wildcards_match(actual_argument_series, expected_argument_series)
-        # yes, i know. i am disappointed in myself
-        num_of_args = actual_argument_series.size
-        expected_argument_series
-          .zip((0..num_of_args), actual_argument_series) do |expected_arg, index, _actual_arg|
-            if expected_arg.is_a? RSpec::Mocks::ArgumentMatchers::AnyArgMatcher
-              actual_argument_series[index] = expected_arg
-            end
-          end
-      end
-
-      def load_call_log_list
-        YAML.load_file @call_log_path
-      rescue Errno::ENOENT
-        return []
       end
     end
   end

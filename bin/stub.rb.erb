@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift('<%= rspec_bash_library_path_for_template %>')
+
+require 'rspec/bash'
+require 'pathname'
+require 'yaml'
+
+include Rspec::Bash
+
+command = File.basename(__FILE__)
+folder = File.dirname(__FILE__)
+
+call_log_path = Pathname.new(folder).join("#{command}_calls.yml")
+call_log = CallLog.new(call_log_path)
+call_log.add_log(STDIN.tty? ? '' : $stdin.read, ARGV)
+
+def interpolate_filename(elements)
+  return elements if elements.is_a? String
+  return nil unless elements.is_a? Array
+
+  elements.map do |element|
+    case element
+    when String then
+      element
+    when Symbol then
+      interpolate_argument(element)
+    end
+  end.join
+end
+
+def interpolate_argument(name)
+  return unless (data = /^arg(\d+)$/.match(name.to_s))
+  ARGV[data[1].to_i - 1]
+end
+
+call_conf_path = Pathname.new(folder).join("#{command}_stub.yml")
+if call_conf_path.exist?
+  call_conf = CallConfiguration.new(call_conf_path, command)
+  config = call_conf.call_configuration
+
+  call_conf_arg_matcher = Util::CallConfArgumentListMatcher.new(config)
+  best_matching_call_conf = call_conf_arg_matcher.get_best_call_conf(*ARGV)
+  exit 0 if best_matching_call_conf.empty?
+
+  (best_matching_call_conf[:outputs] || []).each do |data|
+    $stdout.print data[:content] if data[:target] == :stdout
+    $stderr.print data[:content] if data[:target] == :stderr
+
+    output_filename = interpolate_filename(data[:target])
+    next unless output_filename
+    Pathname.new(output_filename).open('w') do |f|
+      f.print data[:content]
+    end
+  end
+  exit best_matching_call_conf[:exitcode] || 0
+end

@@ -1,8 +1,9 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'StubbedCommand' do
-  include Rspec::Bash
-  let(:stubbed_env) { create_stubbed_env }
+  include_examples 'manage a :temp_directory'
+
   before(:each) do
     allow(FileUtils).to receive(:cp)
   end
@@ -11,7 +12,7 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     context 'with only a series of arguments' do
       it 'passes the check to its CallLog\'s #called_with_args? method' do
@@ -25,7 +26,7 @@ describe 'StubbedCommand' do
 
   context '#with_args' do
     before(:each) do
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
       @subject.with_args('argument_one', 'argument_two')
     end
     it 'sets the arguments array on the StubbedCommand to the arguments that were passed in' do
@@ -37,7 +38,7 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'returns value returned from call_log argument count when there are no arguments' do
       expect(@call_log).to receive(:call_count).with([]).and_return('arbitrary return value')
@@ -60,7 +61,7 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'returns false when there is no call_log' do
       expect(@call_log).to receive(:exist?).and_return(false)
@@ -82,7 +83,7 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_log = double(Rspec::Bash::CallLog)
       allow(Rspec::Bash::CallLog).to receive(:new).and_return(@call_log)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'returns nil when there is no call_log' do
       expect(@call_log).to receive(:exist?).and_return(false)
@@ -99,16 +100,14 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_configuration = double(Rspec::Bash::CallConfiguration)
       allow(Rspec::Bash::CallConfiguration).to receive(:new).and_return(@call_configuration)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'sets the exitcode on call_configuration' do
       expect(@call_configuration).to receive(:set_exitcode).with('exit code', anything)
-      expect(@call_configuration).to receive(:write)
       @subject.returns_exitstatus 'exit code'
     end
     it 'returns itself' do
       expect(@call_configuration).to receive(:set_exitcode)
-      expect(@call_configuration).to receive(:write)
       expect(@subject.returns_exitstatus(anything)).to eql @subject
     end
   end
@@ -117,21 +116,18 @@ describe 'StubbedCommand' do
     before(:each) do
       @call_configuration = double(Rspec::Bash::CallConfiguration)
       allow(Rspec::Bash::CallConfiguration).to receive(:new).and_return(@call_configuration)
-      @subject = Rspec::Bash::StubbedCommand.new('command', Dir.mktmpdir)
+      @subject = Rspec::Bash::StubbedCommand.new('command', temp_directory)
     end
     it 'sets the output on the call_configuration' do
-      expect(@call_configuration).to receive(:set_output).with('contents', 'stderr', anything)
-      expect(@call_configuration).to receive(:write)
+      expect(@call_configuration).to receive(:add_output).with('contents', 'stderr', anything)
       @subject.outputs('contents', to: 'stderr')
     end
     it 'sets the "to" value for the output to stdout by default' do
-      expect(@call_configuration).to receive(:set_output).with('contents', :stdout, anything)
-      expect(@call_configuration).to receive(:write)
+      expect(@call_configuration).to receive(:add_output).with('contents', :stdout, anything)
       @subject.outputs('contents')
     end
     it 'returns itself' do
-      expect(@call_configuration).to receive(:set_output)
-      expect(@call_configuration).to receive(:write)
+      expect(@call_configuration).to receive(:add_output)
       expect(@subject.outputs(anything)).to eql @subject
     end
   end

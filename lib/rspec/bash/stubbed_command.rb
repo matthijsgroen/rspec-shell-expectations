@@ -1,11 +1,10 @@
 module Rspec
   module Bash
     class StubbedCommand
-      attr_reader :call_log, :arguments
+      attr_reader :call_log, :arguments, :path
 
       def initialize(command, dir)
-        command_path = File.join(dir, command)
-        FileUtils.cp(stub_filepath, command_path)
+        @path = create_stub_file(command, dir)
         @arguments = []
         @call_configuration = CallConfiguration.new(
           Pathname.new(dir).join("#{command}_stub.yml"),
@@ -37,20 +36,18 @@ module Rspec
         @call_log.call_count(*arg)
       end
 
-      def returns_exitstatus(statuscode)
-        @call_configuration.set_exitcode(statuscode, @arguments)
-        @call_configuration.write
+      def returns_exitstatus(exitcode)
+        @call_configuration.set_exitcode(exitcode, @arguments)
+        self
+      end
+
+      def outputs(contents, to: :stdout)
+        @call_configuration.add_output(contents, to, @arguments)
         self
       end
 
       def stdin
         @call_log.stdin_for_args(*@arguments) if @call_log.exist?
-      end
-
-      def outputs(contents, to: :stdout)
-        @call_configuration.set_output(contents, to, @arguments)
-        @call_configuration.write
-        self
       end
 
       def inspect
@@ -64,8 +61,19 @@ module Rspec
 
       private
 
-      def stub_filepath
-        project_root.join('bin', 'stub')
+      def create_stub_file(command_name, directory)
+        command_path = File.join(directory, command_name)
+
+        stub_template_path = File.expand_path(
+          'stub.rb.erb', "#{File.dirname(__FILE__)}/../../../bin"
+        )
+        template = ERB.new File.read(stub_template_path), nil, '%'
+        rspec_bash_library_path_for_template = project_root.join('lib')
+        stub_content = template.result(binding)
+        File.open(command_path, 'w') { |file| file.write(stub_content) }
+        File.chmod(0755, command_path)
+
+        command_path
       end
 
       def project_root
