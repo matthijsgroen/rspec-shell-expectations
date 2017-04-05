@@ -4,13 +4,12 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'rspec-bash'
-  spec.version       = '0.0.3'
+  spec.version       = '0.1.0'
   spec.authors       = ['Ben Brewer', 'Mike Urban', 'Matthijs Groen']
   spec.email         = ['ben@benbrewer.me', 'mike.david.urban@gmail.com']
   spec.summary       = 'Test Bash with RSpec'
   spec.description   = <<-DESCRIPTION
-    Stub and mock Bash commands
-    Verify Bash calls and outputs
+    Test Bash scripts through stubbing and mocking Bash commands
   DESCRIPTION
   spec.homepage      = 'https://github.com/mdurban/rspec-bash'
   spec.license       = 'MIT'

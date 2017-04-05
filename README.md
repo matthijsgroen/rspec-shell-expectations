@@ -9,13 +9,11 @@ Run your shell script in a mocked environment to test its behavior using RSpec.
 - Test bash functions, entire scripts and inline scripts
 - Stub shell commands and their exitstatus and outputs
 - Partial mocks of functions
-- Control exit status codes
 - Control multiple outputs (through STDOUT, STDERR or files)
 - Verify STDIN, STDOUT, STDERR
-- Verify if command is called
-- Verify command is called with specific argument sequence
+- Verify command was called with specific argument sequence
 - Verify command was called correct number of times
-- Supports RSpec "anything" wildcard matchers
+- Supports RSpec matchers
 
 ## Installation
 
@@ -63,7 +61,7 @@ see specs in *spec/integration* folder:
     it 'runs the script' do
       stdout, stderr, status = stubbed_env.execute(
         'my-shell-script.sh',
-        { 'SOME_OPTIONAL' => 'env vars' }
+        { 'OPTIONAL_ENV' => 'env vars' }
       )
       expect(status.exitstatus).to eq 0
     end
@@ -85,131 +83,132 @@ see specs in *spec/integration* folder:
 ### Changing exitstatus of stubs:
 
 ```ruby
-  let(:stubbed_env) { create_stubbed_env }
-  before do
-    stubbed_env.stub_command('rake').returns_exitstatus(5)
-    stubbed_env.stub_command('rake').with_args('spec').returns_exitstatus(3)
-  end
+  stubbed_env.stub_command('rake').returns_exitstatus(5)
+```
+
+```ruby
+  stubbed_env.stub_command('rake').with_args('spec').returns_exitstatus(3)
 ```
 
 ### Stubbing output:
 
 ```ruby
-  let(:stubbed_env) { create_stubbed_env }
-  let(:rake_stub) { stubbed_env.stub_command 'rake' }
-  before do
-    rake_stub.outputs('informative message', to: :stdout)
-      .outputs('error message', to: :stderr)
-      .outputs('log contents', to: 'logfile.log')
-      .outputs('converted result', to: ['prefix-', :arg2, '.txt'])
-    # last one creates 'prefix-foo.txt' when called as 'rake convert foo'
-  end
+  let(:rake_stub) { stubbed_env.stub_command('rake') }
+
+  rake_stub.outputs('informative message', to: :stdout)
+    .outputs('error message', to: :stderr)
+    .outputs('log contents', to: 'logfile.log')
+    # creates 'prefix-foo.txt' when called as 'rake convert foo'
+    .outputs('converted result', to: ['prefix-', :arg2, '.txt'])
 ```
 
 ### Verifying stdin:
 
 ```ruby
   let(:stubbed_env) { create_stubbed_env }
-  let(:cat_stub) { stubbed_env.stub_command 'cat' }
-  let(:mail_stub) { stubbed_env.stub_command 'mail' }
-  it 'verifies stdin' do
-    stubbed_env.execute 'script.sh'
+
+  it 'verifies stdin with no args' do
+    cat_stub = stubbed_env.stub_command('cat')
+
     expect(cat_stub.stdin).to eql 'hello'
+  end
+
+  it 'verifies stdin with args' do
+    mail_stub = stubbed_env.stub_command('mail')
+
     expect(mail_stub.with_args('-s', 'hello').stdin).to eql 'world'
   end
 ```
-### Test entire script
+
+### Test entire script, specific function or inline script
 
 ```ruby
-let(:stubbed_env) { Rspec::Bash::StubbedEnv.new }
 stubbed_env.execute('./path/to/script.sh')
 ```
 
-### Test specific function
-
 ```ruby
-let(:stubbed_env) { Rspec::Bash::StubbedEnv.new }
-stubbed_env.stub_command('overridden_function')
 stubbed_env.execute_function(
     './path/to/script.sh',
     'overridden_function'
 )
-
 ```
 
-### Test inline script
-
 ```ruby
-let(:stubbed_env) { create_stubbed_env }
-stubbed_env.stub_command('stubbed_command')
 stubbed_env.execute_inline(<<-multiline_script
     stubbed_command first_argument second_argument
     multiline_script
 )
-
 ```
+
 ### Check that mock was called with specific arguments
 
 ```ruby
-describe 'be_called_with_arguments' do
-  include Rspec::Bash
-  let(:stubbed_env) { create_stubbed_env }
+stubbed_env.execute_inline(<<-multiline_script
+  stubbed_command first_argument second_argument
+ multiline_script
+)
 
-  context 'with a command' do
-    context 'and no chain calls' do
-      before(:each) do
-        @command = stubbed_env.stub_command('stubbed_command')
-        @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-          stubbed_command first_argument second_argument
-        multiline_script
-        )
-      end
-      it 'correctly identifies the called arguments' do
-        expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
-      end
-    end
-  end
+it 'correctly identifies the called arguments' do
+  expect(@command).to be_called_with_arguments('first_argument', 'second_argument')
 end
 ```
 
 ### Check that mock was not called with any arguments
 
 ```ruby
-@command = stubbed_env.stub_command('stubbed_command')
-stubbed_env.execute_inline(<<-multiline_script
-  stubbed_command
-multiline_script
-
-it 'correctly identifies that no arguments were called' do
-  expect(@command).to be_called_with_no_arguments
-end
+expect(@command).to be_called_with_no_arguments
 ```
 
 ### Check that mock was called a certain number of times
 ```ruby
-context 'and the times chain call' do
-  before(:each) do
-    @command = stubbed_env.stub_command('stubbed_command')
-    @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
-      stubbed_command duplicated_argument
-      stubbed_command duplicated_argument
-      stubbed_command once_called_argument
-    multiline_script
-    )
-  end
-  it 'matches when arguments are called twice' do
-    expect(@command).to be_called_with_arguments('duplicated_argument').times(2)
-  end
-  it 'matches when argument is called once' do
-    expect(@command).to be_called_with_arguments('once_called_argument').times(1)
-  end
+  @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(<<-multiline_script
+    stubbed_command duplicated_argument
+    stubbed_command duplicated_argument
+    stubbed_command once_called_argument
+  multiline_script
+
+  expect(@command).to be_called_with_arguments('duplicated_argument').times(2)
+  expect(@command).to be_called_with_arguments('once_called_argument').times(1)
 end
 ```
 
-### Use rspec "anything" wildcards for arguments you don't need to match exactly
+### Supports RSpec matchers
+```ruby
+it 'stub call with a wildcard used for an argument' do
+  grep_mock = stubbed_env.stub_command('grep')
+  grep_mock.with_args('-r', anything).outputs('output from grep')
+
+  expect(command).to be_called_with_arguments('output from grep')
+end
+```
+
 ```ruby
 it 'correctly matches when wildcard is used for arguments' do
   expect(@command).to be_called_with_arguments(anything, 'second_argument', anything)
+end
+```
+
+```ruby
+it 'matches any arguments' do
+  expect(@command).to be_called_with_arguments
+end
+```
+
+```ruby
+it 'matches all arguments' do
+  expect(@command).to be_called_with_arguments(any_args)
+end
+```
+
+```ruby
+it 'matches any String argument' do
+  expect(@command).to be_called_with_arguments(instance_of(String))
+end
+```
+
+```ruby
+it 'matches using regexp' do
+  expect(@command).to be_called_with_arguments(/s..arg/)
 end
 ```
 
@@ -221,18 +220,6 @@ Please see https://www.gnu.org/software/bash/manual/bashref.html#Positional-Para
 
 - The `execute_function()` method is recommended to be used only when testing Bash libraries. This is because it needs to source the entire file to run the function under test, so any executable code in the script will be run even if it is outside of the function being tested
 
-- At this time, absolute paths cannot be mocked.
-
-- The RSpec 'anything' matcher is supported for verifying output, but not yet supported for stubbing. For example,
-```ruby
-  expect(@command).to be_called_with_arguments(anything, 'second_argument', anything)
-```
-works as expected but
-```ruby
-  stubbed_git_command.with_args('pull', anything, '--rebase').outputs('I did it')
-```
-does not.
-
 ## More examples
 
 see the *spec/integration* folder
@@ -243,7 +230,7 @@ Ruby 2+, no JRuby, due to issues with `Open3.capture3`
 
 ## Contributing
 
-1. Fork it ( https://github.com/mdurban/rspec-bash )
+1. Fork it (https://github.com/mdurban/rspec-bash)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
