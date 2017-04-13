@@ -76,7 +76,7 @@ see specs in *spec/integration* folder:
 
   it 'is stubbed' do
     stubbed_env.execute 'my-script.sh'
-    expect(bundle).to be_called_with_arguments('install)
+    expect(bundle).to be_called_with_arguments('install')
   end
 ```
 
