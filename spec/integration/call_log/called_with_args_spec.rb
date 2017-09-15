@@ -49,7 +49,7 @@ describe 'CallLog' do
           expect(first_command).to be_called_with_arguments('not_first_argument', 'second_argument')
         rescue RSpec::Expectations::ExpectationNotMetError => rex
           expected_error_string = <<-multiline_string
-Expected first_command to be called with arguments ["not_first_argument", "second_argument"]
+Expected first_command to be called with args ["not_first_argument", "second_argument"]
 
 Expected Calls:
 first_command not_first_argument second_argument
@@ -66,7 +66,7 @@ first_command first_argument second_argument third_argument
           expect(first_command).to_not be_called_with_arguments('first_argument', 'second_argument')
         rescue RSpec::Expectations::ExpectationNotMetError => rex
           expected_error_string = <<-multiline_string
-Expected first_command to not be called with arguments ["first_argument", "second_argument"]
+Expected first_command to not be called with args ["first_argument", "second_argument"]
 
 Expected Omissions:
 first_command first_argument second_argument

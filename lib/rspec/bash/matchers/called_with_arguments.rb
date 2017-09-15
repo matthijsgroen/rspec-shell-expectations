@@ -20,18 +20,18 @@ RSpec::Matchers.define :be_called_with_arguments do |*expected_argument_list|
 
   failure_message do |actual_command|
     formatted_actual_calls, formatted_expected_call =
-        get_expected_and_actual_call_strings(actual_command, expected_argument_list)
+      get_expected_and_actual_call_strings(actual_command, expected_argument_list)
 
-    "Expected #{actual_command.command} to be called with arguments #{expected_argument_list}\n\n" \
+    "Expected #{actual_command.command} to be called with args #{expected_argument_list}\n\n" \
       "Expected Calls:\n#{formatted_expected_call}\n\n" \
       "Actual Calls:\n#{formatted_actual_calls}\n"
   end
 
   failure_message_when_negated do |actual_command|
     formatted_actual_calls, formatted_expected_call =
-        get_expected_and_actual_call_strings(actual_command, expected_argument_list)
+      get_expected_and_actual_call_strings(actual_command, expected_argument_list)
 
-    "Expected #{actual_command.command} to not be called with arguments #{expected_argument_list}\n\n" \
+    "Expected #{actual_command.command} to not be called with args #{expected_argument_list}\n\n" \
       "Expected Omissions:\n#{formatted_expected_call}\n\n" \
       "Actual Calls:\n#{formatted_actual_calls}\n"
   end
@@ -45,5 +45,5 @@ def get_expected_and_actual_call_strings(actual_command, expected_argument_list)
     "#{command_name} #{arg_array.join(' ')}"
   end.join("\n")
 
-  return formatted_actual_calls, formatted_expected_call
+  [formatted_actual_calls, formatted_expected_call]
 end
