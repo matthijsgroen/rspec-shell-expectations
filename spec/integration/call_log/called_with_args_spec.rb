@@ -43,6 +43,41 @@ describe 'CallLog' do
       it 'matches for regex matches' do
         expect(first_command).to be_called_with_arguments(/f..st_argument/, /se..nd_argument/)
       end
+
+      it 'displays the diff between what was called and what was expected' do
+        begin
+          expect(first_command).to be_called_with_arguments('not_first_argument', 'second_argument')
+        rescue RSpec::Expectations::ExpectationNotMetError => rex
+          expected_error_string = <<-multiline_string
+Expected first_command to be called with arguments ["not_first_argument", "second_argument"]
+
+Expected Calls:
+first_command not_first_argument second_argument
+
+Actual Calls:
+first_command first_argument second_argument
+first_command first_argument second_argument third_argument
+          multiline_string
+          expect(rex.message).to eql expected_error_string
+        end
+      end
+      it 'displays the diff between what was called and what was not expected' do
+        begin
+          expect(first_command).to_not be_called_with_arguments('first_argument', 'second_argument')
+        rescue RSpec::Expectations::ExpectationNotMetError => rex
+          expected_error_string = <<-multiline_string
+Expected first_command to not be called with arguments ["first_argument", "second_argument"]
+
+Expected Omissions:
+first_command first_argument second_argument
+
+Actual Calls:
+first_command first_argument second_argument
+first_command first_argument second_argument third_argument
+          multiline_string
+          expect(rex.message).to eql expected_error_string
+        end
+      end
     end
   end
 end
