@@ -56,7 +56,7 @@ module Rspec
       end
 
       def call_log_arguments
-        load_call_log_list.map { |call_log| call_log['args'] || [] }.compact
+        call_log.map { |call_log| call_log[:args] || [] }.compact
       end
 
       private

@@ -11,6 +11,7 @@ describe 'be_called_with_arguments' do
         @actual_stdout, @actual_stderr, @actual_status = stubbed_env.execute_inline(
           <<-multiline_script
             stubbed_command first_argument second_argument
+            stubbed_command third_argument fourth_argument
           multiline_script
         )
       end
