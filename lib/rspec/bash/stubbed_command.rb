@@ -36,6 +36,10 @@ module Rspec
         @call_log.call_count(*arg)
       end
 
+      def command
+        @call_configuration.command
+      end
+
       def returns_exitstatus(exitcode)
         @call_configuration.set_exitcode(exitcode, @arguments)
         self

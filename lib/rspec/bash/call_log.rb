@@ -55,6 +55,10 @@ module Rspec
         write new_log
       end
 
+      def call_log_arguments
+        call_log.map { |call_log| call_log[:args] || [] }.compact
+      end
+
       private
 
       def write(call_log_to_write)
