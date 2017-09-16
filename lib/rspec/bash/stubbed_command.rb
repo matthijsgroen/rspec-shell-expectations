@@ -7,11 +7,11 @@ module Rspec
         @path = create_stub_file(hashed_command, dir)
         @arguments = []
         @call_configuration = CallConfiguration.new(
-          Pathname.new(File.join(dir, "#{hashed_command}_stub.yml")),
+          Pathname.new(dir).join("#{hashed_command}_stub.yml"),
           original_command
         )
         @call_log = CallLog.new(
-          Pathname.new(File.join(dir, "#{hashed_command}_calls.yml"))
+          Pathname.new(dir).join("#{hashed_command}_calls.yml")
         )
       end
 
@@ -74,7 +74,7 @@ module Rspec
         template = ERB.new File.read(stub_template_path), nil, '%'
         rspec_bash_library_path_for_template = project_root.join('lib')
         stub_content = template.result(binding)
-        # p "stub_content: " + stub_content
+
         File.open(command_path, 'w') { |file| file.write(stub_content) }
         File.chmod(0755, command_path)
 

@@ -1,8 +1,6 @@
 require 'tmpdir'
 require 'English'
 require 'open3'
-require 'fileutils'
-require 'pathname'
 require 'digest'
 
 module Rspec
@@ -29,6 +27,7 @@ module Rspec
       def stub_command(command)
         sha = Digest::SHA1.hexdigest File.basename(command)
         hashed_command = "#{sha}-#{File.basename(command)}"
+
         write_function_override_file_for_command(command, hashed_command)
         StubbedCommand.new(command, hashed_command, @dir)
       end

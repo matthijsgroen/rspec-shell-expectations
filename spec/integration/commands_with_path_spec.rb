@@ -67,7 +67,7 @@ describe 'scenario where command with path is mocked' do
     it 'stubs output of absolute path command' do
       absolute_path_mock.outputs('absolute path is mocked')
 
-      stdout, _, _ = stubbed_env.execute(script_path)
+      stdout, = stubbed_env.execute(script_path)
 
       expect(stdout).to eql('absolute path is mocked')
     end
@@ -75,7 +75,7 @@ describe 'scenario where command with path is mocked' do
     it 'stubs output of absolute path command' do
       relative_path_mock.outputs('relative path is mocked')
 
-      stdout, _, _ = stubbed_env.execute(script_path)
+      stdout, = stubbed_env.execute(script_path)
 
       expect(stdout).to eql('relative path is mocked')
     end
@@ -126,7 +126,7 @@ describe 'scenario where command with path is mocked' do
     it 'stubs output of absolute path command' do
       absolute_path_mock.outputs('absolute path is mocked')
 
-      stdout, _, _ = stubbed_env.execute(script_path)
+      stdout, = stubbed_env.execute(script_path)
 
       expect(stdout).to eql('absolute path is mocked')
     end
@@ -134,7 +134,7 @@ describe 'scenario where command with path is mocked' do
     it 'stubs output of absolute path command' do
       relative_path_mock.outputs('relative path is mocked')
 
-      stdout, _, _ = stubbed_env.execute(script_path)
+      stdout, = stubbed_env.execute(script_path)
 
       expect(stdout).to eql('relative path is mocked')
     end
