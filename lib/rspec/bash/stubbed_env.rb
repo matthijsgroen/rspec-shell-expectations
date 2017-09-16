@@ -3,6 +3,7 @@ require 'English'
 require 'open3'
 require 'fileutils'
 require 'pathname'
+require 'digest'
 
 module Rspec
   # Define stubbed environment to set and assert expectations
@@ -26,7 +27,8 @@ module Rspec
       end
 
       def stub_command(command)
-        hashed_command = (includes_path?(command)) ? "a-" + File.basename(command) : command
+        sha = Digest::SHA1.hexdigest File.basename(command)
+        hashed_command = "#{sha}-#{File.basename(command)}"
         write_function_override_file_for_command(command, hashed_command)
         StubbedCommand.new hashed_command, @dir
       end
@@ -42,8 +44,6 @@ module Rspec
       end
 
       def execute_function(script, command, env_vars = {})
-        # add_command_path_to_stub(command) if includes_path?(command)
-
         full_command = get_wrapped_execution_with_function_overrides(
           <<-multiline_script
             source #{script}
@@ -62,8 +62,8 @@ module Rspec
 
       private
 
-      def write_function_override_file_for_command(command, hashed_command)
-        function_command_binding_for_template = command
+      def write_function_override_file_for_command(original_command, hashed_command)
+        function_command_binding_for_template = original_command
 
         function_command_path_binding_for_template = File.join(@dir, hashed_command)
 
@@ -73,34 +73,7 @@ module Rspec
         )
         function_override_file_content = function_override_file_template.result(binding)
 
-        # mock_command_with_path(command, function_override_file_content) if includes_path?(command)
-
-
         File.write(function_override_file_path, function_override_file_content)
-      end
-
-      def includes_path?(command)
-        command.include? '/'
-      end
-
-      def mock_command_with_path(command, function_override_file_content)
-        make_directory_of_command_path(command)
-
-        command_name = Pathname.new(command.to_s).basename.to_s
-        command_overrides_file = File.join(@dir, "#{command_name}_overrides.sh")
-        File.write(command_overrides_file, function_override_file_content)
-      end
-
-      def make_directory_of_command_path(command)
-        command_path = command[%r{.*/}]
-        FileUtils.mkdir_p "#{@dir}/#{command_path}"
-      end
-
-      def add_command_path_to_stub(command)
-        command_path = command[%r{.*/}]
-
-        @dir << '/' unless command.start_with? '/'
-        @dir << command_path
       end
 
       def get_wrapped_execution_with_function_overrides(execution_snippet)
