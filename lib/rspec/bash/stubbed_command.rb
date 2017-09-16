@@ -74,6 +74,7 @@ module Rspec
         template = ERB.new File.read(stub_template_path), nil, '%'
         rspec_bash_library_path_for_template = project_root.join('lib')
         stub_content = template.result(binding)
+        # p "stub_content: " + stub_content
         File.open(command_path, 'w') { |file| file.write(stub_content) }
         File.chmod(0755, command_path)
 

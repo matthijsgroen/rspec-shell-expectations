@@ -26,8 +26,9 @@ module Rspec
       end
 
       def stub_command(command)
-        write_function_override_file_for_command command
-        StubbedCommand.new command, @dir
+        hashed_command = (includes_path?(command)) ? "a-" + File.basename(command) : command
+        write_function_override_file_for_command(command, hashed_command)
+        StubbedCommand.new hashed_command, @dir
       end
 
       def execute(command, env_vars = {})
@@ -41,7 +42,7 @@ module Rspec
       end
 
       def execute_function(script, command, env_vars = {})
-        add_command_path_to_stub(command) if includes_path?(command)
+        # add_command_path_to_stub(command) if includes_path?(command)
 
         full_command = get_wrapped_execution_with_function_overrides(
           <<-multiline_script
@@ -61,17 +62,19 @@ module Rspec
 
       private
 
-      def write_function_override_file_for_command(command)
+      def write_function_override_file_for_command(command, hashed_command)
         function_command_binding_for_template = command
-        function_command_path_binding_for_template = File.join(@dir, command)
 
-        function_override_file_path = File.join(@dir, "#{command}_overrides.sh")
+        function_command_path_binding_for_template = File.join(@dir, hashed_command)
+
+        function_override_file_path = File.join(@dir, "#{hashed_command}_overrides.sh")
         function_override_file_template = ERB.new(
           File.new(function_override_template_path).read, nil, '%'
         )
         function_override_file_content = function_override_file_template.result(binding)
 
-        mock_command_with_path(command, function_override_file_content) if includes_path?(command)
+        # mock_command_with_path(command, function_override_file_content) if includes_path?(command)
+
 
         File.write(function_override_file_path, function_override_file_content)
       end
