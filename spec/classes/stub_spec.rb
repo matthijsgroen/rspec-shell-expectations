@@ -4,7 +4,7 @@ include Rspec::Bash
 describe 'bin/stub' do
   include_examples 'manage a :temp_directory'
 
-  let!(:subject_command) { StubbedCommand.new('stub', temp_directory) }
+  let!(:subject_command) { StubbedCommand.new('stub', 'hashed-stub', temp_directory) }
   let!(:subject_path) { subject_command.path }
   let!(:subject_file_name) { File.basename(subject_path) }
 

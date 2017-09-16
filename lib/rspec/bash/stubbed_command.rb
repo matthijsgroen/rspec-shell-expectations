@@ -3,15 +3,15 @@ module Rspec
     class StubbedCommand
       attr_reader :call_log, :arguments, :path
 
-      def initialize(command, dir)
-        @path = create_stub_file(command, dir)
+      def initialize(original_command, hashed_command, dir)
+        @path = create_stub_file(hashed_command, dir)
         @arguments = []
         @call_configuration = CallConfiguration.new(
-          Pathname.new(File.join(dir, "#{command}_stub.yml")),
-          command
+          Pathname.new(File.join(dir, "#{hashed_command}_stub.yml")),
+          original_command
         )
         @call_log = CallLog.new(
-          Pathname.new(File.join(dir, "#{command}_calls.yml"))
+          Pathname.new(File.join(dir, "#{hashed_command}_calls.yml"))
         )
       end
 

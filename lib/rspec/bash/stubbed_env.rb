@@ -30,7 +30,7 @@ module Rspec
         sha = Digest::SHA1.hexdigest File.basename(command)
         hashed_command = "#{sha}-#{File.basename(command)}"
         write_function_override_file_for_command(command, hashed_command)
-        StubbedCommand.new hashed_command, @dir
+        StubbedCommand.new(command, hashed_command, @dir)
       end
 
       def execute(command, env_vars = {})
