@@ -1,7 +1,6 @@
 require 'tmpdir'
 require 'English'
 require 'open3'
-require 'digest'
 
 module Rspec
   # Define stubbed environment to set and assert expectations

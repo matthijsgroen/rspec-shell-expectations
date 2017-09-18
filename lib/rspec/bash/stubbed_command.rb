@@ -1,10 +1,12 @@
+require 'digest'
+
 module Rspec
   module Bash
     class StubbedCommand
       attr_reader :call_log, :arguments, :path
 
       def initialize(command, dir)
-        sha = Digest::SHA1.hexdigest File.basename(command)
+        sha = Digest::SHA1.hexdigest command
         hashed_command = "#{sha}-#{File.basename(command)}"
 
         write_function_override_file_for_command(command, hashed_command, dir)
