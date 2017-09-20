@@ -1,17 +1,25 @@
+require 'digest'
+
 module Rspec
   module Bash
     class StubbedCommand
       attr_reader :call_log, :arguments, :path
 
       def initialize(command, dir)
-        @path = create_stub_file(command, dir)
+        sha = Digest::SHA1.hexdigest command
+        hashed_command = "#{sha}-#{File.basename(command)}"
+
+        write_function_override_file_for_command(command, hashed_command, dir)
+
+        @path = create_stub_file(hashed_command, dir)
         @arguments = []
+
         @call_configuration = CallConfiguration.new(
-          Pathname.new(dir).join("#{command}_stub.yml"),
+          Pathname.new(dir).join("#{hashed_command}_stub.yml"),
           command
         )
         @call_log = CallLog.new(
-          Pathname.new(dir).join("#{command}_calls.yml")
+          Pathname.new(dir).join("#{hashed_command}_calls.yml")
         )
       end
 
@@ -65,6 +73,24 @@ module Rspec
 
       private
 
+      def write_function_override_file_for_command(original_command, hashed_command, directory)
+        function_command_binding_for_template = original_command
+
+        function_command_path_binding_for_template = File.join(directory, hashed_command)
+
+        function_override_file_path = File.join(directory, "#{hashed_command}_overrides.sh")
+        function_override_file_template = ERB.new(
+          File.new(function_override_template_path).read, nil, '%'
+        )
+        function_override_file_content = function_override_file_template.result(binding)
+
+        File.write(function_override_file_path, function_override_file_content)
+      end
+
+      def function_override_template_path
+        project_root.join('bin', 'function_override.sh.erb')
+      end
+
       def create_stub_file(command_name, directory)
         command_path = File.join(directory, command_name)
 
@@ -74,6 +100,7 @@ module Rspec
         template = ERB.new File.read(stub_template_path), nil, '%'
         rspec_bash_library_path_for_template = project_root.join('lib')
         stub_content = template.result(binding)
+
         File.open(command_path, 'w') { |file| file.write(stub_content) }
         File.chmod(0755, command_path)
 
