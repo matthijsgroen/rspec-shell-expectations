@@ -12,6 +12,7 @@ describe 'CallLog' do
           <<-multiline_script
               echo -n 'first_call' | first_command first_argument second_argument
               echo -n 'second_call' | first_command first_argument second_argument third_argument
+              first_command first_argument second_argument third_argument fourth_argument
         multiline_script
         )
       end
@@ -32,6 +33,11 @@ describe 'CallLog' do
       it 'matches for anything matches' do
         expect(first_command
           .with_args(anything, anything, 'third_argument').stdin).to eql 'second_call'
+      end
+
+      it 'is blank for cases where no stdin was passed' do
+        expect(first_command
+          .with_args(anything, anything, 'third_argument', 'fourth_argument').stdin).to be_empty
       end
 
       it 'matches for any_args matches' do

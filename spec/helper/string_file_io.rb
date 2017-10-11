@@ -1,5 +1,5 @@
 class StringFileIO < StringIO
-  def read
+  def read(length = 0)
     string
   end
 

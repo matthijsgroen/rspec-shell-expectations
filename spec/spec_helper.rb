@@ -3,6 +3,7 @@ SimpleCov.start
 
 require 'English'
 require 'rspec/bash'
+require 'sparsify'
 require 'tempfile'
 require 'yaml'
 

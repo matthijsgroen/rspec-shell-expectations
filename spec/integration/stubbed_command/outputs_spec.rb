@@ -1,7 +1,7 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'StubbedCommand' do
-  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   let!(:command1_stub) { stubbed_env.stub_command('command1') }
 

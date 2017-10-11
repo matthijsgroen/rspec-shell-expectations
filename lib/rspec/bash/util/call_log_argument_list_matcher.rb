@@ -9,7 +9,7 @@ module Rspec
         alias parent_args_match? args_match?
         alias parent_initialize initialize
 
-        def initialize(*expected_args)
+        def initialize(expected_args = [any_args])
           expected_args = expected_args.empty? ? [any_args] : expected_args
           parent_initialize(*expected_args)
         end

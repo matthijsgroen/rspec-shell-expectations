@@ -72,7 +72,7 @@ describe 'scenario where command with path is mocked' do
       expect(stdout).to eql('absolute path is mocked')
     end
 
-    it 'stubs output of absolute path command' do
+    it 'stubs output of relative path command' do
       relative_path_mock.outputs('relative path is mocked')
 
       stdout, = stubbed_env.execute(script_path)

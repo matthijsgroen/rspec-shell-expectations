@@ -2,78 +2,129 @@ require 'tmpdir'
 require 'English'
 require 'open3'
 
+# TODO: implement unstubbable list (bash, readonly, etc.)
+# TODO: add tests for isolating wrapper and stub utilities
+# TODO: make all tests more consistent
+# TODO: clean up tests you touched
+# TODO: see about breaking StubbedEnv into more SOLID classes
+# TODO: enforce the nil call log args that just kind of works for bash stub
+# TODO: remove PATH protections
+# TODO: look into converting wrapper to not use ERB
+# TODO: get better testing around target interpolation stuff
+
 module Rspec
-  # Define stubbed environment to set and assert expectations
   module Bash
-    def create_stubbed_env
-      StubbedEnv.new
+    def create_stubbed_env(stub_type = StubbedEnv::BASH_STUB)
+      StubbedEnv.new(stub_type)
     end
 
-    # A shell environment that can manipulate behaviour
-    # of executables
     class StubbedEnv
-      attr_reader :dir
+      RUBY_STUB = :ruby_stub
+      BASH_STUB = :bash_stub
 
-      def initialize
-        @dir = Dir.mktmpdir
-        at_exit { cleanup }
+      attr_accessor :function_override_list
+
+      def initialize(stub_type = StubbedEnv::BASH_STUB)
+        @stub_type = stub_type
+        @stub_marshaller_mappings = {
+          RUBY_STUB => RubyStubMarshaller,
+          BASH_STUB => BashStubMarshaller
+        }
+        @stub_function_mappings = {
+          RUBY_STUB => RubyStubFunction,
+          BASH_STUB => BashStubFunction
+        }
+        @function_override_list = []
+        create_stub_server
+        # at_exit { cleanup }
       end
 
       def cleanup
-        FileUtils.remove_entry_secure @dir if Pathname.new(@dir).exist?
+        FileUtils.remove_entry_secure wrapper_output_path if Pathname.new(wrapper_output_path).exist?
+        FileUtils.remove_entry_secure stderr_output_path if Pathname.new(stderr_output_path).exist?
+      end
+
+      def create_stub_server
+        tcp_server = TCPServer.new('localhost', 0)
+        stub_marshaller = @stub_marshaller_mappings[@stub_type].new
+
+        @stub_server_port = tcp_server.addr[1]
+        @call_log_manager = CallLogManager.new
+        @call_conf_manager = CallConfigurationManager.new
+
+        stub_server = StubServer.new(
+          @call_log_manager,
+          @call_conf_manager,
+          stub_marshaller
+        )
+        stub_server.start(tcp_server)
       end
 
       def stub_command(command)
-        StubbedCommand.new(command, @dir)
+        add_function_override_for_command(command)
+        StubbedCommand.new(
+          command,
+          @call_log_manager,
+          @call_conf_manager
+        )
       end
 
       def execute(command, env_vars = {})
-        full_command = get_wrapped_execution_with_function_overrides(
-          <<-multiline_script
-            source #{command}
-          multiline_script
-        )
-
+        full_command = wrap_script_with_function_overrides("source #{command}")
         Open3.capture3(env_vars, full_command)
       end
 
       def execute_function(script, command, env_vars = {})
-        full_command = get_wrapped_execution_with_function_overrides(
-          <<-multiline_script
-            source #{script}
-            #{command}
-          multiline_script
-        )
-
+        full_command = wrap_script_with_function_overrides("source #{script}\n#{command}")
         Open3.capture3(env_vars, full_command)
       end
 
       def execute_inline(command_string, env_vars = {})
-        temp_command_path = Dir::Tmpname.make_tmpname("#{@dir}/inline-", nil)
+        temp_command_path = Dir::Tmpname.make_tmpname(File.join(Dir.tmpdir, 'inline-'), nil)
         File.write(temp_command_path, command_string)
-        execute(temp_command_path, env_vars)
+        stdout, stderr, status = execute(temp_command_path, env_vars)
+        File.delete(temp_command_path)
+        [stdout, stderr, status]
+      end
+
+      def wrap_script_with_function_overrides(script)
+        wrapper_template = ERB.new(File.new(wrapper_input_path).read, nil, '%')
+        File.open(wrapper_output_path, 'w') do |file|
+          file.write(wrapper_template.result(binding))
+        end
+        File.chmod(0755, wrapper_output_path)
+
+        wrapper_output_path
+      end
+
+      def wrapper_input_path
+        File.join(project_root, 'bin', 'wrapper.sh.erb')
+      end
+
+      def wrapper_output_path
+        File.join(Dir.tmpdir, "wrapper-#{@stub_server_port}.sh")
+      end
+
+      def stderr_output_path
+        File.join(Dir.tmpdir, "stderr-#{@stub_server_port}.tmp")
       end
 
       private
 
-      def get_wrapped_execution_with_function_overrides(execution_snippet)
-        execution_binding_for_template = execution_snippet
-        function_override_path_binding_for_template = "#{@dir}/*_overrides.sh"
-        wrapped_error_path_binding_for_template = "#{@dir}/errors"
-
-        function_override_wrapper_template = ERB.new(
-          File.new(function_override_wrapper_template_path).read, nil, '%'
-        )
-
-        function_override_wrapper_template.result(binding)
-      end
-
-      def function_override_wrapper_template_path
-        project_root.join('bin', 'function_override_wrapper.sh.erb')
+      def add_function_override_for_command(command)
+        stub_function = @stub_function_mappings[@stub_type].new(command, @stub_server_port)
+        function_override_string = <<-multiline_string
+#{stub_function.header}
+#{stub_function.body}
+#{stub_function.footer}
+        multiline_string
+        @function_override_list << function_override_string.chomp
       end
 
       def project_root
-        Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..', '..')
+        File.expand_path(
+          File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', '..')
+        )
       end
     end
   end

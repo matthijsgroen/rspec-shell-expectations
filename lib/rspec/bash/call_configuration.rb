@@ -3,18 +3,15 @@ require 'yaml'
 module Rspec
   module Bash
     class CallConfiguration
-      attr_reader :command
+      attr_accessor :call_configuration
 
-      def initialize(config_path, command)
-        @config_path = config_path
-        @configuration = []
-        @command = command
+      def initialize
+        @call_configuration = []
       end
 
       def set_exitcode(exitcode, args = [])
         current_conf = create_or_get_conf(args)
         current_conf[:exitcode] = exitcode
-        write @configuration
       end
 
       def add_output(content, target, args = [])
@@ -23,38 +20,55 @@ module Rspec
           target: target,
           content: content
         }
-        write @configuration
       end
 
-      def call_configuration
-        @config_path.open('r') do |conf_file|
-          YAML.load(conf_file.read) || []
-        end
-      rescue NoMethodError, Errno::ENOENT
-        return []
-      end
-
-      def call_configuration=(new_conf)
-        write new_conf
+      def get_best_call_conf(args = [])
+        call_conf_arg_matcher = Util::CallConfArgumentListMatcher.new(@call_configuration)
+        best_call_conf = call_conf_arg_matcher.get_best_call_conf(args)
+        remove_args_from_conf(
+          interpolate_output_targets(
+            best_call_conf,
+            args
+          )
+        )
       end
 
       private
 
-      def write(call_conf_to_write)
-        @config_path.open('w') do |conf_file|
-          conf_file.write call_conf_to_write.to_yaml
+      def interpolate_output_targets(conf, args)
+        return conf if conf.empty?
+        conf[:outputs].each do |output|
+          output[:target] = interpolate_target(output[:target], args)
         end
+        conf
+      end
+
+      def interpolate_target(target, args)
+        return target unless target.is_a? Array
+        target.map do |target_element|
+          next target_element if target_element.is_a? String
+          interpolate_argument(target_element, args)
+        end.join
+      end
+
+      def interpolate_argument(name, args)
+        matching_arg_index = /^arg(\d+)$/.match(name.to_s)
+        return name.to_s unless matching_arg_index
+        args[matching_arg_index[1].to_i - 1]
+      end
+
+      def remove_args_from_conf(conf)
+        conf.select { |key| ![:args].include?(key) }
       end
 
       def create_or_get_conf(args)
-        @configuration = call_configuration
         new_conf = {
           args: args,
           exitcode: 0,
           outputs: []
         }
-        current_conf = @configuration.select { |conf| conf[:args] == args }
-        @configuration << new_conf if current_conf.empty?
+        current_conf = @call_configuration.select { |conf| conf[:args] == args }
+        @call_configuration << new_conf if current_conf.empty?
         current_conf.first || new_conf
       end
     end

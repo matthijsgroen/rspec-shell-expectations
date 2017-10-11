@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+<%=@function_override_list.join("\n")%>
+(
+<%=script%>
+) 2> <%=stderr_output_path%>
+command_exit_code=$?
+
+/usr/bin/env bash <<EOF
+  /usr/bin/env grep -v "readonly function" <%=stderr_output_path%> >&2
+EOF
+
+exit ${command_exit_code}
