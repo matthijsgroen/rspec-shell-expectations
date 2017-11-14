@@ -2,8 +2,6 @@ require 'tmpdir'
 require 'English'
 require 'open3'
 
-# TODO: add tests for stubs (make an abstract class too) and for wrapper
-# TODO: add tests for isolating wrapper and stub utilities
 # TODO: make all tests more consistent
 # TODO: clean up tests you touched
 # TODO: get ruby stub tests trued up to what is in bash stub tests
