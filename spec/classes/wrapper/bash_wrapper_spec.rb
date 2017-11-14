@@ -1,5 +1,5 @@
 require 'spec_helper'
-include Rspec::Bash::Wrapper
+include Rspec::Bash
 
 describe 'BashWrapper' do
   let(:server_port) { 4000 }

@@ -2,8 +2,6 @@ require 'tmpdir'
 require 'English'
 require 'open3'
 
-include Rspec::Bash::Wrapper
-
 # TODO: add tests for stubs (make an abstract class too) and for wrapper
 # TODO: add tests for isolating wrapper and stub utilities
 # TODO: make all tests more consistent
