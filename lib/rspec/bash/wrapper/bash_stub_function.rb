@@ -18,6 +18,14 @@ module Rspec
         "#{BashStubFunction.stub_path} #{@name} #{@port} \"${@}\""
       end
 
+      def to_s
+        <<-multiline_string
+        #{header}
+        #{body}
+        #{footer}
+        multiline_string
+      end
+
       def self.stub_path
         File.join(project_root, 'bin', 'bash_stub.sh')
       end
@@ -26,7 +34,7 @@ module Rspec
 
       def self.project_root
         File.expand_path(
-          File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', '..')
+          File.join(File.dirname(File.expand_path(__FILE__)), '..', '..', '..', '..')
         )
       end
     end
