@@ -2,13 +2,12 @@ require 'tmpdir'
 require 'English'
 require 'open3'
 
-# TODO: implement unstubbable list (bash, readonly, etc.)
+# TODO: see about breaking StubbedEnv into more SOLID classes
 # TODO: add tests for isolating wrapper and stub utilities
 # TODO: make all tests more consistent
 # TODO: clean up tests you touched
-# TODO: see about breaking StubbedEnv into more SOLID classes
+# TODO: get ruby stub tests trued up to what is in bash stub tests
 # TODO: enforce the nil call log args that just kind of works for bash stub
-# TODO: remove PATH protections
 # TODO: look into converting wrapper to not use ERB
 # TODO: get better testing around target interpolation stuff
 
@@ -21,6 +20,7 @@ module Rspec
     class StubbedEnv
       RUBY_STUB = :ruby_stub
       BASH_STUB = :bash_stub
+      DISALLOWED_COMMANDS = %w(/usr/bin/env bash readonly function).freeze
 
       attr_accessor :function_override_list
 
@@ -36,7 +36,7 @@ module Rspec
         }
         @function_override_list = []
         create_stub_server
-        # at_exit { cleanup }
+        at_exit { cleanup }
       end
 
       def cleanup
@@ -61,6 +61,7 @@ module Rspec
       end
 
       def stub_command(command)
+        check_if_command_is_allowed(command)
         add_function_override_for_command(command)
         StubbedCommand.new(
           command,
@@ -110,6 +111,12 @@ module Rspec
       end
 
       private
+
+      def check_if_command_is_allowed(command)
+        if DISALLOWED_COMMANDS.include? command
+          raise("Not able to stub command #{command}. Reserved for use by test wrapper.")
+        end
+      end
 
       def add_function_override_for_command(command)
         stub_function = @stub_function_mappings[@stub_type].new(command, @stub_server_port)

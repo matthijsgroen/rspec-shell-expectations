@@ -4,10 +4,11 @@ include Rspec::Bash
 describe 'StubbedEnv' do
   subject { StubbedEnv.new(StubbedEnv::RUBY_STUB) }
   let(:server_thread) { double(Thread) }
+  let(:server_port) { 4000 }
   let!(:tcp_server) do
     tcp_server = double(TCPServer)
     allow(tcp_server).to receive(:addr)
-      .and_return(['ADDR', 4000])
+      .and_return(['ADDR', server_port])
     allow(TCPServer).to receive(:new)
       .with('localhost', 0)
       .and_return(tcp_server)
@@ -93,9 +94,9 @@ describe 'StubbedEnv' do
     end
     it 'adds the command to the function override list' do
       expect(RubyStubFunction).to receive(:new)
-        .with('first_command', 4000)
+        .with('first_command', server_port)
       expect(RubyStubFunction).to receive(:new)
-        .with('second_command', 4000)
+        .with('second_command', server_port)
 
       subject.stub_command('first_command')
       subject.stub_command('second_command')
@@ -104,6 +105,14 @@ describe 'StubbedEnv' do
         "first_command header\nfirst_command body\nfirst_command footer",
         "second_command header\nsecond_command body\nsecond_command footer"
       ]
+    end
+    disallowed_commands = %w(/usr/bin/env bash readonly function)
+    disallowed_commands.each do |command|
+      it "does not allow #{command}" do
+        expect { subject.stub_command(command) }.to raise_error(
+          "Not able to stub command #{command}. Reserved for use by test wrapper."
+        )
+      end
     end
   end
   context '#wrap_script_with_function_overrides' do
@@ -115,7 +124,7 @@ describe 'StubbedEnv' do
     end
     it 'calls the script that it created' do
       wrapped_script = subject.wrap_script_with_function_overrides(script)
-      expect(wrapped_script).to eql File.join(Dir.tmpdir, 'wrapper-4000.sh')
+      expect(wrapped_script).to eql File.join(Dir.tmpdir, "wrapper-#{server_port}.sh")
     end
   end
   context '#execute' do
@@ -170,16 +179,16 @@ describe 'StubbedEnv' do
       allow(existing_file).to receive(:exist?)
         .and_return true
       allow(Pathname).to receive(:new)
-        .with(File.join(Dir.tmpdir, 'wrapper-4000.sh'))
+        .with(File.join(Dir.tmpdir, "wrapper-#{server_port}.sh"))
         .and_return(existing_file)
       allow(Pathname).to receive(:new)
-        .with(File.join(Dir.tmpdir, 'stderr-4000.tmp'))
+        .with(File.join(Dir.tmpdir, "stderr-#{server_port}.tmp"))
         .and_return(existing_file)
 
       expect(FileUtils).to receive(:remove_entry_secure)
-        .with(File.join(Dir.tmpdir, 'wrapper-4000.sh'))
+        .with(File.join(Dir.tmpdir, "wrapper-#{server_port}.sh"))
       expect(FileUtils).to receive(:remove_entry_secure)
-        .with(File.join(Dir.tmpdir, 'stderr-4000.tmp'))
+        .with(File.join(Dir.tmpdir, "stderr-#{server_port}.tmp"))
 
       subject.cleanup
     end
