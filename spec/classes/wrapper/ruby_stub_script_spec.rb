@@ -1,9 +1,8 @@
 require 'spec_helper'
 include Rspec::Bash
 
-describe 'StubFunction' do
-  subject { RubyStubFunction.new('first_command', 55_555) }
-  let(:subject_path) { subject.stub_path }
+describe 'RubyStubFunction' do
+  let(:subject_path) { RubyStubScript.path }
 
   let(:stub_output_string_pathname) { instance_double(Pathname) }
   let(:stub_output_string_file) { StringIO.new }

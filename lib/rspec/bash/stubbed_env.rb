@@ -22,24 +22,14 @@ module Rspec
     class StubbedEnv
       RUBY_STUB = :ruby_stub
       BASH_STUB = :bash_stub
-      STUB_MARSHALLER_MAPPINGS = {
-        RUBY_STUB => RubyStubMarshaller,
-        BASH_STUB => BashStubMarshaller
-      }.freeze
-      STUB_FUNCTION_MAPPINGS = {
-        RUBY_STUB => RubyStubFunction,
-        BASH_STUB => BashStubFunction
-      }.freeze
-      DISALLOWED_COMMANDS = %w(/usr/bin/env bash readonly function).freeze
 
-      def initialize(stub_type = StubbedEnv::BASH_STUB)
-        @stub_type = stub_type
-        start_stub_server
+      def initialize(stub_type)
+        start_stub_server(stub_type)
       end
 
-      def start_stub_server
+      def start_stub_server(stub_type)
         tcp_server = create_tcp_server
-        stub_server = create_stub_server
+        stub_server = create_stub_server(stub_type)
         stub_server.start(tcp_server)
       end
 
@@ -71,24 +61,30 @@ module Rspec
 
       private
 
+      STUB_MARSHALLER_MAPPINGS = {
+        RUBY_STUB => RubyStubMarshaller,
+        BASH_STUB => BashStubMarshaller
+      }.freeze
+      STUB_SCRIPT_MAPPINGS = {
+        RUBY_STUB => RubyStubScript,
+        BASH_STUB => BashStubScript
+      }.freeze
+      DISALLOWED_COMMANDS = %w(/usr/bin/env bash readonly function).freeze
+
       def create_tcp_server
         tcp_server = TCPServer.new('localhost', 0)
         @stub_server_port = tcp_server.addr[1]
         tcp_server
       end
 
-      def create_stub_server
-        stub_marshaller = STUB_MARSHALLER_MAPPINGS[@stub_type].new
-
+      def create_stub_server(stub_type)
+        stub_marshaller = STUB_MARSHALLER_MAPPINGS[stub_type].new
+        stub_script_class = STUB_SCRIPT_MAPPINGS[stub_type]
+        @stub_wrapper = BashWrapper.new(@stub_server_port)
+        @stub_function = StubFunction.new(@stub_server_port, stub_script_class)
         @call_log_manager = CallLogManager.new
         @call_conf_manager = CallConfigurationManager.new
-        @stub_wrapper = BashWrapper.new(@stub_server_port)
-
-        StubServer.new(
-          @call_log_manager,
-          @call_conf_manager,
-          stub_marshaller
-        )
+        StubServer.new(@call_log_manager, @call_conf_manager, stub_marshaller)
       end
 
       def create_stubbed_command(command)
@@ -126,8 +122,7 @@ module Rspec
       end
 
       def add_override_for_command(command)
-        stub_function = STUB_FUNCTION_MAPPINGS[@stub_type].new(command, @stub_server_port)
-        function_override = stub_function.to_s.chomp
+        function_override = @stub_function.script(command).chomp
         @stub_wrapper.add_override(function_override)
       end
     end

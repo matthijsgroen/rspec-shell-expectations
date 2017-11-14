@@ -8,7 +8,7 @@ def execute_script(script)
       script.gsub!(/<temp file>/, temp_file.path)
     end
     stdout, stderr, status = stubbed_env.execute_function(
-      BashStubFunction.stub_path,
+      BashStubScript.path,
       script
     )
     [stdout, stderr, status]
@@ -173,7 +173,7 @@ describe 'BashStub' do
 
       it 'extracts a single value field' do
         stdout, = stubbed_env.execute_function(
-          BashStubFunction.stub_path,
+          BashStubScript.path,
           "extract-properties '#{call_conf}' 'exitcode'"
         )
         expect(stdout.chomp).to eql '10'
@@ -181,7 +181,7 @@ describe 'BashStub' do
 
       it 'extracts a multiple value field' do
         stdout, stderr = stubbed_env.execute_function(
-          BashStubFunction.stub_path,
+          BashStubScript.path,
           "extract-properties '#{call_conf}' 'outputs\\..*\\.content'"
         )
         expect(stdout.chomp).to eql "stdout\\nstdout stdout\nstderr stderr\\nstderr" \

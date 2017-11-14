@@ -2,7 +2,7 @@ require 'spec_helper'
 include Rspec::Bash
 
 describe('stubbed_env integration tests') do
-  let(:subject) { StubbedEnv.new }
+  let(:subject) { create_stubbed_env }
 
   context '#execute_inline' do
     context 'with a stubbed function' do

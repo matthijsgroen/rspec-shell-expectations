@@ -71,18 +71,17 @@ describe 'StubbedEnv' do
       stub_command
     end
     before do
-      first_command_stub_function = double(RubyStubFunction)
-      second_command_stub_function = double(RubyStubFunction)
+      stub_function = double(StubFunction)
 
-      allow(first_command_stub_function).to receive(:to_s)
+      allow(stub_function).to receive(:script)
+        .with('first_command')
         .and_return('first_command override')
-      allow(second_command_stub_function).to receive(:to_s)
+      allow(stub_function).to receive(:script)
+        .with('second_command')
         .and_return('second_command override')
 
-      allow(RubyStubFunction).to receive(:new).with('first_command', anything)
-        .and_return(first_command_stub_function)
-      allow(RubyStubFunction).to receive(:new).with('second_command', anything)
-        .and_return(second_command_stub_function)
+      allow(StubFunction).to receive(:new)
+        .and_return(stub_function)
     end
 
     it 'adds the call conf and log managers to the command' do
@@ -93,11 +92,6 @@ describe 'StubbedEnv' do
       expect(command).to equal(stub_command)
     end
     it 'adds the function override for the command to the wrapper' do
-      expect(RubyStubFunction).to receive(:new)
-        .with('first_command', server_port)
-      expect(RubyStubFunction).to receive(:new)
-        .with('second_command', server_port)
-
       expect(stub_wrapper).to receive(:add_override)
         .with('first_command override')
       expect(stub_wrapper).to receive(:add_override)
