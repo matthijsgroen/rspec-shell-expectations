@@ -99,17 +99,19 @@ describe 'BashStub' do
     end
 
     context 'with verifyable json-encode stub' do
-      before do
+      before(:all) do
+        stubbed_env = create_stubbed_env
         json_encode = stubbed_env.stub_command('json-encode')
         json_encode.outputs('json encoded', to: :stdout)
+
+        @stdout, = stubbed_env.execute_function(
+          BashStubScript.path,
+          'echo stdin | create-call-log first_command 55555 first_argument second_argument third_argument'
+        )
       end
 
-      execute_script(
-        'echo stdin | create-call-log first_command 55555 first_argument second_argument third_argument'
-      )
-
       it 'passes the stdin and args through the json-decode function' do
-        expect(stdout.chomp).to eql JSON.pretty_generate(
+        expect(@stdout.chomp).to eql JSON.pretty_generate(
           Sparsify.sparse(
             {
               command: 'first_command',
@@ -128,19 +130,27 @@ describe 'BashStub' do
 
   context '.send-to-server' do
     context 'with a server port and call log message' do
-      let!(:netcat) { stubbed_env.stub_command('nc').outputs('call conf message') }
-      execute_script 'send-to-server 55555 "call log message"'
+      before(:all) do
+        stubbed_env = create_stubbed_env
+        @netcat = stubbed_env.stub_command('nc')
+          .outputs('call conf message')
 
-      it 'calls netcat to send the message to the server port and returns its response' do
-        expect(netcat).to be_called_with_arguments('localhost', '55555')
+        @stdout, = stubbed_env.execute_function(
+          BashStubScript.path,
+          'send-to-server 55555 "call log message"'
+        )
       end
 
       it 'calls netcat to send the message to the server port and returns its response' do
-        expect(netcat.with_args('localhost', '55555').stdin).to eql 'call log message'
+        expect(@netcat).to be_called_with_arguments('localhost', '55555')
       end
 
       it 'calls netcat to send the message to the server port and returns its response' do
-        expect(stdout.chomp).to eql 'call conf message'
+        expect(@netcat.with_args('localhost', '55555').stdin).to eql 'call log message'
+      end
+
+      it 'calls netcat to send the message to the server port and returns its response' do
+        expect(@stdout.chomp).to eql 'call conf message'
       end
     end
   end
@@ -303,63 +313,67 @@ describe 'BashStub' do
 
   context '.main' do
     context 'with stdin, command, port and arguments' do
-      let!(:create_call_log) { stubbed_env.stub_command('create-call-log').outputs('call log') }
-      let!(:send_to_server) { stubbed_env.stub_command('send-to-server').outputs('call conf') }
-      let!(:extract_properties) do
-        extract_properties = stubbed_env.stub_command('extract-properties')
-        extract_properties.with_args('call conf', 'outputs\..*\.target')
-          .outputs("stdout\nstderr\ntofile\n")
-        extract_properties.with_args('call conf', 'outputs\..*\.content')
-          .outputs("std out\nstd err\nto file\n")
-        extract_properties.with_args('call conf', 'exitcode')
-          .outputs("3\n")
-        extract_properties
-      end
-      let!(:print_output) { stubbed_env.stub_command('print-output') }
+      before(:all) do
+        stubbed_env = create_stubbed_env
+        @create_call_log = stubbed_env.stub_command('create-call-log')
+          .outputs('call log')
+        @send_to_server = stubbed_env.stub_command('send-to-server')
+          .outputs('call conf')
+        @extract_properties = stubbed_env.stub_command('extract-properties')
+        @print_output = stubbed_env.stub_command('print-output')
 
-      execute_script(
-        'echo "stdin" | main first_command 55555 first_argument second_argument'
-      )
+        @extract_properties.with_args('call conf', 'outputs\..*\.target')
+          .outputs("stdout\nstderr\ntofile\n")
+        @extract_properties.with_args('call conf', 'outputs\..*\.content')
+          .outputs("std out\nstd err\nto file\n")
+        @extract_properties.with_args('call conf', 'exitcode')
+          .outputs("3\n")
+
+        _, _, @status = stubbed_env.execute_function(
+          BashStubScript.path,
+          'echo "stdin" | main first_command 55555 first_argument second_argument'
+        )
+      end
 
       it 'creates a call log from the stdin and args' do
-        expect(create_call_log).to be_called_with_arguments(
+        expect(@create_call_log).to be_called_with_arguments(
           'first_command', '55555', 'first_argument', 'second_argument'
         )
-        expect(create_call_log.stdin.chomp).to eql 'stdin'
+        expect(@create_call_log.stdin.chomp).to eql 'stdin'
       end
       it 'sends that call log to the server' do
-        expect(send_to_server).to be_called_with_arguments(
+        expect(@send_to_server).to be_called_with_arguments(
           '55555', 'call log'
         )
       end
       it 'extracts the target list from the call conf returned by the server' do
-        expect(extract_properties).to be_called_with_arguments(
+        expect(@extract_properties).to be_called_with_arguments(
           'call conf', 'outputs\..*\.target'
         )
       end
       it 'extracts the content list from the call conf returned by the server' do
-        expect(extract_properties).to be_called_with_arguments(
+        expect(@extract_properties).to be_called_with_arguments(
           'call conf', 'outputs\..*\.content'
         )
       end
       it 'extracts the exit code from the call conf returned by the server' do
-        expect(extract_properties).to be_called_with_arguments(
+        expect(@extract_properties).to be_called_with_arguments(
           'call conf', 'exitcode'
         )
       end
       it 'prints the extracted outputs' do
-        expect(print_output).to be_called_with_arguments(
+        expect(@print_output).to be_called_with_arguments(
           'stdout', 'std out'
         )
-        expect(print_output).to be_called_with_arguments(
+        expect(@print_output).to be_called_with_arguments(
           'stderr', 'std err'
         )
-        expect(print_output).to be_called_with_arguments(
+        expect(@print_output).to be_called_with_arguments(
           'tofile', 'to file'
         )
       end
       it 'exits with the extracted exit code' do
-        expect(exitcode).to eql 3
+        expect(@status.exitstatus).to eql 3
       end
     end
   end
