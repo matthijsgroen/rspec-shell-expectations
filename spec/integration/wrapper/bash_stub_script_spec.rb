@@ -42,14 +42,14 @@ describe 'BashStub' do
       end
     end
     context 'with stdin and no arguments' do
-      execute_script "echo 'st d\nin' | create-call-log first_command 55555"
+      execute_script "echo -e '\\nst d\nin' | create-call-log first_command 55555"
 
       it 'makes a call log with just the name and stdin set to supplied stdin' do
         expect(stdout.chomp).to eql JSON.pretty_generate(
           Sparsify.sparse(
             {
               command: 'first_command',
-              stdin: "st d\nin"
+              stdin: "\nst d\nin\n"
             }, sparse_array: true
           ), indent: '', space: ''
         )
@@ -57,7 +57,7 @@ describe 'BashStub' do
     end
     context 'with arguments and no stdin' do
       execute_script 'create-call-log first_command 55555' \
-      " first_argument 'second argument' 'third\nargument'"
+      " first_argument 'second argument' '\nthird\nargument\n'"
 
       it 'makes a call log with the name, stdin set to blank, and the supplied arguments' do
         expect(stdout.chomp).to eql JSON.pretty_generate(
@@ -68,7 +68,7 @@ describe 'BashStub' do
               args: [
                 'first_argument',
                 'second argument',
-                "third\nargument"
+                "\nthird\nargument\n"
               ]
             }, sparse_array: true
           ), indent: '', space: ''
@@ -78,7 +78,7 @@ describe 'BashStub' do
     context 'with arguments and stdin' do
       execute_script(
         "echo 'st d\nin' | create-call-log first_command 55555" \
-        " first_argument 'second argument' 'third\nargument'"
+        " first_argument 'second argument' '\nthird\nargument\n'"
       )
 
       it 'makes a call log with the name, stdin set to supplied stdn, and the supplied arguments' do
@@ -86,11 +86,11 @@ describe 'BashStub' do
           Sparsify.sparse(
             {
               command: 'first_command',
-              stdin: "st d\nin",
+              stdin: "st d\nin\n",
               args: [
                 'first_argument',
                 'second argument',
-                "third\nargument"
+                "\nthird\nargument\n"
               ]
             }, sparse_array: true
           ), indent: '', space: ''
@@ -202,34 +202,34 @@ describe 'BashStub' do
 
   context '.print-output' do
     context 'given a stdout target and its associated content' do
-      execute_script("print-output 'stdout' 'stdout \\\\nstdout\nstdout'")
+      execute_script("print-output 'stdout' '\\nstdout \\\\nstdout\nstdout\\n'")
 
       it 'prints the output to stdout' do
-        expect(stdout.chomp).to eql "stdout \\nstdout\nstdout"
+        expect(stdout).to eql "\nstdout \\nstdout\nstdout\n"
       end
 
       it 'does not print the output to stderr' do
-        expect(stderr.chomp).to eql ''
+        expect(stderr).to eql ''
       end
     end
 
     context 'given a stderr target and its associated content' do
-      execute_script("print-output 'stderr' 'stderr \\\\nstderr\nstderr'")
+      execute_script("print-output 'stderr' '\\nstderr \\\\nstderr\nstderr\\n'")
 
       it 'prints the output to stderr' do
-        expect(stderr.chomp).to eql "stderr \\nstderr\nstderr"
+        expect(stderr).to eql "\nstderr \\nstderr\nstderr\n"
       end
 
       it 'does not print the output to stdout' do
-        expect(stdout.chomp).to eql ''
+        expect(stdout).to eql ''
       end
     end
 
     context 'given a file target (anything but stderr or stdout)' do
-      execute_script "print-output '<temp file>' 'tofile \\\\ntofile\ntofile'"
+      execute_script "print-output '<temp file>' '\\ntofile \\\\ntofile\ntofile\\n'"
 
       it 'prints the output to the file' do
-        expect(temp_file.read.chomp).to eql "tofile \\ntofile\ntofile"
+        expect(temp_file.read).to eql "\ntofile \\ntofile\ntofile\n"
       end
 
       it 'does not print the output to stderr' do
@@ -261,10 +261,10 @@ describe 'BashStub' do
       end
     end
     context 'with a new line character' do
-      execute_script "json-encode 'cat\ndog\n'"
+      execute_script "json-encode '\ncat\ndog\n'"
 
       it 'converts \n to escaped \n' do
-        expect(stdout.chomp).to eql 'cat\ndog\n'
+        expect(stdout.chomp).to eql '\ncat\ndog\n'
       end
     end
     context 'with a tab character' do
@@ -325,7 +325,7 @@ describe 'BashStub' do
         @extract_properties.with_args('call conf', 'outputs\..*\.target')
           .outputs("stdout\nstderr\ntofile\n")
         @extract_properties.with_args('call conf', 'outputs\..*\.content')
-          .outputs("std out\nstd err\nto file\n")
+          .outputs("\\nstd out\\n\n\\nstd err\\n\n\\nto file\\n\n")
         @extract_properties.with_args('call conf', 'exitcode')
           .outputs("3\n")
 
@@ -361,15 +361,15 @@ describe 'BashStub' do
           'call conf', 'exitcode'
         )
       end
-      it 'prints the extracted outputs' do
+      it 'prints the extracted outputs (with newlines still escaped)' do
         expect(@print_output).to be_called_with_arguments(
-          'stdout', 'std out'
+          'stdout', '\nstd out\n'
         )
         expect(@print_output).to be_called_with_arguments(
-          'stderr', 'std err'
+          'stderr', '\nstd err\n'
         )
         expect(@print_output).to be_called_with_arguments(
-          'tofile', 'to file'
+          'tofile', '\nto file\n'
         )
       end
       it 'exits with the extracted exit code' do

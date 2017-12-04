@@ -10,7 +10,7 @@ describe 'CallLog' do
       before(:each) do
         stubbed_env.execute_inline(
           <<-multiline_script
-              first_command first_argument second_argument
+              first_command first_argument '\nsecond_argument\n'
               first_command first_argument second_argument third_argument
         multiline_script
         )
@@ -25,7 +25,7 @@ describe 'CallLog' do
       end
 
       it 'matches for exact matches' do
-        expect(first_command).to be_called_with_arguments('first_argument', 'second_argument')
+        expect(first_command).to be_called_with_arguments('first_argument', "\nsecond_argument\n")
       end
 
       it 'matches for anything matches' do
@@ -55,7 +55,9 @@ Expected Calls:
 first_command not_first_argument second_argument
 
 Actual Calls:
-first_command first_argument second_argument
+first_command first_argument 
+second_argument
+
 first_command first_argument second_argument third_argument
           multiline_string
           expect(rex.message).to eql expected_error_string

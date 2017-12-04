@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 function json-encode {
-  echo -n "${1}." |
+  echo -n ".${1}." |
     awk '
       BEGIN {RS=""}
       {
@@ -10,7 +10,7 @@ function json-encode {
         gsub(/\r/, "\\r")
         gsub(/\b/, "\\b")
         gsub(/\n/, "\\n")
-        print substr($0, 1, length($0)-1)
+        print substr($0, 2, length($0)-2)
       }
     '
 }
@@ -28,14 +28,14 @@ function json-decode {
 function create-call-log {
   command_name=${1}; shift
   command_port=${1}; shift
-  raw_stdin=$([[ -t 0 ]] && echo -n '' || cat -)
+  raw_stdin=$([[ -t 0 ]] && echo -n '' || cat -; ret=$?; echo .; exit "$ret")
 
   argument_list=( "${@}" )
   command=$(
     echo "\"command\":\"${command_name}\","
   )
   stdin=$(
-    echo "\"stdin\":\"$(json-encode "${raw_stdin}")\","
+    echo "\"stdin\":\"$(json-encode "${raw_stdin%.}")\","
   )
   arguments=$(
     for index in "${!argument_list[@]}"; do

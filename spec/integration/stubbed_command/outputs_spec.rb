@@ -10,26 +10,26 @@ describe 'StubbedCommand' do
       context 'when given no arguments to match' do
         let(:output) do
           command1_stub
-            .outputs('hello', to: :stdout)
+            .outputs("\nhello\n", to: :stdout)
           output, = stubbed_env.execute_inline('command1 first_argument second_argument')
           output
         end
 
         it 'outputs the expected output to stdout' do
-          expect(output).to eql 'hello'
+          expect(output).to eql "\nhello\n"
         end
       end
       context 'when given an exact argument match' do
         let(:output) do
           command1_stub
             .with_args('first_argument', 'second_argument')
-            .outputs('hello', to: :stdout)
+            .outputs("\nhello\n", to: :stdout)
           output, = stubbed_env.execute_inline('command1 first_argument second_argument')
           output
         end
 
         it 'outputs the expected output to stdout' do
-          expect(output).to eql 'hello'
+          expect(output).to eql "\nhello\n"
         end
       end
       context 'when given an anything argument match' do
@@ -91,26 +91,26 @@ describe 'StubbedCommand' do
       context 'when given no arguments to match' do
         let(:error) do
           command1_stub
-            .outputs('hello', to: :stderr)
+            .outputs("\nhello\n", to: :stderr)
           _, error, = stubbed_env.execute_inline('command1 first_argument second_argument')
           error
         end
 
         it 'outputs the expected error to stderr' do
-          expect(error).to eql "hello\n"
+          expect(error).to eql "\nhello\n"
         end
       end
       context 'when given an exact argument match' do
         let(:error) do
           command1_stub
             .with_args('first_argument', 'second_argument')
-            .outputs('hello', to: :stderr)
+            .outputs("\nhello\n", to: :stderr)
           _, error, = stubbed_env.execute_inline('command1 first_argument second_argument')
           error
         end
 
         it 'outputs the expected error to stderr' do
-          expect(error).to eql "hello\n"
+          expect(error).to eql "\nhello\n"
         end
       end
       context 'when given an anything argument match' do
@@ -172,24 +172,24 @@ describe 'StubbedCommand' do
       context 'when given no arguments to match' do
         before(:each) do
           command1_stub
-            .outputs('hello', to: temp_file.path)
+            .outputs("\nhello\n", to: temp_file.path)
           stubbed_env.execute_inline('command1 first_argument second_argument')
         end
 
         it 'outputs the expected content to the file' do
-          expect(temp_file.read).to eql 'hello'
+          expect(temp_file.read).to eql "\nhello\n"
         end
       end
       context 'when given an exact argument match' do
         before(:each) do
           command1_stub
             .with_args('first_argument', 'second_argument')
-            .outputs('hello', to: temp_file.path)
+            .outputs("\nhello\n", to: temp_file.path)
           stubbed_env.execute_inline('command1 first_argument second_argument')
         end
 
         it 'outputs the expected content to the file' do
-          expect(temp_file.read).to eql 'hello'
+          expect(temp_file.read).to eql "\nhello\n"
         end
       end
       context 'when given an anything argument match' do
