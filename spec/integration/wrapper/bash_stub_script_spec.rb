@@ -261,10 +261,10 @@ describe 'BashStub' do
       end
     end
     context 'with a new line character' do
-      execute_script "json-encode '\n'"
+      execute_script "json-encode 'cat\ndog\n'"
 
       it 'converts \n to escaped \n' do
-        expect(stdout.chomp).to eql '\n'
+        expect(stdout.chomp).to eql 'cat\ndog\n'
       end
     end
     context 'with a tab character' do

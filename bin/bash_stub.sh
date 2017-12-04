@@ -1,21 +1,28 @@
 #!/usr/bin/env bash
 function json-encode {
-  echo "${1}" |
-    sed -r \
-      -e 's/(\"|\\)/\\\1/g' \
-      -e 's/\t/\\t/g' \
-      -e 's/\r/\\r/g' \
-      -e 's/\x08/\\b/g' |
-    sed -r \
-      -e ':a' \
-      -e 'N' \
-      -e '$!ba' \
-      -e 's/\n/\\n/g'
+  echo -n "${1}." |
+    awk '
+      BEGIN {RS=""}
+      {
+        gsub(/\\/, "\\\\")
+        gsub(/\"/, "\\\"")
+        gsub(/\t/, "\\t")
+        gsub(/\r/, "\\r")
+        gsub(/\b/, "\\b")
+        gsub(/\n/, "\\n")
+        print substr($0, 1, length($0)-1)
+      }
+    '
 }
 
 function json-decode {
-  echo "${1}" | sed -r \
-    -e 's/\\"/"/g'
+  echo "${1}" |
+    awk '
+      {
+        gsub(/\\"/, "\"")
+        print $0
+      }
+    '
 }
 
 function create-call-log {
@@ -39,8 +46,8 @@ function create-call-log {
 
   echo "{"
   echo "${command}"
-  [[ -n "${arguments}" ]] && echo "${stdin}" || echo "${stdin:0:-1}"
-  [[ -n "${arguments}" ]] && echo "${arguments:0:-1}"
+  [[ -n "${arguments}" ]] && echo "${stdin}" || echo "${stdin%,}"
+  [[ -n "${arguments}" ]] && echo "${arguments%,}"
   echo "}"
 }
 
@@ -49,7 +56,7 @@ function send-to-server {
 }
 
 function extract-properties {
-  echo "${1}" | sed -rn "s/^\"${2}\":\"?([^,\"]*)\"?,?$/\1/gp"
+  echo "${1}" | sed -En "s/^\"${2}\":\"?([^,\"]*)\"?,?$/\1/gp"
 }
 
 function print-output {

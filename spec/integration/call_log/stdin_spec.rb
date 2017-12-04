@@ -1,7 +1,7 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'CallLog' do
-  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   let!(:first_command) { stubbed_env.stub_command('first_command') }
 
