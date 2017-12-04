@@ -2,8 +2,6 @@ require 'tmpdir'
 require 'English'
 require 'open3'
 
-# TODO: make all tests more consistent
-# TODO: clean up tests you touched
 # TODO: get ruby stub tests trued up to what is in bash stub tests
 # TODO: enforce the nil call log args that just kind of works for bash stub
 # TODO: look into converting wrapper to not use ERB

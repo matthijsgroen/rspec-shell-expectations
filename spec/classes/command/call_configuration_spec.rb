@@ -1,13 +1,11 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'CallConfiguration' do
-  let(:stubbed_env) { create_stubbed_env }
-  include Rspec::Bash
+  subject { Rspec::Bash::CallConfiguration.new }
 
   context '#set_exitcode' do
     context 'with any setup' do
-      subject { Rspec::Bash::CallConfiguration.new }
-
       context 'with no existing configuration' do
         let(:expected_conf) do
           [
@@ -40,7 +38,7 @@ describe 'CallConfiguration' do
             }
           ]
         end
-        before(:each) do
+        before do
           subject.call_configuration = [
             {
               args: %w(first_argument),
@@ -64,7 +62,7 @@ describe 'CallConfiguration' do
             }
           ]
         end
-        before(:each) do
+        before do
           subject.call_configuration = [
             {
               args: %w(first_argument second_argument),
@@ -83,8 +81,6 @@ describe 'CallConfiguration' do
   end
   context '#add_output' do
     context 'with any setup' do
-      subject { Rspec::Bash::CallConfiguration.new }
-
       context 'with no existing configuration' do
         let(:expected_conf) do
           [
@@ -130,7 +126,7 @@ describe 'CallConfiguration' do
             }
           ]
         end
-        before(:each) do
+        before do
           subject.call_configuration = [
             {
               args: %w(first_argument),
@@ -169,7 +165,7 @@ describe 'CallConfiguration' do
             }
           ]
         end
-        before(:each) do
+        before do
           subject.call_configuration = [
             {
               args: %w(first_argument second_argument),
@@ -192,8 +188,6 @@ describe 'CallConfiguration' do
   end
   context '#get_best_call_conf' do
     context 'with any setup' do
-      subject { Rspec::Bash::CallConfiguration.new }
-
       context 'with no existing configuration' do
         it 'updates the status code conf for the arguments passed in' do
           call_conf = subject.get_best_call_conf(%w(first_argument second_argument))
@@ -201,7 +195,7 @@ describe 'CallConfiguration' do
         end
       end
       context 'with an existing, non-matching configuration' do
-        before(:each) do
+        before do
           subject.call_configuration = [
             {
               args: %w(first_argument),
@@ -225,7 +219,7 @@ describe 'CallConfiguration' do
             ]
           }
         end
-        before(:each) do
+        before do
           subject.call_configuration = [
             {
               args: %w(first_argument second_argument),

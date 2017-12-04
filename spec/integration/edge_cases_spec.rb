@@ -3,6 +3,7 @@ include Rspec::Bash
 
 describe 'scenarios where performance improvements break things' do
   let(:stubbed_env) { create_stubbed_env }
+
   context 'weird case where a docker flag argument gets removed' do
     let!(:docker) { stubbed_env.stub_command('docker') }
     before do
@@ -12,8 +13,8 @@ describe 'scenarios where performance improvements break things' do
             -i \
             --env HADOOP_USER_NAME \
             --env CLIENT_CONF_URL \
-            registry.cloud.cas.org/cdh/hadoop-client:5.7.0_2 \
-            hadoop fs -test -e  hdfs:///sf-ops/sfn/builds/_LAST_COMPILED
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+            hadoop fs -test -e  hdfs:///xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         multiline_script
       )
     end
@@ -22,12 +23,10 @@ describe 'scenarios where performance improvements break things' do
         'run',
         '--rm',
         '-i',
-        '--env',
-        'HADOOP_USER_NAME',
-        '--env',
-        'CLIENT_CONF_URL',
-        'registry.cloud.cas.org/cdh/hadoop-client:5.7.0_2',
-        'hadoop', 'fs', '-test', '-e', 'hdfs:///sf-ops/sfn/builds/_LAST_COMPILED'
+        '--env', 'HADOOP_USER_NAME',
+        '--env', 'CLIENT_CONF_URL',
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        'hadoop', 'fs', '-test', '-e', 'hdfs:///xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
       )
     end
   end

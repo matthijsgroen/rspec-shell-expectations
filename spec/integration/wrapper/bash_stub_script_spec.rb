@@ -28,8 +28,9 @@ describe 'BashStub' do
 
   context '.create-call-log' do
     context 'with no stdin or arguments' do
-      execute_script 'create-call-log first_command 55555'
-
+      execute_script(
+        'create-call-log first_command 55555'
+      )
       it 'makes a call log with just the name and stdin set to blank' do
         expect(stdout.chomp).to eql JSON.pretty_generate(
           Sparsify.sparse(
@@ -42,7 +43,9 @@ describe 'BashStub' do
       end
     end
     context 'with stdin and no arguments' do
-      execute_script "echo -e '\\nst d\nin' | create-call-log first_command 55555"
+      execute_script(
+        "echo -e '\\nst d\nin' | create-call-log first_command 55555"
+      )
 
       it 'makes a call log with just the name and stdin set to supplied stdin' do
         expect(stdout.chomp).to eql JSON.pretty_generate(
@@ -56,8 +59,9 @@ describe 'BashStub' do
       end
     end
     context 'with arguments and no stdin' do
-      execute_script 'create-call-log first_command 55555' \
-      " first_argument 'second argument' '\nthird\nargument\n'"
+      execute_script(
+        "create-call-log first_command 55555 first_argument 'second argument' '\nthird\nargument\n'"
+      )
 
       it 'makes a call log with the name, stdin set to blank, and the supplied arguments' do
         expect(stdout.chomp).to eql JSON.pretty_generate(
@@ -76,9 +80,10 @@ describe 'BashStub' do
       end
     end
     context 'with arguments and stdin' do
-      execute_script(
-        "echo 'st d\nin' | create-call-log first_command 55555" \
-        " first_argument 'second argument' '\nthird\nargument\n'"
+      execute_script(<<-multiline_script
+        echo 'st d\nin' | \
+          create-call-log first_command 55555 first_argument 'second argument' '\nthird\nargument\n'
+      multiline_script
       )
 
       it 'makes a call log with the name, stdin set to supplied stdn, and the supplied arguments' do
@@ -226,7 +231,7 @@ describe 'BashStub' do
     end
 
     context 'given a file target (anything but stderr or stdout)' do
-      execute_script "print-output '<temp file>' '\\ntofile \\\\ntofile\ntofile\\n'"
+      execute_script("print-output '<temp file>' '\\ntofile \\\\ntofile\ntofile\\n'")
 
       it 'prints the output to the file' do
         expect(temp_file.read).to eql "\ntofile \\ntofile\ntofile\n"
@@ -244,7 +249,7 @@ describe 'BashStub' do
 
   context '.json-decode' do
     context 'with an encoded quotation mark' do
-      execute_script 'json-decode "\\\\\\""'
+      execute_script('json-decode "\\\\\\""')
 
       it 'converts \" to "' do
         expect(stdout.chomp).to eql '"'
@@ -254,56 +259,56 @@ describe 'BashStub' do
 
   context '.json-encode' do
     context 'with a quotation mark' do
-      execute_script 'json-encode "\""'
+      execute_script('json-encode "\""')
 
       it 'converts " to \"' do
         expect(stdout.chomp).to eql '\"'
       end
     end
     context 'with a new line character' do
-      execute_script "json-encode '\ncat\ndog\n'"
+      execute_script("json-encode '\ncat\ndog\n'")
 
       it 'converts \n to escaped \n' do
         expect(stdout.chomp).to eql '\ncat\ndog\n'
       end
     end
     context 'with a tab character' do
-      execute_script "json-encode '\t'"
+      execute_script("json-encode '\t'")
 
       it 'converts \t to escaped \t' do
         expect(stdout.chomp).to eql '\t'
       end
     end
     context 'with a carriage return character' do
-      execute_script "json-encode '\r'"
+      execute_script("json-encode '\r'")
 
       it 'converts \r to escaped \r' do
         expect(stdout.chomp).to eql '\r'
       end
     end
     context 'with a backspace character' do
-      execute_script "json-encode '\b'"
+      execute_script("json-encode '\b'")
 
       it 'converts \r to escaped \r' do
         expect(stdout.chomp).to eql '\b'
       end
     end
     context 'with a unicode character' do
-      execute_script 'json-encode "@"'
+      execute_script('json-encode "@"')
 
       it 'does not convert the character' do
         expect(stdout.chomp).to eql '@'
       end
     end
     context 'with a forward slash character' do
-      execute_script 'json-encode "/"'
+      execute_script('json-encode "/"')
 
       it 'does not convert the character' do
         expect(stdout.chomp).to eql '/'
       end
     end
     context 'with an escaped character' do
-      execute_script 'json-encode "\u"'
+      execute_script('json-encode "\u"')
 
       it 'converts \u to \\u' do
         expect(stdout.chomp).to eql '\\\\u'

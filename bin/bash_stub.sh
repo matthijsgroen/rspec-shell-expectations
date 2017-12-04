@@ -16,7 +16,7 @@ function json-encode {
 }
 
 function json-decode {
-  echo "${1}" |
+  echo -n "${1}" |
     awk '
       {
         gsub(/\\"/, "\"")
@@ -56,7 +56,7 @@ function send-to-server {
 }
 
 function extract-properties {
-  echo "${1}" | sed -En "s/^\"${2}\":\"?([^,\"]*)\"?,?$/\1/gp"
+  echo -n "${1}" | sed -En "s/^\"${2}\":\"?([^,\"]*)\"?,?$/\1/gp"
 }
 
 function print-output {
