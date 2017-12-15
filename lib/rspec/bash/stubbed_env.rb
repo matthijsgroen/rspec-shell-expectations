@@ -110,9 +110,9 @@ module Rspec
       end
 
       def check_if_command_is_allowed(command)
-        if DISALLOWED_COMMANDS.include? command
-          raise("Not able to stub command #{command}. Reserved for use by test wrapper.")
-        end
+        error_message = "Not able to stub command #{command}. Reserved for use by test wrapper."
+
+        raise(error_message) if DISALLOWED_COMMANDS.include? command
       end
 
       def add_override_for_command(command)

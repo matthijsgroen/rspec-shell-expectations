@@ -7,7 +7,8 @@ describe 'scenarios where performance improvements break things' do
   context 'weird case where a docker flag argument gets removed' do
     let!(:docker) { stubbed_env.stub_command('docker') }
     before do
-      stubbed_env.execute_inline(<<-multiline_script
+      stubbed_env.execute_inline(
+        <<-multiline_script
           docker run \
             --rm \
             -i \

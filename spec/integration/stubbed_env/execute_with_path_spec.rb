@@ -12,7 +12,6 @@ describe 'StubbedEnv' do
       end
 
       context 'with stubbed environment' do
-
         it 'exits with an error' do
           subject.execute_inline 'command1 "foo bar" 2>&1'
           expect($CHILD_STATUS.exitstatus).not_to eq 0

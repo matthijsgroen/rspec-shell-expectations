@@ -144,7 +144,6 @@ describe 'CallConfiguration' do
           subject.add_output('new_content', :stderr, %w(first_argument second_argument))
           expect(subject.call_configuration).to eql expected_conf
         end
-
       end
       context 'with an existing, matching configuration' do
         let(:expected_conf) do

@@ -87,11 +87,9 @@ describe 'StubServer' do
       allow(call_conf_manager).to receive(:get_best_call_conf)
         .with('first_command', %w(first_argument second_argument))
         .and_return(
-          {
-            args:     %w(first_argument second_argument),
-            exitcode: 0,
-            outputs:  []
-          }
+          args:     %w(first_argument second_argument),
+          exitcode: 0,
+          outputs:  []
         )
     end
 
@@ -99,24 +97,25 @@ describe 'StubServer' do
       expect(call_log_manager).to receive(:add_log)
         .with('first_command', 'stdin', %w(first_argument second_argument))
 
-      subject.process_stub_call({
+      subject.process_stub_call(
         command: 'first_command',
         stdin:   'stdin',
         args:    %w(first_argument second_argument)
-      })
+      )
     end
 
     it 'returns the best matching call configuration for the command' do
-      expect(subject.process_stub_call({
-        command: 'first_command',
-        stdin:   'stdin',
-        args:    %w(first_argument second_argument)
-      })).to eql(
-        {
-          args:     %w(first_argument second_argument),
-          exitcode: 0,
-          outputs:  []
-        })
+      expect(
+        subject.process_stub_call(
+          command: 'first_command',
+          stdin:   'stdin',
+          args:    %w(first_argument second_argument)
+        )
+      ).to eql(
+        args:     %w(first_argument second_argument),
+        exitcode: 0,
+        outputs:  []
+      )
     end
   end
 end

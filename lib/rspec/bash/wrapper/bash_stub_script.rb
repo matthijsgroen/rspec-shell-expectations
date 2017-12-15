@@ -13,4 +13,3 @@ module Rspec
     end
   end
 end
-

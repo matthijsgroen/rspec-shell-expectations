@@ -30,8 +30,12 @@ module Rspec
       end
 
       def cleanup
-        FileUtils.remove_entry_secure wrapper_output_path if Pathname.new(wrapper_output_path).exist?
-        FileUtils.remove_entry_secure stderr_output_path if Pathname.new(stderr_output_path).exist?
+        remove_file_system_path wrapper_output_path
+        remove_file_system_path stderr_output_path
+      end
+
+      def remove_file_system_path(path)
+        FileUtils.remove_entry_secure(path) if Pathname.new(path).exist?
       end
 
       def add_override(override)

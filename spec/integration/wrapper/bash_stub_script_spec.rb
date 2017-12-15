@@ -3,24 +3,22 @@ include Rspec::Bash
 
 def execute_script(script)
   let(:temp_file) { Tempfile.new('for-testing') }
-  let!(:execute_results) do
-    if script.include? '<temp file>'
-      script.gsub!(/<temp file>/, temp_file.path)
-    end
-    stdout, stderr, status = stubbed_env.execute_function(
-      BashStubScript.path,
-      script
-    )
-    [stdout, stderr, status]
+
+  capture_standard_streams script
+
+  after do
+    FileUtils.remove_entry_secure temp_file if script.include? '<temp file>'
   end
+end
+
+def capture_standard_streams(script)
+  let!(:execute_results) do
+    script.gsub!(/<temp file>/, temp_file.path) if script.include? '<temp file>'
+    stubbed_env.execute_function(BashStubScript.path, script)
+  end
+
   let(:stdout) { execute_results[0] }
   let(:stderr) { execute_results[1] }
-  let(:exitcode) { execute_results[2].exitstatus }
-  after do
-    if script.include? '<temp file>'
-      FileUtils.remove_entry_secure temp_file
-    end
-  end
 end
 
 describe 'BashStub' do
@@ -80,10 +78,11 @@ describe 'BashStub' do
       end
     end
     context 'with arguments and stdin' do
-      execute_script(<<-multiline_script
-        echo 'st d\nin' | \
-          create-call-log first_command 55555 first_argument 'second argument' '\nthird\nargument\n'
-      multiline_script
+      execute_script(
+        <<-multiline_script
+          echo 'st d\nin' | \
+            create-call-log first_command 55555 first_argument 'second argument' '\nthird\nargument\n'
+        multiline_script
       )
 
       it 'makes a call log with the name, stdin set to supplied stdn, and the supplied arguments' do
@@ -108,10 +107,11 @@ describe 'BashStub' do
         stubbed_env = create_stubbed_env
         json_encode = stubbed_env.stub_command('json-encode')
         json_encode.outputs('json encoded', to: :stdout)
+        command = 'first_command 55555 first_argument second_argument third_argument'
 
         @stdout, = stubbed_env.execute_function(
           BashStubScript.path,
-          'echo stdin | create-call-log first_command 55555 first_argument second_argument third_argument'
+          "echo stdin | create-call-log #{command}"
         )
       end
 
@@ -137,8 +137,7 @@ describe 'BashStub' do
     context 'with a server port and call log message' do
       before(:all) do
         stubbed_env = create_stubbed_env
-        @netcat = stubbed_env.stub_command('nc')
-          .outputs('call conf message')
+        @netcat = stubbed_env.stub_command('nc').outputs('call conf message')
 
         @stdout, = stubbed_env.execute_function(
           BashStubScript.path,
@@ -195,7 +194,7 @@ describe 'BashStub' do
       end
 
       it 'extracts a multiple value field' do
-        stdout, stderr = stubbed_env.execute_function(
+        stdout, _stderr = stubbed_env.execute_function(
           BashStubScript.path,
           "extract-properties '#{call_conf}' 'outputs\\..*\\.content'"
         )
@@ -320,19 +319,18 @@ describe 'BashStub' do
     context 'with stdin, command, port and arguments' do
       before(:all) do
         stubbed_env = create_stubbed_env
-        @create_call_log = stubbed_env.stub_command('create-call-log')
-          .outputs('call log')
-        @send_to_server = stubbed_env.stub_command('send-to-server')
-          .outputs('call conf')
+        @create_call_log = stubbed_env.stub_command('create-call-log').outputs('call log')
+        @send_to_server = stubbed_env.stub_command('send-to-server').outputs('call conf')
         @extract_properties = stubbed_env.stub_command('extract-properties')
         @print_output = stubbed_env.stub_command('print-output')
 
-        @extract_properties.with_args('call conf', 'outputs\..*\.target')
+        @extract_properties
+          .with_args('call conf', 'outputs\..*\.target')
           .outputs("stdout\nstderr\ntofile\n")
-        @extract_properties.with_args('call conf', 'outputs\..*\.content')
+        @extract_properties
+          .with_args('call conf', 'outputs\..*\.content')
           .outputs("\\nstd out\\n\n\\nstd err\\n\n\\nto file\\n\n")
-        @extract_properties.with_args('call conf', 'exitcode')
-          .outputs("3\n")
+        @extract_properties.with_args('call conf', 'exitcode').outputs("3\n")
 
         _, _, @status = stubbed_env.execute_function(
           BashStubScript.path,

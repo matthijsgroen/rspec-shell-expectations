@@ -24,10 +24,10 @@ describe 'BashStubMarshaller' do
   context '#marshal' do
     before do
       allow(Sparsify).to receive(:sparse)
-        .with({message: { child: 'unmarshalled' }}, sparse_array: true)
+        .with({ message: { child: 'unmarshalled' } }, sparse_array: true)
         .and_return(:'message.child' => 'unmarshalled')
       allow(JSON).to receive(:pretty_generate)
-        .with({:'message.child' => 'unmarshalled'}, indent: '', space: '')
+        .with({ :'message.child' => 'unmarshalled' }, indent: '', space: '')
         .and_return("{\n\"message.child\":\"unmarshalled\"\n}")
     end
     it 'uses the JSON and sparsify libraries to flatten the data' do

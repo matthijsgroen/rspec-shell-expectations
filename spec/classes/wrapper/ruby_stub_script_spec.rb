@@ -132,22 +132,22 @@ describe 'RubyStubFunction' do
   context 'with some configuration (logging and output)' do
     before do
       stdout_configuration = {
-          args: [],
-          outputs: [
-              {
-                  target: :stderr,
-                  content: "stderr\n"
-              },
-              {
-                  target: :stdout,
-                  content: "stdout\n"
-              },
-              {
-                  target: 'tofile',
-                  content: "tofile\n"
-              }
-          ],
-          exitcode: 8
+        args: [],
+        outputs: [
+          {
+            target: :stderr,
+            content: "stderr\n"
+          },
+          {
+            target: :stdout,
+            content: "stdout\n"
+          },
+          {
+            target: 'tofile',
+            content: "tofile\n"
+          }
+        ],
+        exitcode: 8
       }
       allow(stub_socket).to receive(:read).and_return(Marshal.dump(stdout_configuration))
       allow($stdin).to receive(:read).and_return('')
@@ -161,7 +161,15 @@ describe 'RubyStubFunction' do
       ARGV.replace ['first_command', 55_555, 'first_argument', 'second_argument', 'third_argument']
       safe_load_subject
 
-      ARGV.replace ['first_command', 55_555, 'first_argument', 'second_argument', 'third_argument', 'fourth_argument']
+      ARGV.replace [
+        'first_command',
+        55_555,
+        'first_argument',
+        'second_argument',
+        'third_argument',
+        'fourth_argument'
+      ]
+
       safe_load_subject
     end
 

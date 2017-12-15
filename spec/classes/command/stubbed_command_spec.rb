@@ -30,7 +30,11 @@ describe 'StubbedCommand' do
 
   context '#call_count' do
     it 'returns value returned from call_log argument count when there are no arguments' do
-      expect(call_log_manager).to receive(:call_count).with('command', []).and_return('arbitrary return value')
+      expect(call_log_manager).to(
+        receive(:call_count)
+          .with('command', [])
+          .and_return('arbitrary return value')
+      )
 
       expect(subject.call_count).to eql 'arbitrary return value'
     end
@@ -86,12 +90,22 @@ describe 'StubbedCommand' do
 
   context '#outputs' do
     it 'sets the output on the call_configuration' do
-      expect(call_conf_manager).to receive(:add_output).with('command', 'contents', 'stderr', anything)
+      expect(call_conf_manager).to receive(:add_output).with(
+        'command',
+        'contents',
+        'stderr',
+        anything
+      )
 
       subject.outputs('contents', to: 'stderr')
     end
     it 'sets the "to" value for the output to stdout by default' do
-      expect(call_conf_manager).to receive(:add_output).with('command', 'contents', :stdout, anything)
+      expect(call_conf_manager).to receive(:add_output).with(
+        'command',
+        'contents',
+        :stdout,
+        anything
+      )
 
       subject.outputs('contents')
     end

@@ -37,34 +37,32 @@ describe 'CallConfigurationManager' do
       it 'passes the query along to the correct CallConfiguration' do
         allow(first_command_call_conf).to receive(:get_best_call_conf)
           .with(%w(first_argument second_argument))
-          .and_return({
+          .and_return(
             args:     %w(first_argument second_argument),
             exitcode: 0,
             outputs:  []
-          }).once
+          ).once
         allow(first_command_call_conf).to receive(:get_best_call_conf)
           .with(%w(first_argument other_argument))
-          .and_return({
+          .and_return(
             args:     %w(first_argument other_argument),
             exitcode: 1,
             outputs:  []
-          }).once
+          ).once
 
         expect(subject.get_best_call_conf('first_command', %w(first_argument second_argument)))
-          .to eql({
+          .to eql(
             args:     %w(first_argument second_argument),
             exitcode: 0,
             outputs:  []
-          })
+          )
         expect(subject.get_best_call_conf('first_command', %w(first_argument other_argument)))
-          .to eql({
+          .to eql(
             args:     %w(first_argument other_argument),
             exitcode: 1,
             outputs:  []
-          })
+          )
       end
     end
   end
 end
-
-
