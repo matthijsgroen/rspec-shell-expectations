@@ -44,6 +44,7 @@ describe 'CallLog' do
         expect(first_command).to be_called_with_arguments(/f..st_argument/, /se..nd_argument/)
       end
 
+      # rubocop:disable TrailingWhitespace
       it 'displays the diff between what was called and what was expected' do
         begin
           expect(first_command).to be_called_with_arguments('not_first_argument', 'second_argument')
@@ -63,6 +64,7 @@ first_command first_argument second_argument third_argument
           expect(rex.message).to eql expected_error_string
         end
       end
+      # rubocop:enable TrailingWhitespace
       it 'displays the diff between what was called and what was not expected' do
         begin
           expect(first_command).to_not be_called_with_arguments('first_argument', 'second_argument')
