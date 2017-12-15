@@ -1,6 +1,7 @@
 require 'tmpdir'
 require 'English'
 require 'open3'
+require 'tempfile'
 
 module Rspec
   module Bash
@@ -41,7 +42,8 @@ module Rspec
       end
 
       def execute_inline(command_string, env_vars = {})
-        temp_command_path = create_file('inline-')
+        temp_command_file = Tempfile.new('inline-')
+        temp_command_path = temp_command_file.path
         write_file(temp_command_path, command_string)
         stdout, stderr, status = execute(temp_command_path, env_vars)
         delete_file(temp_command_path)
@@ -90,10 +92,6 @@ module Rspec
 
       def wrap_script(script)
         @stub_wrapper.wrap_script(script)
-      end
-
-      def create_file(prefix)
-        Dir::Tmpname.make_tmpname(File.join(Dir.tmpdir, prefix), nil)
       end
 
       def delete_file(file_path)

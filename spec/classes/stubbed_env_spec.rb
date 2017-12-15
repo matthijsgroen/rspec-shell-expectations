@@ -133,9 +133,12 @@ describe 'StubbedEnv' do
   end
   context '#execute_inline' do
     before do
-      allow(Dir::Tmpname).to receive(:make_tmpname)
-        .with(File.join(Dir.tmpdir, 'inline-'), anything)
+      tempfile = double(Tempfile)
+      allow(tempfile).to receive(:path)
         .and_return('file_to_execute')
+      allow(Tempfile).to receive(:new)
+        .with('inline-')
+        .and_return(tempfile)
       allow(stub_wrapper).to receive(:wrap_script)
       allow(Open3).to receive(:capture3)
     end
