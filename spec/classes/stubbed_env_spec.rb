@@ -1,343 +1,161 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'StubbedEnv' do
-  include Rspec::Bash
-  let(:subject) { Rspec::Bash::StubbedEnv.new }
+  subject { StubbedEnv.new(StubbedEnv::RUBY_STUB) }
+  let(:server_thread) { double(Thread) }
+  let(:server_port) { 4000 }
+  let!(:tcp_server) do
+    tcp_server = double(TCPServer)
+    allow(tcp_server).to receive(:addr)
+      .and_return(['ADDR', server_port])
+    allow(TCPServer).to receive(:new)
+      .with('localhost', 0)
+      .and_return(tcp_server)
+    tcp_server
+  end
+  let!(:log_manager) do
+    log_manager = double(CallLogManager)
+    allow(CallLogManager).to receive(:new)
+      .and_return(log_manager)
+    log_manager
+  end
+  let!(:conf_manager) do
+    conf_manager = double(CallConfigurationManager)
+    allow(CallConfigurationManager).to receive(:new)
+      .and_return(conf_manager)
+    conf_manager
+  end
+  let!(:stub_marshaller) do
+    stub_marshaller = double(RubyStubMarshaller)
+    allow(RubyStubMarshaller).to receive(:new)
+      .and_return(stub_marshaller)
+    stub_marshaller
+  end
+  let!(:stub_server) do
+    stub_server = double(StubServer)
+    allow(stub_server).to receive(:start)
+      .and_return(server_thread)
+    allow(StubServer).to receive(:new)
+      .with(log_manager, conf_manager, stub_marshaller)
+      .and_return(stub_server)
+    stub_server
+  end
+  let!(:stub_wrapper) do
+    stub_wrapper = double(BashWrapper)
+    allow(BashWrapper).to receive(:new)
+      .and_return(stub_wrapper)
+    allow(stub_wrapper).to receive(:add_override)
+    stub_wrapper
+  end
 
+  context '#initialize' do
+    it 'creates and starts a StubServer' do
+      allow(server_thread).to receive(:kill)
+
+      expect(StubServer).to receive(:new)
+        .with(log_manager, conf_manager, stub_marshaller)
+        .and_return(stub_server)
+
+      expect(stub_server).to receive(:start)
+        .with(tcp_server)
+
+      StubbedEnv.new(StubbedEnv::RUBY_STUB)
+    end
+  end
+  context '#stub_command' do
+    let!(:stub_command) do
+      stub_command = double(StubbedCommand)
+      allow(StubbedCommand).to receive(:new)
+        .and_return(stub_command)
+      stub_command
+    end
+    before do
+      stub_function = double(StubFunction)
+
+      allow(stub_function).to receive(:script)
+        .with('first_command')
+        .and_return('first_command override')
+      allow(stub_function).to receive(:script)
+        .with('second_command')
+        .and_return('second_command override')
+
+      allow(StubFunction).to receive(:new)
+        .and_return(stub_function)
+    end
+
+    it 'adds the call conf and log managers to the command' do
+      expect(StubbedCommand).to receive(:new)
+        .with('first_command', log_manager, conf_manager)
+
+      command = subject.stub_command('first_command')
+      expect(command).to equal(stub_command)
+    end
+    it 'adds the function override for the command to the wrapper' do
+      expect(stub_wrapper).to receive(:add_override)
+        .with('first_command override')
+      expect(stub_wrapper).to receive(:add_override)
+        .with('second_command override')
+
+      subject.stub_command('first_command')
+      subject.stub_command('second_command')
+    end
+    disallowed_commands = %w(/usr/bin/env bash readonly function)
+    disallowed_commands.each do |command|
+      it "does not allow #{command}" do
+        expect { subject.stub_command(command) }.to raise_error(
+          "Not able to stub command #{command}. Reserved for use by test wrapper."
+        )
+      end
+    end
+  end
+  context '#execute' do
+    it 'wraps the file to execute and sends it to Open3' do
+      allow(stub_wrapper).to receive(:wrap_script)
+        .with('source file_to_execute')
+        .and_return('wrapped script')
+      expect(Open3).to receive(:capture3)
+        .with({ 'DOG' => 'cat' }, 'wrapped script')
+
+      subject.execute('file_to_execute', 'DOG' => 'cat')
+    end
+  end
+  context('#execute_function') do
+    it 'wraps the file to execute and sends it to Open3' do
+      allow(stub_wrapper).to receive(:wrap_script)
+        .with("source file_to_execute\nfunction_to_execute")
+        .and_return('wrapped script')
+      expect(Open3).to receive(:capture3)
+        .with({ 'DOG' => 'cat' }, 'wrapped script')
+
+      subject.execute_function('file_to_execute', 'function_to_execute', 'DOG' => 'cat')
+    end
+  end
   context '#execute_inline' do
-    context 'with a stubbed function' do
-      before(:each) do
-        @overridden_function = subject.stub_command('overridden_function')
-        @overridden_command = subject.stub_command('overridden_command')
-        @overridden_function.outputs('i was overridden')
-      end
-
-      context 'and no arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_inline(
-            <<-multiline_script
-              #!/usr/bin/env bash
-              function overridden_function {
-                echo 'i was not overridden'
-              }
-              overridden_function
-
-              echo 'standard error output' 1>&2
-            multiline_script
-          )
-        end
-
-        it 'calls the stubbed function' do
-          expect(@overridden_function).to be_called
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-
-        it 'prints provided stderr output to standard error' do
-          expect(@stderr).to eql("standard error output\n")
-        end
-      end
-
-      context 'and simple arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_inline(
-            <<-multiline_script
-            #!/usr/bin/env bash
-              function overridden_function {
-                echo 'i was not overridden'
-              }
-              overridden_function argument_one argument_two
-
-              echo 'standard error output' 1>&2
-            multiline_script
-          )
-        end
-
-        it 'calls the stubbed function' do
-          expect(@overridden_function).to be_called_with_arguments('argument_one', 'argument_two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
-
-      context 'and complex arguments (spaces, etc.)' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_inline(
-            <<-multiline_script
-            #!/usr/bin/env bash
-              function overridden_function {
-                echo 'i was not overridden'
-              }
-              overridden_function "argument one" "argument two"
-
-              echo 'standard error output' 1>&2
-            multiline_script
-          )
-        end
-
-        it 'calls the stubbed function' do
-          expect(@overridden_function).to be_called_with_arguments('argument one', 'argument two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
+    before do
+      tempfile = double(Tempfile)
+      allow(tempfile).to receive(:path)
+        .and_return('file_to_execute')
+      allow(Tempfile).to receive(:new)
+        .with('inline-')
+        .and_return(tempfile)
+      allow(stub_wrapper).to receive(:wrap_script)
+      allow(Open3).to receive(:capture3)
     end
-    context 'with a stubbed command' do
-      before(:each) do
-        @overridden_command = subject.stub_command('overridden_command')
-        @overridden_function = subject.stub_command('overridden_function')
-        @overridden_command.outputs('i was overridden')
-      end
-
-      context 'and no arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_inline(
-            <<-multiline_script
-              #!/usr/bin/env bash
-              overridden_command
-            multiline_script
-          )
-        end
-
-        it 'calls the stubbed command' do
-          expect(@overridden_command).to be_called
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
-
-      context 'and simple arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_inline(
-            <<-multiline_script
-              #!/usr/bin/env bash
-              overridden_command argument_one argument_two
-            multiline_script
-          )
-        end
-
-        it 'calls the stubbed command' do
-          expect(@overridden_command).to be_called_with_arguments('argument_one', 'argument_two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
-
-      context 'and complex arguments (spaces, etc.)' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_inline(
-            <<-multiline_script
-              #!/usr/bin/env bash
-              overridden_command "argument one" "argument two"
-            multiline_script
-          )
-        end
-
-        it 'calls the stubbed command' do
-          expect(@overridden_command).to be_called_with_arguments('argument one', 'argument two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
+    it 'puts the inline script into a file' do
+      expect(File).to receive(:write)
+        .with('file_to_execute', 'inline script to execute')
+      expect(File).to receive(:delete)
+        .with('file_to_execute')
+      subject.execute_inline('inline script to execute', 'DOG' => 'cat')
     end
-  end
-
-  context '#execute_function' do
-    context 'with a stubbed function' do
-      before(:each) do
-        @overridden_function = subject.stub_command('overridden_function')
-        @overridden_command = subject.stub_command('overridden_command')
-        @overridden_function.outputs('i was overridden')
-        @overridden_function.outputs('standard error output', to: :stderr)
-      end
-
-      context 'and no arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_function(
-            './spec/scripts/function_library.sh',
-            'overridden_function'
-          )
-        end
-
-        it 'calls the stubbed function' do
-          expect(@overridden_function).to be_called
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-
-        it 'prints provided stderr output to standard error' do
-          expect(@stderr).to eql("standard error output\n")
-        end
-      end
-
-      context 'and a path' do
-        context 'relative path' do
-          before(:each) do
-            @overridden_path_function =
-              subject.stub_command('relative/path/to/overridden_path_functions')
-            @overridden_path_function.outputs('i was overridden in a path')
-
-            @stdout, @stderr, @status = subject.execute_function(
-              './spec/scripts/function_library.sh',
-              'relative/path/to/overridden_path_functions'
-            )
-          end
-
-          it 'calls the relative path stubbed function' do
-            expect(@overridden_path_function).to be_called
-          end
-
-          it 'prints the relative path overridden output' do
-            expect(@stdout).to eql('i was overridden in a path')
-          end
-        end
-        context 'absolute path' do
-          before(:each) do
-            @overridden_path_function =
-              subject.stub_command('/absolute/path/to/overridden_path_functions')
-            @overridden_path_function.outputs('i was overridden in a path')
-
-            @stdout, @stderr, @status = subject.execute_function(
-              './spec/scripts/function_library.sh',
-              '/absolute/path/to/overridden_path_functions'
-            )
-          end
-
-          it 'calls the stubbed function' do
-            expect(@overridden_path_function).to be_called
-          end
-
-          it 'prints the overridden output' do
-            expect(@stdout).to eql('i was overridden in a path')
-          end
-        end
-      end
-
-      context 'and simple arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_function(
-            './spec/scripts/function_library.sh',
-            'overridden_function argument_one argument_two'
-          )
-        end
-
-        it 'calls the stubbed function' do
-          expect(@overridden_function).to be_called_with_arguments('argument_one', 'argument_two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
-
-      context 'and complex arguments (spaces, etc.)' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_function(
-            './spec/scripts/function_library.sh',
-            'overridden_function "argument one" "argument two"'
-          )
-        end
-
-        it 'calls the stubbed function' do
-          expect(@overridden_function).to be_called_with_arguments('argument one', 'argument two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
-    end
-    context 'with a stubbed command' do
-      before(:each) do
-        @overridden_function = subject.stub_command('overridden_function')
-        @overridden_command = subject.stub_command('overridden_command')
-        @overridden_command.outputs('i was overridden')
-      end
-
-      context 'and no arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_function(
-            './spec/scripts/function_library.sh',
-            'overridden_command_function'
-          )
-        end
-
-        it 'calls the stubbed command' do
-          expect(@overridden_command).to be_called
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-
-        it 'prints provided stderr output to standard error' do
-          expect(@stderr).to eql("standard error output\n")
-        end
-      end
-
-      context 'and simple arguments' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_function(
-            './spec/scripts/function_library.sh',
-            'overridden_command_function argument_one argument_two'
-          )
-        end
-
-        it 'calls the stubbed command' do
-          expect(@overridden_command).to be_called_with_arguments('argument_one', 'argument_two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
-
-      context 'and complex arguments (spaces, etc.)' do
-        before(:each) do
-          @stdout, @stderr, @status = subject.execute_function(
-            './spec/scripts/function_library.sh',
-            'overridden_command_function "argument one" "argument two"'
-          )
-        end
-
-        it 'calls the stubbed command' do
-          expect(@overridden_command).to be_called_with_arguments('argument one', 'argument two')
-        end
-
-        it 'prints the overridden output' do
-          expect(@stdout).to eql('i was overridden')
-        end
-      end
-    end
-  end
-
-  describe 'creating a stubbed env' do
-    it 'creates a folder to place the stubbed commands in' do
-      env = create_stubbed_env
-      expect(Pathname.new(env.dir)).to exist
-      expect(Pathname.new(env.dir)).to be_directory
-    end
-  end
-
-  describe '#cleanup' do
-    it 'removes the folder with stubbed commands' do
-      env = create_stubbed_env
-      env.cleanup
-      expect(Pathname.new(env.dir)).not_to exist
+    it 'wraps the file to execute and sends it to Open3' do
+      allow(stub_wrapper).to receive(:wrap_script)
+        .with('source file_to_execute')
+        .and_return('wrapped script')
+      expect(Open3).to receive(:capture3)
+        .with({ 'DOG' => 'cat' }, 'wrapped script')
+      subject.execute_inline('inline script to execute', 'DOG' => 'cat')
     end
   end
 end

@@ -13,19 +13,19 @@ module Rspec
           @expected_call_conf_list = call_conf_list
         end
 
-        def args_match?(*call_arguments)
-          !get_call_conf_matches(*call_arguments).empty?
+        def args_match?(call_arguments)
+          !get_call_conf_matches(call_arguments).empty?
         end
 
-        def get_best_call_conf(*call_arguments)
-          get_call_conf_matches(*call_arguments).sort_by do |call_conf|
+        def get_best_call_conf(call_arguments)
+          get_call_conf_matches(call_arguments).sort_by do |call_conf|
             [
               call_conf[:args].length
             ]
           end.last || {}
         end
 
-        def get_call_conf_matches(*call_arguments)
+        def get_call_conf_matches(call_arguments)
           @expected_call_conf_list.select do |expected_call_conf|
             @expected_args = remap_argument_matchers(expected_call_conf[:args])
             parent_args_match?(*call_arguments)

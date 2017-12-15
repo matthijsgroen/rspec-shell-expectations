@@ -68,15 +68,37 @@ see specs in *spec/integration* folder:
   end
 ```
 
+### Choosing a stub type
+The stubbed functions/commands for the test runner were traditionally built with ruby. A faster alternative stub, written in bash, has recently been introduced, and is the current default. This can be configured, however, as shown.
+For ruby:
+```ruby
+let(:stubbed_env) { create_stubbed_env(StubbedEnv::RUBY_STUB) }
+```
+For bash (default, if not provided):
+```ruby
+let(:stubbed_env) { create_stubbed_env(StubbedEnv::BASH_STUB) }
+```
+
+Via environment variable:
+```bash
+export RSPEC_BASH_STUB_TYPE=ruby_stub
+# <run your tests here>
+...
+```
+
 ### Stubbing commands:
 
 ```ruby
   let(:stubbed_env) { create_stubbed_env }
   let!(:bundle) { stubbed_env.stub_command('bundle') }
+  let!(:absolute_command) { stubbed_env.stub_command('/path/to/bundle') }
+  let!(:relative_command) { stubbed_env.stub_command('./path/to/bundle') }
 
   it 'is stubbed' do
     stubbed_env.execute 'my-script.sh'
     expect(bundle).to be_called_with_arguments('install')
+    expect(absolute_command).to be_called_with_arguments('hello')
+    expect(relative_command).to be_called_with_arguments('world')
   end
 ```
 
@@ -220,6 +242,7 @@ Please see https://www.gnu.org/software/bash/manual/bashref.html#Positional-Para
 
 - The `execute_function()` method is recommended to be used only when testing Bash libraries. This is because it needs to source the entire file to run the function under test, so any executable code in the script will be run even if it is outside of the function being tested
 
+- The current form of stub injection does not allow for stubs to be picked up by other commands. Ex. `xargs stubbed_command` will result in the `stubbed_command` not being found. There is a pending issue for this.
 ## More examples
 
 see the *spec/integration* folder

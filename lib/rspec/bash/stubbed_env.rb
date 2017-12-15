@@ -1,79 +1,118 @@
 require 'tmpdir'
 require 'English'
 require 'open3'
+require 'tempfile'
 
 module Rspec
-  # Define stubbed environment to set and assert expectations
   module Bash
-    def create_stubbed_env
-      StubbedEnv.new
+    def create_stubbed_env(stub_type =
+      ENV.fetch('RSPEC_BASH_STUB_TYPE', StubbedEnv::BASH_STUB).to_sym)
+
+      StubbedEnv.new(stub_type)
     end
 
-    # A shell environment that can manipulate behaviour
-    # of executables
     class StubbedEnv
-      attr_reader :dir
+      RUBY_STUB = :ruby_stub
+      BASH_STUB = :bash_stub
 
-      def initialize
-        @dir = Dir.mktmpdir
-        at_exit { cleanup }
+      def initialize(stub_type)
+        start_stub_server(stub_type)
       end
 
-      def cleanup
-        FileUtils.remove_entry_secure @dir if Pathname.new(@dir).exist?
+      def start_stub_server(stub_type)
+        tcp_server = create_tcp_server
+        stub_server = create_stub_server(stub_type)
+        stub_server.start(tcp_server)
       end
 
       def stub_command(command)
-        StubbedCommand.new(command, @dir)
+        check_if_command_is_allowed(command)
+        add_override_for_command(command)
+        create_stubbed_command(command)
       end
 
       def execute(command, env_vars = {})
-        full_command = get_wrapped_execution_with_function_overrides(
-          <<-multiline_script
-            source #{command}
-          multiline_script
-        )
-
-        Open3.capture3(env_vars, full_command)
+        script_runner = "source #{command}"
+        script_wrapper = wrap_script(script_runner)
+        execute_script(env_vars, script_wrapper)
       end
 
       def execute_function(script, command, env_vars = {})
-        full_command = get_wrapped_execution_with_function_overrides(
-          <<-multiline_script
-            source #{script}
-            #{command}
-          multiline_script
-        )
-
-        Open3.capture3(env_vars, full_command)
+        script_runner = "source #{script}\n#{command}"
+        script_wrapper = wrap_script(script_runner)
+        execute_script(env_vars, script_wrapper)
       end
 
       def execute_inline(command_string, env_vars = {})
-        temp_command_path = Dir::Tmpname.make_tmpname("#{@dir}/inline-", nil)
-        File.write(temp_command_path, command_string)
-        execute(temp_command_path, env_vars)
+        temp_command_file = Tempfile.new('inline-')
+        temp_command_path = temp_command_file.path
+        write_file(temp_command_path, command_string)
+        stdout, stderr, status = execute(temp_command_path, env_vars)
+        delete_file(temp_command_path)
+        [stdout, stderr, status]
       end
 
       private
 
-      def get_wrapped_execution_with_function_overrides(execution_snippet)
-        execution_binding_for_template = execution_snippet
-        function_override_path_binding_for_template = "#{@dir}/*_overrides.sh"
-        wrapped_error_path_binding_for_template = "#{@dir}/errors"
+      STUB_MARSHALLER_MAPPINGS = {
+        RUBY_STUB => RubyStubMarshaller,
+        BASH_STUB => BashStubMarshaller
+      }.freeze
+      STUB_SCRIPT_MAPPINGS = {
+        RUBY_STUB => RubyStubScript,
+        BASH_STUB => BashStubScript
+      }.freeze
+      DISALLOWED_COMMANDS = %w(/usr/bin/env bash readonly function).freeze
 
-        function_override_wrapper_template = ERB.new(
-          File.new(function_override_wrapper_template_path).read, nil, '%'
+      def create_tcp_server
+        tcp_server = TCPServer.new('localhost', 0)
+        @stub_server_port = tcp_server.addr[1]
+        tcp_server
+      end
+
+      def create_stub_server(stub_type)
+        stub_marshaller = STUB_MARSHALLER_MAPPINGS[stub_type].new
+        stub_script_class = STUB_SCRIPT_MAPPINGS[stub_type]
+        @stub_wrapper = BashWrapper.new(@stub_server_port)
+        @stub_function = StubFunction.new(@stub_server_port, stub_script_class)
+        @call_log_manager = CallLogManager.new
+        @call_conf_manager = CallConfigurationManager.new
+        StubServer.new(@call_log_manager, @call_conf_manager, stub_marshaller)
+      end
+
+      def create_stubbed_command(command)
+        StubbedCommand.new(
+          command,
+          @call_log_manager,
+          @call_conf_manager
         )
-
-        function_override_wrapper_template.result(binding)
       end
 
-      def function_override_wrapper_template_path
-        project_root.join('bin', 'function_override_wrapper.sh.erb')
+      def execute_script(env_vars, script)
+        Open3.capture3(env_vars, script)
       end
 
-      def project_root
-        Pathname.new(File.dirname(File.expand_path(__FILE__))).join('..', '..', '..')
+      def wrap_script(script)
+        @stub_wrapper.wrap_script(script)
+      end
+
+      def delete_file(file_path)
+        File.delete(file_path)
+      end
+
+      def write_file(file_path, contents)
+        File.write(file_path, contents)
+      end
+
+      def check_if_command_is_allowed(command)
+        error_message = "Not able to stub command #{command}. Reserved for use by test wrapper."
+
+        raise(error_message) if DISALLOWED_COMMANDS.include? command
+      end
+
+      def add_override_for_command(command)
+        function_override = @stub_function.script(command).chomp
+        @stub_wrapper.add_override(function_override)
       end
     end
   end

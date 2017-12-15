@@ -1,13 +1,12 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'StubbedEnv' do
-  include Rspec::Bash
+  subject { create_stubbed_env }
 
   context '#execute(..., ENV => VARIABLES)' do
-    let(:stubbed_env) { create_stubbed_env }
-
     it 'exits with an error' do
-      stdout, = stubbed_env.execute_inline(
+      stdout, = subject.execute_inline(
         'echo $SOME_ENV_VAR',
         'SOME_ENV_VAR' => 'SekretCredential'
       )

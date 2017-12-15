@@ -1,0 +1,5 @@
+require 'rspec/bash/command/call_configuration'
+require 'rspec/bash/command/call_configuration_manager'
+require 'rspec/bash/command/call_log'
+require 'rspec/bash/command/call_log_manager'
+require 'rspec/bash/command/stubbed_command'

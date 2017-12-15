@@ -1,8 +1,8 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'CallLog' do
   context '#called_with_no_args?' do
-    include Rspec::Bash
     let(:stubbed_env) { create_stubbed_env }
     let!(:ls) { stubbed_env.stub_command('ls') }
 

@@ -122,21 +122,21 @@ describe 'CallConfArgumentListMatcher' do
       it 'returns the longest conf match' do
         argument_list_from_call = %w(first_argument second_argument third_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        call_conf_match = subject.get_best_call_conf(argument_list_from_call)
         expect(call_conf_match).to eql call_conf_list.at(2)
       end
 
       it 'returns the last longest conf match for multiple exact matches' do
         argument_list_from_call = %w(first_argument second_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        call_conf_match = subject.get_best_call_conf(argument_list_from_call)
         expect(call_conf_match).to eql call_conf_list.at(5)
       end
 
       it 'returns the longest conf match for any_arg v. anything matches' do
         argument_list_from_call = %w(first_argument second_argument third_argument fourth_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        call_conf_match = subject.get_best_call_conf(argument_list_from_call)
         expect(call_conf_match).to eql call_conf_list.at(6)
       end
 
@@ -146,14 +146,14 @@ describe 'CallConfArgumentListMatcher' do
           fourth_argument fifth_argument
         )
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        call_conf_match = subject.get_best_call_conf(argument_list_from_call)
         expect(call_conf_match).to eql call_conf_list.at(8)
       end
 
       it 'returns the last anything match for multiple, all anything matches' do
         argument_list_from_call = %w(first_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        call_conf_match = subject.get_best_call_conf(argument_list_from_call)
         expect(call_conf_match).to eql call_conf_list.at(10)
       end
     end
@@ -227,7 +227,7 @@ describe 'CallConfArgumentListMatcher' do
         argument_list_from_call =
           %w(first_argument second_argument third_argument fourth_argument fifth_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match = subject.get_best_call_conf(*argument_list_from_call)
+        call_conf_match = subject.get_best_call_conf(argument_list_from_call)
         expect(call_conf_match).to be_empty
       end
     end
@@ -338,21 +338,21 @@ describe 'CallConfArgumentListMatcher' do
       it 'returns the correct confs for a single exact/anything argument match' do
         argument_list_from_call = %w(first_argument second_argument third_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match_list = subject.get_call_conf_matches(*argument_list_from_call)
+        call_conf_match_list = subject.get_call_conf_matches(argument_list_from_call)
         expect(call_conf_match_list).to eql call_conf_list.values_at(1, 3, 6)
       end
 
       it 'returns the correct confs for multiple exact/anything argument matches' do
         argument_list_from_call = %w(first_argument second_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match_list = subject.get_call_conf_matches(*argument_list_from_call)
+        call_conf_match_list = subject.get_call_conf_matches(argument_list_from_call)
         expect(call_conf_match_list).to eql call_conf_list.values_at(0, 2, 4, 6)
       end
 
       it 'returns the correct confs for the all argument match' do
         argument_list_from_call = %w(first_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        call_conf_match_list = subject.get_call_conf_matches(*argument_list_from_call)
+        call_conf_match_list = subject.get_call_conf_matches(argument_list_from_call)
         expect(call_conf_match_list).to eql call_conf_list.values_at(6)
       end
 
@@ -362,7 +362,7 @@ describe 'CallConfArgumentListMatcher' do
           third_argument fourth_argument fifth_argument
         )
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.get_call_conf_matches(*argument_list_from_call)
+        actual_args_match = subject.get_call_conf_matches(argument_list_from_call)
         expect(actual_args_match).to eql call_conf_list.values_at(6, 7, 8)
       end
     end
@@ -447,21 +447,21 @@ describe 'CallConfArgumentListMatcher' do
       it 'returns the correct confs for a single exact/anything argument match' do
         argument_list_from_call = %w(first_argument second_argument third_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.args_match?(*argument_list_from_call)
+        actual_args_match = subject.args_match?(argument_list_from_call)
         expect(actual_args_match).to be true
       end
 
       it 'returns the correct confs for multiple exact/anything argument matches' do
         argument_list_from_call = %w(first_argument second_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.args_match?(*argument_list_from_call)
+        actual_args_match = subject.args_match?(argument_list_from_call)
         expect(actual_args_match).to be true
       end
 
       it 'returns the correct confs for the all argument match' do
         argument_list_from_call = %w(first_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.args_match?(*argument_list_from_call)
+        actual_args_match = subject.args_match?(argument_list_from_call)
         expect(actual_args_match).to be true
       end
     end
@@ -547,21 +547,21 @@ describe 'CallConfArgumentListMatcher' do
       it 'returns the correct confs for a single exact/anything argument match' do
         argument_list_from_call = %w(first_argument second_argument third_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.args_match?(*argument_list_from_call)
+        actual_args_match = subject.args_match?(argument_list_from_call)
         expect(actual_args_match).to be true
       end
 
       it 'returns the correct confs for multiple exact/anything argument matches' do
         argument_list_from_call = %w(first_argument second_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.args_match?(*argument_list_from_call)
+        actual_args_match = subject.args_match?(argument_list_from_call)
         expect(actual_args_match).to be true
       end
 
       it 'returns the correct confs for the all argument match' do
         argument_list_from_call = %w(first_argument)
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.args_match?(*argument_list_from_call)
+        actual_args_match = subject.args_match?(argument_list_from_call)
         expect(actual_args_match).to be false
       end
 
@@ -571,7 +571,7 @@ describe 'CallConfArgumentListMatcher' do
           third_argument fourth_argument fifth_argument
         )
         subject = CallConfArgumentListMatcher.new(call_conf_list)
-        actual_args_match = subject.args_match?(*argument_list_from_call)
+        actual_args_match = subject.args_match?(argument_list_from_call)
         expect(actual_args_match).to be true
       end
     end

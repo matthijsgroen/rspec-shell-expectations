@@ -1,6 +1,7 @@
-require 'rspec/bash/stubbed_command'
-require 'rspec/bash/util'
-require 'rspec/bash/call_configuration'
-require 'rspec/bash/call_log'
-require 'rspec/bash/stubbed_env'
+require 'rspec/bash/command'
 require 'rspec/bash/matchers'
+require 'rspec/bash/server'
+require 'rspec/bash/util'
+require 'rspec/bash/wrapper'
+
+require 'rspec/bash/stubbed_env'

@@ -1,7 +1,7 @@
 require 'spec_helper'
+include Rspec::Bash
 
 describe 'CallLog' do
-  include Rspec::Bash
   let(:stubbed_env) { create_stubbed_env }
   let!(:first_command) { stubbed_env.stub_command('first_command') }
 
@@ -11,7 +11,8 @@ describe 'CallLog' do
         stubbed_env.execute_inline(
           <<-multiline_script
               echo -n 'first_call' | first_command first_argument second_argument
-              echo -n 'second_call' | first_command first_argument second_argument third_argument
+              echo -e '\nsecond_call' | first_command first_argument second_argument third_argument
+              first_command first_argument second_argument third_argument fourth_argument
         multiline_script
         )
       end
@@ -31,7 +32,12 @@ describe 'CallLog' do
 
       it 'matches for anything matches' do
         expect(first_command
-          .with_args(anything, anything, 'third_argument').stdin).to eql 'second_call'
+          .with_args(anything, anything, 'third_argument').stdin).to eql "\nsecond_call\n"
+      end
+
+      it 'is blank for cases where no stdin was passed' do
+        expect(first_command
+          .with_args(anything, anything, 'third_argument', 'fourth_argument').stdin).to be_empty
       end
 
       it 'matches for any_args matches' do
@@ -46,7 +52,7 @@ describe 'CallLog' do
 
       it 'matches for regex matches' do
         expect(first_command
-          .with_args(/f..st_argument/, /se..nd_argument/, /.*/).stdin).to eql 'second_call'
+          .with_args(/f..st_argument/, /se..nd_argument/, /.*/).stdin).to eql "\nsecond_call\n"
       end
     end
   end
