@@ -2,11 +2,6 @@ require 'tmpdir'
 require 'English'
 require 'open3'
 
-# TODO: get ruby stub tests trued up to what is in bash stub tests
-# TODO: enforce the nil call log args that just kind of works for bash stub
-# TODO: look into converting wrapper to not use ERB
-# TODO: get better testing around target interpolation stuff
-
 module Rspec
   module Bash
     def create_stubbed_env(stub_type = StubbedEnv::BASH_STUB)
