@@ -5,7 +5,9 @@ require 'tempfile'
 
 module Rspec
   module Bash
-    def create_stubbed_env(stub_type = StubbedEnv::BASH_STUB)
+    def create_stubbed_env(stub_type =
+      ENV.fetch('RSPEC_BASH_STUB_TYPE', StubbedEnv::BASH_STUB).to_sym)
+
       StubbedEnv.new(stub_type)
     end
 
