@@ -1,5 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/mdurban/rspec-bash.png?label=ready&title=Ready)](http://waffle.io/mdurban/rspec-bash)
 [![Build Status](https://travis-ci.org/mdurban/rspec-bash.svg?branch=master)](https://travis-ci.org/mdurban/rspec-bash)
+[![Dependency Status](https://gemnasium.com/badges/github.com/mdurban/rspec-bash.svg)](https://gemnasium.com/github.com/mdurban/rspec-bash)
 
 # Rspec::Bash
 
