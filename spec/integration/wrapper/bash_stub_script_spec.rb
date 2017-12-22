@@ -159,25 +159,29 @@ describe 'BashStub' do
     end
   end
 
-  context '.extract-properties' do
+  context '.extract-*-properties' do
     context 'given a standard call conf message' do
       let(:call_conf) do
         JSON.pretty_generate(
           Sparsify.sparse(
             {
-              exitcode: 10,
+              exitcode: 10_000,
               outputs: [
                 {
                   target: 'stdout',
-                  content: "stdout\nstdout stdout"
+                  content: "stdout\nstdout,stdout"
+                },
+                {
+                  target: 'stdout',
+                  content: 1
                 },
                 {
                   target: 'stderr',
-                  content: "stderr stderr\nstderr"
+                  content: "stderr\" stderr\nstderr"
                 },
                 {
                   target: 'tofile',
-                  content: "tofile\ntofile tofile"
+                  content: "tofile\ntofile:\", tofile"
                 }
               ]
             }, sparse_array: true
@@ -188,18 +192,18 @@ describe 'BashStub' do
       it 'extracts a single value field' do
         stdout, = stubbed_env.execute_function(
           BashStubScript.path,
-          "extract-properties '#{call_conf}' 'exitcode'"
+          "extract-number-properties '#{call_conf}' 'exitcode'"
         )
-        expect(stdout.chomp).to eql '10'
+        expect(stdout.chomp).to eql '10000'
       end
 
       it 'extracts a multiple value field' do
         stdout, _stderr = stubbed_env.execute_function(
           BashStubScript.path,
-          "extract-properties '#{call_conf}' 'outputs\\..*\\.content'"
+          "extract-string-properties '#{call_conf}' 'outputs\\..*\\.content'"
         )
-        expect(stdout.chomp).to eql "stdout\\nstdout stdout\nstderr stderr\\nstderr" \
-        "\ntofile\\ntofile tofile"
+        expect(stdout.chomp).to eql "stdout\\nstdout,stdout\nstderr\\\" stderr\\nstderr" \
+        "\ntofile\\ntofile:\\\", tofile"
       end
     end
   end
@@ -318,19 +322,20 @@ describe 'BashStub' do
   context '.main' do
     context 'with stdin, command, port and arguments' do
       before(:all) do
-        stubbed_env = create_stubbed_env
-        @create_call_log = stubbed_env.stub_command('create-call-log').outputs('call log')
-        @send_to_server = stubbed_env.stub_command('send-to-server').outputs('call conf')
-        @extract_properties = stubbed_env.stub_command('extract-properties')
-        @print_output = stubbed_env.stub_command('print-output')
+        stubbed_env                = create_stubbed_env
+        @create_call_log           = stubbed_env.stub_command('create-call-log').outputs('call log')
+        @send_to_server            = stubbed_env.stub_command('send-to-server').outputs('call conf')
+        @extract_string_properties = stubbed_env.stub_command('extract-string-properties')
+        @extract_number_properties = stubbed_env.stub_command('extract-number-properties')
+        @print_output              = stubbed_env.stub_command('print-output')
 
-        @extract_properties
+        @extract_string_properties
           .with_args('call conf', 'outputs\..*\.target')
           .outputs("stdout\nstderr\ntofile\n")
-        @extract_properties
+        @extract_string_properties
           .with_args('call conf', 'outputs\..*\.content')
           .outputs("\\nstd out\\n\n\\nstd err\\n\n\\nto file\\n\n")
-        @extract_properties.with_args('call conf', 'exitcode').outputs("3\n")
+        @extract_number_properties.with_args('call conf', 'exitcode').outputs("3\n")
 
         _, _, @status = stubbed_env.execute_function(
           BashStubScript.path,
@@ -350,17 +355,17 @@ describe 'BashStub' do
         )
       end
       it 'extracts the target list from the call conf returned by the server' do
-        expect(@extract_properties).to be_called_with_arguments(
+        expect(@extract_string_properties).to be_called_with_arguments(
           'call conf', 'outputs\..*\.target'
         )
       end
       it 'extracts the content list from the call conf returned by the server' do
-        expect(@extract_properties).to be_called_with_arguments(
+        expect(@extract_string_properties).to be_called_with_arguments(
           'call conf', 'outputs\..*\.content'
         )
       end
       it 'extracts the exit code from the call conf returned by the server' do
-        expect(@extract_properties).to be_called_with_arguments(
+        expect(@extract_number_properties).to be_called_with_arguments(
           'call conf', 'exitcode'
         )
       end
