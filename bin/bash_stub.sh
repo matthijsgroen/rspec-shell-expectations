@@ -55,8 +55,12 @@ function send-to-server {
   echo -n "${2}" | nc localhost ${1}
 }
 
-function extract-properties {
-  echo -n "${1}" | sed -En "s/^\"${2}\":\"?([^,\"]*)\"?,?$/\1/gp"
+function extract-number-properties {
+  echo -n "${1}" | sed -En "s/^\"${2}\":([0-9]+),?$/\1/gp"
+}
+
+function extract-string-properties {
+  echo -n "${1}" | sed -En "s/^\"${2}\":\"(.*)\",?$/\1/gp"
 }
 
 function print-output {
@@ -76,9 +80,9 @@ function main {
   client_message=$(create-call-log "${@}")
   server_message=$(send-to-server "${2}" "${client_message}")
   IFS=$'\n'
-  target_list=( $(extract-properties "${server_message}" "outputs\..*\.target") )
-  content_list=( $(extract-properties "${server_message}" "outputs\..*\.content") )
-  exit_code=$(extract-properties "${server_message}" "exitcode")
+  target_list=( $(extract-string-properties "${server_message}" "outputs\..*\.target") )
+  content_list=( $(extract-string-properties "${server_message}" "outputs\..*\.content") )
+  exit_code=$(extract-number-properties "${server_message}" "exitcode")
 
   for index in "${!target_list[@]}"; do
     target=${target_list[${index}]}
