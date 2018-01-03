@@ -179,7 +179,7 @@ describe 'StubbedCommand' do
     end
 
     describe 'target file path' do
-      let(:temp_file) { Tempfile.new('for-testing') }
+      let(:temp_file) { Tempfile.new('for testing') }
 
       context 'when given no arguments to match' do
         before do

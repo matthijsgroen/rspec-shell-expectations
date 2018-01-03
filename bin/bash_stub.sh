@@ -72,7 +72,7 @@ function print-output {
       echo -en "${2}" >&2
       ;;
     *)
-      echo -en "${2}" > ${1}
+      echo -en "${2}" > "${1}"
       ;;
   esac
 }
