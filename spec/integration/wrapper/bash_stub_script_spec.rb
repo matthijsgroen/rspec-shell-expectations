@@ -2,7 +2,7 @@ require 'spec_helper'
 include Rspec::Bash
 
 def execute_script(script)
-  let(:temp_file) { Tempfile.new('for-testing') }
+  let(:temp_file) { Tempfile.new('for testing') }
 
   capture_standard_streams script
 
