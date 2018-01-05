@@ -4,21 +4,25 @@ include Rspec::Bash
 def execute_script(script)
   let(:temp_file) { Tempfile.new('for testing') }
 
-  capture_standard_streams script
+  capture_execute_results script
 
   after do
     FileUtils.remove_entry_secure temp_file if script.include? '<temp file>'
   end
 end
 
-def capture_standard_streams(script)
+def capture_execute_results(script)
   let!(:execute_results) do
     script.gsub!(/<temp file>/, temp_file.path) if script.include? '<temp file>'
     stubbed_env.execute_function(BashStubScript.path, script)
   end
+  capture_standard_streams
+end
 
+def capture_standard_streams
   let(:stdout) { execute_results[0] }
   let(:stderr) { execute_results[1] }
+  let(:exit_code) { execute_results[2].exitstatus }
 end
 
 describe 'BashStub' do
@@ -238,6 +242,21 @@ describe 'BashStub' do
 
       it 'prints the output to the file' do
         expect(temp_file.read).to eql "\ntofile \\ntofile\ntofile\n"
+      end
+
+      it 'does not print the output to stderr' do
+        expect(stderr.chomp).to eql ''
+      end
+
+      it 'does not print the output to stdout' do
+        expect(stdout.chomp).to eql ''
+      end
+    end
+    context 'given a file target that is an empty string' do
+      execute_script("print-output '' '\\ntofile \\\\ntofile\ntofile\\n'")
+
+      it 'does not exit with a non-zero exit code' do
+        expect(exit_code).to eql 0
       end
 
       it 'does not print the output to stderr' do

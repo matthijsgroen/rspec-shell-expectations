@@ -71,6 +71,8 @@ function print-output {
     stderr)
       echo -en "${2}" >&2
       ;;
+    '')
+      ;;
     *)
       echo -en "${2}" > "${1}"
       ;;
