@@ -278,5 +278,19 @@ describe 'StubbedCommand' do
         end
       end
     end
+
+    describe 'any target' do
+      context 'when given a non-string output' do
+        before do
+          command.outputs(['an array'], to: :stdout)
+        end
+
+        execute_script('stubbed_command first_argument second_argument')
+
+        it 'outputs the expected output to stdout' do
+          expect(stdout).to eql '["an array"]'
+        end
+      end
+    end
   end
 end

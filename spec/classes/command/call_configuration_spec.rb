@@ -81,6 +81,26 @@ describe 'CallConfiguration' do
   end
   context '#add_output' do
     context 'with any setup' do
+      context 'regardless of existing or non-existing configuration' do
+        let(:expected_conf) do
+          [
+            {
+              args: %w(first_argument second_argument),
+              exitcode: 0,
+              outputs: [
+                {
+                  target: :stderr,
+                  content: '2'
+                }
+              ]
+            }
+          ]
+        end
+        it 'updates the internal configuration but converts output to a string' do
+          subject.add_output(2, :stderr, %w(first_argument second_argument))
+          expect(subject.call_configuration).to eql expected_conf
+        end
+      end
       context 'with no existing configuration' do
         let(:expected_conf) do
           [
