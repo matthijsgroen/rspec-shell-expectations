@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in rspec-shell-expectations.gemspec
-gemspec
-gem 'rubocop'
+gem 'rainbow', '>= 2.1.0', '< 2.2.0'
 gem 'rake'
-gem 'cucumber'
-gem 'rspec'
+gem 'rspec', '3.5.0'
+gem 'rubocop', '0.47.1'
+gem 'simplecov', require: false, group: :test
+gem 'sparsify', '~> 1.1'

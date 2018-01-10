@@ -1,0 +1,38 @@
+Metrics/LineLength:
+  Max: 100
+
+Style/NumericLiteralPrefix:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Security/MarshalLoad:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'spec/classes/stub_spec.rb'
+    - 'spec/classes/wrapper/ruby_stub_script_spec.rb'
+
+Metrics/BlockLength:
+  Max: 428
+
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/rspec/bash/stubbed_command.rb'
+
+Security/YAMLLoad:
+  Exclude:
+    - 'bin/stub.rb.erb'
+    - 'spec/classes/stub_spec.rb'
+    - 'lib/rspec/bash/call_configuration.rb'
+    - 'lib/rspec/bash/call_log.rb'
+    - 'spec/classes/util/call_conf_argument_list_matcher_spec.rb'
+
+Metrics/BlockLength:
+  Max: 1000
+
+Style/TrivialAccessors:
+  Exclude:
+    - 'lib/rspec/bash/call_log.rb'
