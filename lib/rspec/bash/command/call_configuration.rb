@@ -18,7 +18,7 @@ module Rspec
         current_conf = create_or_get_conf(args)
         current_conf[:outputs] << {
           target: target,
-          content: content
+          content: content.to_s
         }
       end
 
